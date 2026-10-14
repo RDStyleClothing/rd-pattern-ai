@@ -8,11 +8,11 @@
 /* Layout: print-room bench — big live repeat on the left, a spec rail of controls on the right, variations along the bottom */
 :root{
   --bg:#ecebe7; --panel:#f7f6f3; --ink:#1d1b18; --muted:#6b665e; --line:#d6d2ca;
-  --accent:#8a5a1c; --accent-ink:#fff; --well:#dedad2;
+  --accent:#8a5a1c; --accent-ink:#fff; --well:#dedad2; --good:#1f9d55; --bad:#d23b2f;
   --f-display:"Archivo",system-ui,sans-serif; --f-body:"Archivo",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,monospace;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--panel:#1f1d1a;--ink:#ece8e1;--muted:#a19a8f;--line:#35322d;--accent:#d29a4e;--accent-ink:#1a1307;--well:#2a2723;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#161513;--panel:#1f1d1a;--ink:#ece8e1;--muted:#a19a8f;--line:#35322d;--accent:#d29a4e;--accent-ink:#1a1307;--well:#2a2723;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--panel:#1f1d1a;--ink:#ece8e1;--muted:#a19a8f;--line:#35322d;--accent:#d29a4e;--accent-ink:#1a1307;--well:#2a2723;--good:#3fcf7a;--bad:#ff5a4d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--panel:#1f1d1a;--ink:#ece8e1;--muted:#a19a8f;--line:#35322d;--accent:#d29a4e;--accent-ink:#1a1307;--well:#2a2723;--good:#3fcf7a;--bad:#ff5a4d;color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45;
   padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 32px}
@@ -27,10 +27,18 @@ h1{font-family:var(--f-display);font-stretch:118%;font-weight:800;font-size:clam
 .refbox .rtxt{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:6px;min-width:0}
 .refbox .rtxt b{color:var(--ink);font-weight:600;font-size:13px;overflow-wrap:anywhere}
 .btn.sm{padding:6px 10px;font-size:12px}
-.keybox{border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:var(--bg)}
-.keybox summary{cursor:pointer;font-size:13px;font-weight:600}
-.keybox summary span{font-weight:400;color:var(--muted)}
-.keyin{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.conn{position:relative}
+.chip{display:flex;align-items:center;gap:8px;padding:7px 12px 7px 10px;border:1px solid var(--line);border-radius:99px;background:var(--panel);color:var(--ink);cursor:pointer;font:13px var(--f-body)}
+.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chip .plug{width:16px;height:16px;color:var(--muted)}
+.chip .clabel{display:flex;flex-direction:column;align-items:flex-start;line-height:1.15;text-align:left}
+.chip .clabel b{font-size:12px;font-weight:700}
+.chip .clabel span{font-size:11.5px;color:var(--muted)}
+.dot{width:11px;height:11px;border-radius:50%;flex:none;background:var(--bad);box-shadow:0 0 0 3px color-mix(in srgb,var(--bad) 22%,transparent)}
+.dot[data-state="ok"]{background:var(--good);box-shadow:0 0 0 3px color-mix(in srgb,var(--good) 25%,transparent)}
+.dot[data-state="checking"]{background:var(--muted);box-shadow:none;animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.35}}
+.connpanel{position:absolute;right:0;top:calc(100% + 8px);z-index:20;width:min(340px,calc(100vw - 32px));background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:0 10px 30px rgba(0,0,0,.18)}
 .name select{font:13px var(--f-body);padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);width:100%}
 .btn:disabled{opacity:.45;cursor:not-allowed}
 .drop{outline:2px dashed var(--accent);outline-offset:-6px}
@@ -87,14 +95,28 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .thumb canvas{width:100%;aspect-ratio:1/1;display:block}
 .thumb span{font:11px var(--f-mono);padding:4px 6px;text-align:left;color:var(--muted)}
 .err{padding:16px;color:var(--ink)}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
 <div class="wrap">
   <header>
     <div>
-      <div class="brand"><h1>RD Pattern AI</h1><span class="pill" id="ver">v0.5.0</span></div>
+      <div class="brand"><h1>RD Pattern AI</h1><span class="pill" id="ver">v1.0.0</span></div>
       <p class="sub">Generate original prints in the spirit of a customer reference. Drop in a reference photo, pull its colours, let Claude set the stripe, then save a seamless repeat at print resolution.</p>
+    </div>
+    <div class="conn">
+      <button class="chip" id="connbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="connpanel">
+        <svg class="plug" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2v5M15 2v5M6 7h12v4a6 6 0 0 1-12 0V7zM12 17v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="dot" id="conndot" data-state="off"></span>
+        <span class="clabel"><b>Claude API</b><span id="conntext">Not connected</span></span>
+      </button>
+      <div class="connpanel" id="connpanel" role="dialog" aria-label="Claude API key" hidden>
+        <p class="note">Match with Claude uses this workstation's Anthropic API key. It is saved only in this browser and sent only to api.anthropic.com.</p>
+        <label class="name">API key<input id="apikey" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…"></label>
+        <label class="name">Model<select id="apimodel"><option value="claude-sonnet-5-5">Claude Sonnet 5.5 (best match)</option><option value="claude-haiku-5-5">Claude Haiku 5.5 (lower cost)</option></select></label>
+        <div class="btns"><button class="btn sm primary" id="keysave">Save &amp; test</button><button class="btn sm" id="keytest">Test again</button><button class="btn sm" id="keyclear">Remove key</button></div>
+        <p class="status" id="connstatus" role="status"></p>
+      </div>
     </div>
   </header>
 
@@ -126,15 +148,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
           <button class="btn" id="refcols">Use reference colours</button>
           <button class="btn primary" id="match" hidden>Match with Claude</button>
         </div>
-        <details class="keybox" id="keybox">
-          <summary>Claude API key <span id="keystate">· not set</span></summary>
-          <div class="keyin">
-            <p class="note">Match with Claude uses this workstation's Anthropic API key. It is saved only in this browser and sent only to api.anthropic.com.</p>
-            <label class="name">API key<input id="apikey" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…"></label>
-            <label class="name">Model<select id="apimodel"><option value="claude-sonnet-5-5">Claude Sonnet 5.5 (best match)</option><option value="claude-haiku-5-5">Claude Haiku 5.5 (lower cost)</option></select></label>
-            <div class="btns"><button class="btn sm" id="keysave">Save key</button><button class="btn sm" id="keyclear">Remove key</button></div>
-          </div>
-        </details>
+        <p class="note" id="matchhint" hidden>Connect Claude in the top bar to use Match with Claude.</p>
         <p class="status" id="refstatus" role="status"></p>
       </section>
       <section>
@@ -304,7 +318,7 @@ void main(){
 
 <script>
 (()=>{
-const VERSION='0.5.0';
+const VERSION='1.0.0';
 const PRESETS=[
   {name:'Reference bronze',ground:'#94714a',mid:'#55392a',stripe:'#15100c'},
   {name:'Camel / espresso',ground:'#b48a5a',mid:'#6e4c30',stripe:'#2a1a10'},
@@ -694,24 +708,53 @@ const inClaude=!!window.claude;
 const KKEY='rdpai.apikey', KMODEL='rdpai.model';
 const lsGet=k=>{try{return localStorage.getItem(k)||'';}catch(e){return '';}};
 const lsSet=(k,v)=>{try{v?localStorage.setItem(k,v):localStorage.removeItem(k);return true;}catch(e){return false;}};
-function refreshMatch(){
-  if(inClaude&&sample){matchVia='claude';}
-  else matchVia=lsGet(KKEY)?'key':null;
-  $('match').hidden=!matchVia;
-  $('keybox').hidden=inClaude&&!!sample;
-  const k=lsGet(KKEY);$('keystate').textContent=k?'· saved (…'+k.slice(-4)+')':'· not set';
+// connection state: 'ok' (green), 'bad' / 'off' (red), 'checking'
+let conn='off';
+function setConn(state,text){
+  conn=state;$('conndot').dataset.state=state;$('conntext').textContent=text;
+  $('connbtn').title=state==='ok'?'Claude connected':'Claude not connected — click to set up';
+  refreshMatch();
 }
+function refreshMatch(){
+  matchVia=inClaude&&sample?'claude':(lsGet(KKEY)&&conn==='ok'?'key':null);
+  $('match').hidden=!matchVia;$('matchhint').hidden=!!matchVia;
+}
+const apiHeaders=k=>({'x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'});
+async function testKey(){ // free check: list models with the key
+  const k=lsGet(KKEY);
+  if(!k){setConn('off','Not connected');return false;}
+  setConn('checking','Checking key…');
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/models?limit=1',{headers:apiHeaders(k)});
+    if(r.ok){setConn('ok','Connected · …'+k.slice(-4));return true;}
+    setConn('bad',r.status===401||r.status===403?'Key not valid':'Key check failed ('+r.status+')');return false;
+  }catch(e){setConn('bad','Cannot reach Anthropic');return false;}
+}
+const panel=$('connpanel'),cbtn=$('connbtn');
+const openPanel=o=>{panel.hidden=!o;cbtn.setAttribute('aria-expanded',String(o));if(o)setTimeout(()=>$('apikey').focus(),0);};
+cbtn.onclick=e=>{e.stopPropagation();if(inClaude&&sample)return;openPanel(panel.hidden);};
+document.addEventListener('click',e=>{if(!panel.hidden&&!panel.contains(e.target)&&e.target!==cbtn)openPanel(false);});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden){openPanel(false);cbtn.focus();}});
+const connStatus=t=>$('connstatus').textContent=t;
 (async()=>{
   if(inClaude){try{sample=await window.claude.use('sample');const lim=sample?await sample.limits().catch(()=>null):null;if(!(lim&&lim.images))sample=null;}catch(e){sample=null;}}
-  refreshMatch();
+  if(inClaude&&sample){setConn('ok','Connected via Claude account');cbtn.style.cursor='default';return;}
+  await testKey();
 })();
 $('apimodel').value=lsGet(KMODEL)||'claude-sonnet-5-5';
 $('apimodel').onchange=e=>lsSet(KMODEL,e.target.value);
-$('keysave').onclick=()=>{const v=$('apikey').value.trim();
-  if(!/^sk-ant-[A-Za-z0-9_\-]{20,}$/.test(v)){refStatus('That does not look like an Anthropic API key (it starts with sk-ant-).');return;}
-  refStatus(lsSet(KKEY,v)?'Key saved in this browser. Match with Claude is ready.':'This browser is blocking saved data, so the key could not be stored.');
-  $('apikey').value='';$('keybox').open=false;refreshMatch();};
-$('keyclear').onclick=()=>{lsSet(KKEY,'');$('apikey').value='';refreshMatch();refStatus('Key removed from this browser.');};
+$('keysave').onclick=async()=>{const v=$('apikey').value.trim();
+  if(v){
+    if(!/^sk-ant-[A-Za-z0-9_\-]{20,}$/.test(v)){connStatus('That does not look like an Anthropic API key (it starts with sk-ant-).');setConn('bad','Key not valid');return;}
+    if(!lsSet(KKEY,v)){connStatus('This browser is blocking saved data, so the key could not be stored.');return;}
+    $('apikey').value='';
+  } else if(!lsGet(KKEY)){connStatus('Paste a key first.');return;}
+  connStatus('Testing…');const ok=await testKey();
+  connStatus(ok?'Connected. Match with Claude is ready.':'The key did not work. Check it in the Anthropic console.');
+  if(ok)setTimeout(()=>openPanel(false),900);
+};
+$('keytest').onclick=async()=>{connStatus('Testing…');const ok=await testKey();connStatus(ok?'Connected.':(lsGet(KKEY)?'The key did not work.':'No key saved.'));};
+$('keyclear').onclick=()=>{lsSet(KKEY,'');$('apikey').value='';setConn('off','Not connected');connStatus('Key removed from this browser.');};
 async function askAnthropic(img,prompt){
   const b64=await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]);fr.readAsDataURL(img);});
   const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':lsGet(KKEY),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
@@ -758,9 +801,10 @@ $('match').onclick=async()=>{
     refStatus('Claude set the print'+(out?.notes?': '+String(out.notes).slice(0,200):'.')+' Fine-tune with the sliders.');
   }catch(e){
     const m={not_granted:'Claude was not allowed for this page.',rate_limited:'Too many requests just now. Try again in a minute.',invalid_json:'Claude did not return usable settings. Try again.',
-      image_rejected:'Claude could not read that image. Try a different photo.',bad_key:'The API key was refused. Check it under Claude API key.',
+      image_rejected:'Claude could not read that image. Try a different photo.',bad_key:'The API key was refused. Check it in the Claude API box in the top bar.',
       no_credit:'The Anthropic account has no credit left. Top it up in the Anthropic console.',cancelled:''};
     if(['not_granted','sampling_disabled','images_unavailable','not_declared','capability_disabled','capability_removed'].includes(e?.code))btn.hidden=true;
+    if(e?.code==='bad_key')setConn('bad','Key not valid');
     refStatus(m[e?.code]??'Claude could not finish ('+(e?.code||'error')+(e?.message?': '+String(e.message).slice(0,120):'')+'). Try again.');
   }finally{btn.disabled=false;}
 };
