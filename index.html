@@ -94,11 +94,52 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .thumb canvas{width:100%;aspect-ratio:1/1;display:block}
 .thumb span{font:11px var(--f-mono);padding:4px 6px;text-align:left;color:var(--muted)}
 .chip.api .clabel{gap:2px}
-.lrow{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);white-space:nowrap}
-.lrow .dot,.apisec h3 .dot{width:9px;height:9px}
 .connpanel{width:min(380px,calc(100vw - 32px))!important;max-height:calc(100vh - 120px);overflow:auto}
 .apisec{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px}
 .apisec h3{margin:0;display:flex;align-items:center;gap:8px;font:700 13px var(--f-body)}
+.lrow{display:grid;grid-template-columns:10px auto auto;column-gap:7px;align-items:center;font-size:11.5px;line-height:1.3;color:var(--muted);white-space:nowrap}
+.lrow .dot{width:9px;height:9px;margin:0;box-shadow:0 0 0 2px color-mix(in srgb,var(--bad) 22%,transparent)}
+.lrow .dot[data-state="ok"]{box-shadow:0 0 0 2px color-mix(in srgb,var(--good) 25%,transparent)}
+.lrow .lname{color:var(--ink);font-weight:600}
+.apisec h3 .dot{width:9px;height:9px}
+.hcount{text-transform:none;letter-spacing:0;font-weight:400}
+.btn.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,var(--line))}
+.hist .head .btns{align-items:center}
+.hg{border:1px solid var(--line);border-radius:8px;background:var(--panel);margin-top:8px;overflow:hidden}
+.hg-head{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;width:100%;padding:10px 12px;border:0;background:none;color:var(--ink);font:14px var(--f-body);text-align:left;cursor:pointer}
+.hg-head:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.chev{width:12px;color:var(--muted)}
+.hmeta{font:11.5px var(--f-mono);color:var(--muted);margin-left:auto}
+.hsw{display:inline-flex;gap:3px}.hsw i{width:14px;height:14px;border-radius:3px;border:1px solid var(--line);display:inline-block}
+.hg-body{padding:0 12px 12px;display:flex;flex-direction:column;gap:12px}
+.hc-head{display:flex;align-items:center;gap:8px;font:12px var(--f-mono);color:var(--muted);margin-bottom:6px}
+.hcell{position:relative;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:6px;background:var(--bg);overflow:hidden}
+.hcell.on{border-color:var(--ink)}.hcell.sel{outline:2px solid var(--accent);outline-offset:1px}
+.htile{border:0;border-radius:0;position:relative}.htile img{width:100%;aspect-ratio:1/1;display:block;object-fit:cover}
+.htile span.vb,.htile span.kb{position:absolute;top:6px;font:600 10.5px var(--f-mono);padding:2px 6px;border-radius:4px;background:rgba(0,0,0,.66);color:#fff}
+.htile span.vb{left:6px}.htile span.kb{left:auto;right:36px;background:rgba(52,90,200,.9)}
+.hpick{position:absolute;top:4px;right:4px;width:24px;height:24px;display:grid;place-items:center;background:var(--panel);border:1px solid var(--line);border-radius:5px;cursor:pointer}
+.hpick input{margin:0;accent-color:var(--accent)}
+.hfoot{display:flex;flex-direction:column;gap:6px;padding:6px 6px 7px}
+.hinfo{font:11px var(--f-mono);color:var(--muted);min-width:0;overflow-wrap:anywhere}.hx{color:var(--accent)}.hdate{font-size:10.5px}
+.hmini{display:flex;gap:2px;flex:none}
+.hmini button{width:26px;height:26px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--ink);cursor:pointer;padding:0;display:grid;place-items:center}
+.hmini svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.hmini button:hover{border-color:var(--ink)}.hmini button.danger{color:var(--bad)}
+.hmini button:focus-visible,.hpick:focus-within{outline:2px solid var(--accent);outline-offset:1px}
+.modal{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.55);display:flex;align-items:flex-start;justify-content:center;padding:24px 16px;overflow:auto}
+.mbox{background:var(--panel);border-radius:10px;border:1px solid var(--line);width:min(1100px,100%);padding:16px;display:flex;flex-direction:column;gap:12px}
+.mhead{display:flex;align-items:center;gap:12px}.mhead button{margin-left:auto}
+.cmpgrid{display:grid;gap:12px}
+.cmpitem{margin:0;display:flex;flex-direction:column;gap:6px}.cmpitem canvas{width:100%;height:auto;border-radius:6px;display:block}
+.cmpitem figcaption{font:12px var(--f-mono);color:var(--muted)}
+@media (max-width:700px){.cmpgrid{grid-template-columns:1fr!important}.hmeta{margin-left:0}}
+@media (min-width:901px){.stage{position:sticky;top:12px;align-self:start;z-index:2}.canvasbox{width:min(100%,calc(100vh - 150px));margin-inline:auto}}
+body.gem-mode .rail section.eng{display:none}
+.gecols{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px}
+.gechip{display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--muted)}
+.gechip input{width:100%;height:34px;border:1px solid var(--line);border-radius:4px;padding:2px;background:none;cursor:pointer}
+.gechip code{font:11px var(--f-mono);color:var(--ink)}
 .conns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .tright{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .name textarea{font:13px var(--f-body);padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%;resize:vertical}
@@ -113,22 +154,22 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <div class="wrap">
   <header>
     <div>
-      <div class="brand"><h1>RD Pattern AI</h1><span class="pill" id="ver">v1.2.1</span></div>
-      <p class="sub">Generate original prints in the spirit of a customer reference. Drop in a reference photo and its colours load as a starting point. Let Claude set the stripe engine, or render other print types with Gemini, then save a seamless repeat at print resolution.</p>
+      <div class="brand"><h1>RD Pattern AI</h1><span class="pill" id="ver">v1.4.0</span></div>
+      <p class="sub">Generate original prints in the spirit of a customer reference. Drop in a reference photo and press Match reference: Claude reads the print, then the stripe engine or Gemini recreates it in the reference colours, ready to edit. Save a seamless repeat at print resolution.</p>
     </div>
     <div class="conn">
       <button class="chip api" id="connbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="connpanel">
         <svg class="plug" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2v5M15 2v5M6 7h12v4a6 6 0 0 1-12 0V7zM12 17v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span class="clabel"><b>API</b>
-          <span class="lrow"><span class="dot" id="conndot" data-state="off"></span>Claude · <span id="conntext">Not connected</span></span>
-          <span class="lrow"><span class="dot" id="gdot" data-state="off"></span>Gemini · <span id="gtext">Not connected</span></span>
+          <span class="lrow"><span class="dot" id="conndot" data-state="off"></span><span class="lname">Claude</span><span id="conntext">Not connected</span></span>
+          <span class="lrow"><span class="dot" id="gdot" data-state="off"></span><span class="lname">Gemini</span><span id="gtext">Not connected</span></span>
         </span>
       </button>
       <div class="connpanel" id="connpanel" role="dialog" aria-label="API keys" hidden>
         <p class="note">Keys are saved only in this browser on this workstation. Green light = key tested and working; red = missing or refused.</p>
         <div class="apisec">
           <h3><span class="dot" id="conndot2" data-state="off"></span>Anthropic (Claude)</h3>
-          <p class="note">Used by Match with Claude. Sent only to api.anthropic.com.</p>
+          <p class="note">Used by Match reference to read the print. Sent only to api.anthropic.com.</p>
           <label class="name">API key<input id="apikey" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…"></label>
           <label class="name">Model<select id="apimodel"><option value="claude-sonnet-5-5">Claude Sonnet 5.5 (best match)</option><option value="claude-haiku-5-5">Claude Haiku 5.5 (lower cost)</option></select></label>
           <div class="btns"><button class="btn sm primary" id="keysave">Save &amp; test</button><button class="btn sm" id="keytest">Test again</button><button class="btn sm" id="keyclear">Remove key</button></div>
@@ -136,7 +177,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
         </div>
         <div class="apisec">
           <h3><span class="dot" id="gdot2" data-state="off"></span>Google Gemini</h3>
-          <p class="note">Used by Render with Gemini. Sent only to generativelanguage.googleapis.com. Each render uses one or two image generations on this key.</p>
+          <p class="note">Used by Match reference and Render with Gemini. Sent only to generativelanguage.googleapis.com. Each render uses one or two image generations on this key.</p>
           <label class="name">API key<input id="gkey" type="password" autocomplete="off" spellcheck="false" placeholder="AIza…"></label>
           <label class="name">Image model<select id="gmodel"></select></label>
           <div class="btns"><button class="btn sm primary" id="gkeysave">Save &amp; test</button><button class="btn sm" id="gkeytest">Test again</button><button class="btn sm" id="gkeyclear">Remove key</button></div>
@@ -159,7 +200,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
       </div>
       <div class="canvasbox"><canvas id="view" width="900" height="900"></canvas></div>
       <div class="meta"><span id="m-stripes"></span><span id="m-angle"></span><span id="m-repeat"></span></div>
-      <p class="note srcnote" id="srcnote" hidden>Showing a Gemini render. Save repeat PNG and Add to board work for renders; the layered and Illustrator exports are built from engine prints. <button class="linkbtn" id="srcback">Back to the stripe engine</button></p>
+      <p class="note srcnote" id="srcnote" hidden>Showing a Gemini render. Save repeat PNG and Save to history work for renders; the layered and Illustrator exports are built from engine prints. <button class="linkbtn" id="srcback">Back to the stripe engine</button></p>
     </div>
 
     <aside class="rail">
@@ -173,16 +214,28 @@ input[type=range]{width:100%;accent-color:var(--accent)}
         </div>
         <div class="btns">
           <button class="btn" id="refcols">Use reference colours</button>
-          <button class="btn primary" id="match" hidden>Match with Claude</button>
+          <button class="btn primary" id="match" hidden title="Claude reads the reference; the stripe engine or Gemini recreates it in the reference colours">Match reference</button>
         </div>
-        <p class="note" id="matchhint" hidden>Add a Claude key under API in the top bar to use Match with Claude.</p>
+        <p class="note" id="matchhint" hidden>Add a Claude or Gemini key under API in the top bar to use Match.</p>
         <p class="status" id="refstatus" role="status"></p>
+      </section>
+      <section id="gedit" hidden>
+        <h2>Edit render</h2>
+        <p class="note">Change any colour of the render; its texture and shading follow. Motif size repeats the print more times inside the same repeat size.</p>
+        <div class="gecols" id="gecols"></div>
+        <div class="out">
+          <label>Colours found<select id="gek"><option value="auto">Auto</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
+          <label>Motif size<select id="getiles"><option value="1">As drawn</option><option value="2">½ · 2 × 2 per repeat</option><option value="3">⅓ · 3 × 3 per repeat</option><option value="4">¼ · 4 × 4 per repeat</option></select></label>
+        </div>
+        <label class="name">Ask Gemini for a change<textarea id="gerefine" rows="2" maxlength="400" placeholder="e.g. make the checks half the size, remove the herringbone texture"></textarea></label>
+        <div class="btns"><button class="btn primary" id="gerefgo">Apply change with Gemini</button><button class="btn" id="gereset">Undo colour &amp; size edits</button></div>
+        <p class="status" id="gestatus" role="status"></p>
       </section>
       <section>
         <h2>Render with Gemini</h2>
         <p class="note">For prints the stripe engine can't draw: checks, plaids, florals, geometrics. Gemini redraws the reference as an original, flat print.</p>
         <div class="out">
-          <label>Closeness<select id="gclose"><option value="close">Close to reference</option><option value="inspired" selected>Inspired by</option><option value="loose">Loose</option></select></label>
+          <label>Closeness<select id="gclose"><option value="exact" selected>Recreate the reference</option><option value="close">Close to reference</option><option value="inspired">Inspired by</option><option value="loose">Loose</option></select></label>
           <label>Scale<select id="gscale"><option value="ref" selected>As reference</option><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select></label>
           <label>Colours<select id="gcols"><option value="ref">From reference</option><option value="current">Current colourway</option></select></label>
           <label>Options<select id="gcount"><option>1</option><option selected>2</option><option>4</option></select></label>
@@ -194,7 +247,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
         <p class="note" id="gemhint"></p>
         <p class="status" id="gemstatus" role="status"></p>
       </section>
-      <section>
+      <section class="eng">
         <h2>Colourway</h2>
         <div id="refsug" hidden><p class="note" style="margin:0 0 6px">From reference</p><div class="swatches" id="refsw"></div></div>
         <div class="swatches" id="presets"></div>
@@ -204,7 +257,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
           <label>Stripe<input type="color" id="c-stripe"><code id="x-stripe"></code></label>
         </div>
       </section>
-      <section>
+      <section class="eng">
         <h2>Stripe</h2>
         <div class="row"><label for="density">Density</label><input type="range" id="density" min="4" max="22" step="1"><output for="density"></output></div>
         <div class="row"><label for="angle">Angle</label><input type="range" id="angle" min="0" max="180" step="1"><output for="angle"></output></div>
@@ -213,7 +266,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
         <div class="row"><label for="brk">Breakup</label><input type="range" id="brk" min="0" max="0.75" step="0.01"><output for="brk"></output></div>
         <div class="row"><label for="warp">Flow</label><input type="range" id="warp" min="0" max="3" step="0.05"><output for="warp"></output></div>
       </section>
-      <section>
+      <section class="eng">
         <h2>Brush &amp; ground</h2>
         <div class="row"><label for="hair">Dry brush</label><input type="range" id="hair" min="0" max="1.5" step="0.01"><output for="hair"></output></div>
         <div class="row"><label for="sec">Shadow strokes</label><input type="range" id="sec" min="0" max="1" step="0.01"><output for="sec"></output></div>
@@ -234,7 +287,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
           <button class="btn primary" id="saveai">Export for Illustrator</button>
           <button class="btn" id="savepng">Save repeat PNG</button>
           <button class="btn" id="saverec">Save recipe</button>
-          <button class="btn" id="addboard">Add to board</button>
+          <button class="btn" id="addboard">Save to history</button>
           <button class="btn" id="loadrec">Load recipe</button>
           <input type="file" id="recfile" accept=".json,application/json" hidden>
         </div>
@@ -255,10 +308,14 @@ input[type=range]{width:100%;accent-color:var(--accent)}
     <div class="grid" id="vargrid"></div>
   </div>
 
-  <div class="vars">
-    <div class="head"><h2>Design board <span style="text-transform:none;letter-spacing:0;font-weight:400">· saved in this browser</span></h2><button class="btn" id="exportboard">Export board</button></div>
-    <div class="grid" id="boardgrid"></div>
+  <div class="vars hist" id="histwrap">
+    <div class="head"><h2>Session history <span class="hcount" id="histcount">saved in this browser</span></h2>
+      <div class="btns"><span class="note">Tick up to 4 to compare</span><button class="btn sm primary" id="hcompare" hidden>Compare</button><button class="btn sm" id="hbatch">Batch export</button><button class="btn sm" id="hlog">Decision log CSV</button><button class="btn sm danger" id="hreset">Reset session</button></div></div>
+    <div id="histlist"></div>
   </div>
+</div>
+<div class="modal" id="cmpmodal" role="dialog" aria-modal="true" aria-label="Compare versions" hidden>
+  <div class="mbox"><div class="mhead"><b>Compare versions</b><span class="note">each shown as a 2 × 2 repeat</span><button class="btn sm" id="cmpclose">Close</button></div><div class="cmpgrid" id="cmpgrid"></div></div>
 </div>
 
 <script id="fs" type="x-shader">#version 300 es
@@ -369,7 +426,7 @@ void main(){
 
 <script>
 (()=>{
-const VERSION='1.2.1';
+const VERSION='1.4.0';
 const PRESETS=[
   {name:'Reference bronze',ground:'#94714a',mid:'#55392a',stripe:'#15100c'},
   {name:'Camel / espresso',ground:'#b48a5a',mid:'#6e4c30',stripe:'#2a1a10'},
@@ -456,6 +513,7 @@ function syncUI(){
   document.querySelectorAll('#presets .sw').forEach((b,i)=>b.setAttribute('aria-pressed',String(PRESETS[i].ground===P.ground&&PRESETS[i].mid===P.mid&&PRESETS[i].stripe===P.stripe)));
   const px=Math.round(P.inches*P.dpi);
   $('pxnote').textContent=`${P.inches}″ × ${P.inches}″ at ${P.dpi} dpi = ${px.toLocaleString()} × ${px.toLocaleString()} px, seamless on all four edges.`+(px>Math.min(MAXR,MAXV)?` This device can render up to ${Math.min(MAXR,MAXV)} px; lower the size or resolution.`:'');
+  persistSession();
 }
 let raf=0;
 function render(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{
@@ -631,7 +689,7 @@ $('savepng').onclick=async()=>{
     const pw=new PngWriter(px,px,3,P.dpi);
     await renderStrips(P,px,-1,async(rows,y0,h)=>{await pw.rows(rows,h);status(`Rendering ${Math.round((y0+h)/px*100)}%…`);});
     const png=await pw.finish();render();
-    await saveFile(fname('png'),png);status('Saved '+fname('png'));
+    const fnp=fname('png');await saveFile(fnp,png);status('Saved '+fnp+'.'+await recordExport('Saved repeat PNG',fnp,'PNG'));
   }catch(e){render();status(errMsg(e));}finally{setBusy(false);}
 };
 function specText(base,px){
@@ -705,7 +763,7 @@ $('savepkg').onclick=async()=>{
     entries.push({name:`${base}/README_SPEC.txt`,blob:new Blob([specText(base,px).replace(/\n/g,'\r\n')]),deflate:true});
     const zip=await makeZip(entries,n=>status('Packing '+n.split('/').pop()+'…'));
     status(`Package ready (${(zip.size/1048576).toFixed(1)} MB). Saving…`);
-    await saveFile(base+'.zip',zip);status(`Saved ${base}.zip (${(zip.size/1048576).toFixed(1)} MB).`);
+    await saveFile(base+'.zip',zip);status(`Saved ${base}.zip (${(zip.size/1048576).toFixed(1)} MB).`+await recordExport('Exported layered package',base+'.zip','PSD'));
   }catch(e){console.error(e);render();status(e&&e.code?errMsg(e):'Could not build the package ('+(e&&e.message||'error')+').');}
   finally{setBusy(false);}
 };
@@ -1002,7 +1060,7 @@ $('saveai').onclick=async()=>{
     const zip=await makeZip(entries,n=>status('Packing '+n.split('/').pop()+'…'));
     const paths=stats.reduce((t,s)=>t+s.paths,0);
     await saveFile(base+'_ILLUSTRATOR.zip',zip);
-    status(`Saved ${base}_ILLUSTRATOR.zip (${(zip.size/1048576).toFixed(1)} MB, ${paths.toLocaleString()} vector shapes).`);
+    status(`Saved ${base}_ILLUSTRATOR.zip (${(zip.size/1048576).toFixed(1)} MB, ${paths.toLocaleString()} vector shapes).`+await recordExport('Exported Illustrator package',base+'_ILLUSTRATOR.zip','AI'));
   }catch(e){console.error(e);render();status(e&&e.code?errMsg(e):'Could not build the Illustrator package ('+(e&&e.message||'error')+').');}
   finally{setBusy(false);}
 };
@@ -1019,8 +1077,9 @@ $('recfile').onchange=async e=>{const f=e.target.files[0];if(!f)return;
   e.target.value='';};
 
 // ---------- reference ----------
-function setReference(src,name){
-  refImg.onload=()=>{refreshGem();try{suggestFromReference();}catch(e){console.error(e);}render();};refImg.src=src;$('refimg').src=src;$('refname').textContent=name;refStatus('');
+function setReference(src,name,restore){
+  H.ref={data:src,name};persistSession();
+  refImg.onload=()=>{refreshGem();try{if(restore){refSug=suggestPalettes(refImg);showSuggestions();}else suggestFromReference();}catch(e){console.error(e);}render();};refImg.src=src;$('refimg').src=src;$('refname').textContent=name;refStatus('');
 }
 function loadRefFile(f){
   if(!f||!f.type.startsWith('image/')){refStatus('That file is not an image. Use a JPG, PNG or WebP photo.');return;}
@@ -1068,7 +1127,9 @@ function setConn(state,text){
 }
 function refreshMatch(){
   matchVia=inClaude&&sample?'claude':(lsGet(KKEY)&&conn==='ok'?'key':null);
-  $('match').hidden=!matchVia;$('matchhint').hidden=!!matchVia;
+  let gok=false;try{gok=gconn==='ok';}catch(e){}
+  const any=!!matchVia||gok;
+  $('match').hidden=!any;$('matchhint').hidden=any;
 }
 const apiHeaders=k=>({'x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'});
 async function testKey(){ // free check: list models with the key
@@ -1101,7 +1162,7 @@ $('keysave').onclick=async()=>{const v=$('apikey').value.trim();
     $('apikey').value='';
   } else if(!lsGet(KKEY)){connStatus('Paste a key first.');return;}
   connStatus('Testing…');const ok=await testKey();
-  connStatus(ok?'Connected. Match with Claude is ready.':'The key did not work. Check it in the Anthropic console.');
+  connStatus(ok?'Connected. Match reference is ready.':'The key did not work. Check it in the Anthropic console.');
 };
 $('keytest').onclick=async()=>{connStatus('Testing…');const ok=await testKey();connStatus(ok?'Connected.':(lsGet(KKEY)?'The key did not work.':'No key saved.'));};
 $('keyclear').onclick=()=>{lsSet(KKEY,'');$('apikey').value='';setConn('off','Not connected');connStatus('Key removed from this browser.');};
@@ -1136,36 +1197,45 @@ Parameters (stay inside the ranges):
 
 Current settings: ${JSON.stringify(cur)}
 
-Reply with only one JSON object with exactly these keys: density, angle, weight, len, brk, warp, hair, sec, halo, mottle, ground, mid, stripe, fit, notes (fit = true if this brush-stroke stripe generator can reasonably represent the print, false for checks, ginghams, plaids, florals, geometrics, dots and other prints that are not brush-stroke stripes; notes = one short sentence describing the print you see).`;
+Reply with only one JSON object with exactly these keys: density, angle, weight, len, brk, warp, hair, sec, halo, mottle, ground, mid, stripe, fit, notes (fit = true if this brush-stroke stripe generator can reasonably represent the print, false for checks, ginghams, plaids, florals, geometrics, dots and other prints that are not brush-stroke stripes; notes = one or two precise sentences describing the print: print type, motif construction and shapes, proportions, scale relative to the garment, texture and colours).`;
 $('match').onclick=async()=>{
-  if(!matchVia)return;
   if(!refImg.naturalWidth){refStatus('Add a reference photo first.');return;}
-  const btn=$('match');btn.disabled=true;refStatus('Claude is studying the reference…');
+  const claudeOK=!!matchVia,gemOK=gconn==='ok'&&!!lsGet(GKEY);
+  if(!claudeOK&&!gemOK){refStatus('Add a Claude or Gemini key under API in the top bar.');return;}
+  const btn=$('match');btn.disabled=true;
   try{
-    const img=await refBlob();
-    const out=matchVia==='claude'?await sample.json(matchPrompt(curParams()),{images:img}):await askAnthropic(img,matchPrompt(curParams()));
+    let out=null;
+    if(claudeOK){
+      refStatus('Claude is reading the reference…');
+      try{const img=await refBlob();out=matchVia==='claude'?await sample.json(matchPrompt(curParams()),{images:img}):await askAnthropic(img,matchPrompt(curParams()));}
+      catch(e){
+        const m={not_granted:'Claude was not allowed for this page.',rate_limited:'Claude is busy just now.',invalid_json:'Claude did not return usable settings.',
+          image_rejected:'Claude could not read that image.',bad_key:'The Claude key was refused.',no_credit:'The Anthropic account has no credit left.',cancelled:''};
+        if(e?.code==='bad_key')setConn('bad','Key not valid');
+        const msg=m[e?.code]??('Claude could not finish ('+(e?.code||'error')+').');
+        if(!gemOK){refStatus(msg+' Try again, or add a Gemini key under API.');return;}
+        refStatus(msg+' Going straight to Gemini…');
+      }
+    }
     const p={};
-    Object.entries(RANGES).forEach(([k,[lo,hi]])=>{const v=Number(out?.[k]);if(Number.isFinite(v))p[k]=Math.min(hi,Math.max(lo,k==='density'||k==='angle'?Math.round(v):Math.round(v*100)/100));});
-    ['ground','mid','stripe'].forEach(k=>{if(/^#[0-9a-fA-F]{6}$/.test(out?.[k]||''))p[k]=out[k].toLowerCase();});
-    if(out?.fit===false||String(out?.fit).toLowerCase()==='false'){
-      ['ground','mid','stripe'].forEach(k=>{if(p[k])P[k]=p[k];});toEngine();syncUI();render();renderVarsSoon();
-      refStatus('Claude sees: '+String(out?.notes||'a print that is not a stripe').slice(0,200)+' That is not a brush-stroke stripe print, so the stripe engine cannot match it. Claude applied the colours only; use Render with Gemini below for this reference.');return;}
-    applyParams(p);
-    refStatus('Claude set the print'+(out?.notes?': '+String(out.notes).slice(0,200):'.')+' Fine-tune with the sliders.');
-  }catch(e){
-    const m={not_granted:'Claude was not allowed for this page.',rate_limited:'Too many requests just now. Try again in a minute.',invalid_json:'Claude did not return usable settings. Try again.',
-      image_rejected:'Claude could not read that image. Try a different photo.',bad_key:'The API key was refused. Check it under API in the top bar.',
-      no_credit:'The Anthropic account has no credit left. Top it up in the Anthropic console.',cancelled:''};
-    if(['not_granted','sampling_disabled','images_unavailable','not_declared','capability_disabled','capability_removed'].includes(e?.code))btn.hidden=true;
-    if(e?.code==='bad_key')setConn('bad','Key not valid');
-    refStatus(m[e?.code]??'Claude could not finish ('+(e?.code||'error')+(e?.message?': '+String(e.message).slice(0,120):'')+'). Try again.');
+    if(out){Object.entries(RANGES).forEach(([k,[lo,hi]])=>{const v=Number(out?.[k]);if(Number.isFinite(v))p[k]=Math.min(hi,Math.max(lo,k==='density'||k==='angle'?Math.round(v):Math.round(v*100)/100));});
+      ['ground','mid','stripe'].forEach(k=>{if(/^#[0-9a-fA-F]{6}$/.test(out?.[k]||''))p[k]=out[k].toLowerCase();});}
+    const fit=out&&!(out.fit===false||String(out.fit).toLowerCase()==='false');
+    if(fit){applyParams(p);refStatus('Recreated with the stripe engine'+(out?.notes?': '+String(out.notes).slice(0,200):'.')+' Edit with the sliders and colours.');return;}
+    if(out){['ground','mid','stripe'].forEach(k=>{if(p[k])P[k]=p[k];});syncUI();}
+    const seen=out?.notes?'Claude sees: '+String(out.notes).slice(0,240)+' ':'';
+    if(!gemOK){toEngine();render();renderVarsSoon();refStatus(seen+'That is not a brush-stroke stripe print, so the stripe engine cannot recreate it. Add a Gemini key under API and press Match again.');return;}
+    refStatus(seen+'Gemini is recreating it in the reference colours as a seamless repeat…');
+    $('gclose').value='exact';$('gcols').value='ref';$('gscale').value='ref';
+    const made=await runGemini({...readGemOpts(),close:'exact',cols:'ref',scale:'ref',count:1,seam:true,notes:$('gnotes').value.trim().slice(0,400)},out?.notes);
+    refStatus(made?seen+'Recreated with Gemini in the reference colours ('+(gmeta?.how||'')+'). Edit it under Edit render: change any colour, the motif size, or ask Gemini for a change.':seen+'Gemini could not recreate it; see the message under Render with Gemini.');
   }finally{btn.disabled=false;}
 };
 
 // ---------- print source: the stripe engine, or a Gemini render ----------
 let src='engine', gimg=null, gmeta=null; const grenders=[];
 function toEngine(){if(src!=='engine'){src='engine';markGem();}}
-['input','change'].forEach(ev=>document.addEventListener(ev,e=>{if(e.target.closest&&e.target.closest('.rail')&&e.target.matches('input[type=range],input[type=color],#seed'))toEngine();},true));
+['input','change'].forEach(ev=>document.addEventListener(ev,e=>{if(e.target.closest&&e.target.closest('.rail')&&!e.target.closest('#gedit')&&e.target.matches('input[type=range],input[type=color],#seed'))toEngine();},true));
 document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.sw,#shuffle,#vargrid .thumb'))toEngine();},true);
 function drawGem(size){
   vctx.imageSmoothingEnabled=true;vctx.imageSmoothingQuality='high';
@@ -1194,12 +1264,12 @@ function drawGem(size){
   if(mode==='cmp')$('m-repeat').textContent='reference vs. part of one repeat';
 }
 function markGem(){document.querySelectorAll('#gemgrid .thumb').forEach(b=>b.setAttribute('aria-pressed',String(src==='gemini'&&b._r===gmeta)));
-  $('srcnote').hidden=src!=='gemini';render();}
+  $('srcnote').hidden=src!=='gemini';document.body.classList.toggle('gem-mode',src==='gemini');$('gedit').hidden=src!=='gemini';render();}
 
 // ---------- Gemini connection (this workstation's Google AI key, saved in this browser) ----------
 const GKEY='rdpai.gemini.key',GMODEL='rdpai.gemini.model',GAPI='https://generativelanguage.googleapis.com/v1beta';
 let gconn='off',gmodels=[];
-function setGConn(state,text){gconn=state;$('gdot').dataset.state=state;$('gdot2').dataset.state=state;$('gtext').textContent=text;apiTitle();refreshGem();}
+function setGConn(state,text){gconn=state;$('gdot').dataset.state=state;$('gdot2').dataset.state=state;$('gtext').textContent=text;apiTitle();refreshGem();refreshMatch();}
 function apiTitle(){const c=$('conndot').dataset.state==='ok',g=$('gdot').dataset.state==='ok';$('connbtn').title=`API keys: Claude ${c?'connected':'not connected'}, Gemini ${g?'connected':'not connected'}. Click to set up.`;}
 function refreshGem(){const ok=gconn==='ok'&&!!lsGet(GKEY);$('gemgo').disabled=!ok||!refImg.naturalWidth||gbusy;
   $('gemhint').textContent=!ok?'Add a Gemini key under API in the top bar to render with it.':!refImg.naturalWidth?'Add a reference photo first.':'';$('gemhint').hidden=!$('gemhint').textContent;}
@@ -1305,26 +1375,31 @@ const SCALES={small:'small scale: about 8 to 12 repeats of the main motif across
 const CLOSE={close:'Stay very close to the reference: the same print type, the same motif shapes, proportions and layout, as if the same fabric were redrawn as clean artwork.',
   inspired:'Keep the same print family, technique and mood, but redraw the motifs with your own variations so the design is new.',
   loose:'Use the reference only as a starting point: a fresh design in the same print family and colour story.'};
-function gemPrompt(o){
+function gemPrompt(o,desc){
+  const exact=o.close==='exact';
   const cols=o.cols==='current'?`Use exactly this palette and no other hues: ground ${P.ground.toUpperCase()}, secondary ${P.mid.toUpperCase()}, main motif ${P.stripe.toUpperCase()} (tints and blends of these are fine).`
-    :'Match the colours of the print in the reference as they would look on flat fabric in neutral light (ignore shadows, folds and highlights on the garment).';
-  return `Create an ORIGINAL seamless textile print design based on the print in the attached reference photo.
+    :'Match the colours of the print in the reference exactly as they would look on flat fabric in neutral light (ignore shadows, folds and highlights on the garment).';
+  const head=exact?`Recreate the textile print shown in the attached reference photo as clean, flat, seamless print artwork.
+Copy the print as faithfully as possible: the same print type, motif shapes and construction, proportions, spacing, layout, weave or surface texture, and colours. Only remove what comes from the photograph: the garment shape, folds, pleats, seams, shadows, lighting and perspective.`
+    :`Create an ORIGINAL seamless textile print design based on the print in the attached reference photo.
 ${CLOSE[o.close]}
-Output: a flat, straight-on, edge-to-edge square swatch of the print itself, as artwork for fabric printing. No garment, model, hanger, folds, pleats, shadows, lighting, perspective, borders, labels or text. Fill the whole square evenly so it can repeat as a tile, with motifs allowed to run off every edge.
-Keep the reference's print type (for example gingham, check, plaid, stripe, floral, paisley, animal, geometric, conversational) and its technique (woven yarn-dye, printed, painted, watercolour, screen print), including fine texture such as twill or weave lines where the reference has them.
+Keep the reference's print type (for example gingham, check, plaid, stripe, floral, paisley, animal, geometric, conversational) and its technique (woven yarn-dye, printed, painted, watercolour, screen print), including fine texture such as twill or weave lines where the reference has them.`;
+  return `${head}
+Output: a flat, straight-on, edge-to-edge square swatch of the print itself, as artwork for fabric printing. No garment, model, hanger, folds, pleats, shadows, lighting, perspective, borders, labels or text. Fill the whole square evenly so it can repeat as a tile, with motifs allowed to run off every edge.${desc?`
+Description of the reference print from a textile analyst: ${String(desc).slice(0,500)}`:''}
 Scale: ${SCALES[o.scale]}.
 Colours: ${cols}
-Do not reproduce logos, brand marks, signatures or recognisable copyrighted artwork; create a fresh design in the same spirit.${o.notes?`\nDesigner notes: ${o.notes}`:''}`;
+${exact?'Leave out any logos, brand marks or text.':'Do not reproduce logos, brand marks, signatures or recognisable copyrighted artwork; create a fresh design in the same spirit.'}${o.notes?`\nDesigner notes: ${o.notes}`:''}`;
 }
 let gbusy=false;
 const gemStatus=t=>$('gemstatus').textContent=t;
 const GERR={bad_key:'Gemini refused the key. Check it under API in the top bar.',rate_limited:'Gemini is rate limiting this key. Wait a minute and try again.',
   upstream_error:'Gemini had a server error. Try again.',no_image:'Gemini did not return an image'};
-$('gemgo').onclick=async()=>{
-  if(gbusy||!refImg.naturalWidth||gconn!=='ok')return;
+function readGemOpts(){return {close:$('gclose').value,cols:$('gcols').value,scale:$('gscale').value,notes:$('gnotes').value.trim().slice(0,400),count:+$('gcount').value,size:$('gsize').value,seam:$('gseam').checked};}
+async function runGemini(o,desc){
+  if(gbusy||!refImg.naturalWidth||gconn!=='ok')return 0;
   gbusy=true;refreshGem();
-  const o={close:$('gclose').value,cols:$('gcols').value,scale:$('gscale').value,notes:$('gnotes').value.trim().slice(0,400),count:+$('gcount').value,size:$('gsize').value,seam:$('gseam').checked};
-  const prompt=gemPrompt(o);let made=0;
+  const prompt=gemPrompt(o,desc);let made=0;
   try{
     const ref=await refBlob();
     for(let i=0;i<o.count;i++){
@@ -1336,23 +1411,97 @@ $('gemgo').onclick=async()=>{
       if(o.seam){const r=await makeSeamless(cv,o.size,t=>gemStatus(t+lab));cv=r.cv;how=r.how;score=r.score;}
       const rec={cv,model,how,seamless:o.seam,prompt,opts:o,name:(P.name||'Gemini print'),at:Date.now()};
       grenders.unshift(rec);made++;
-      gimg=cv;gmeta=rec;src='gemini';renderGemGrid();markGem();
+      showRender(rec);renderGemGrid();
     }
-    gemStatus(`Done. ${made} render${made>1?'s':''} added below the preview${o.seam?'; repeat check: '+gmeta.how:''}. Click a render to view it; touch any stripe control to go back to the engine.`);
+    gemStatus(`Done. ${made} render${made>1?'s':''} added below the preview${o.seam?'; repeat check: '+gmeta.how:''}. Edit it under Edit render; touch "Back to the stripe engine" to leave Gemini mode.`);
   }catch(e){console.error(e);
     gemStatus((GERR[e?.code]?GERR[e.code].replace(/\.$/,''):'Gemini could not finish')+(e?.message?` (${String(e.message).slice(0,160)})`:'')+'.'+(made?` ${made} render${made>1?'s were':' was'} kept.`:''));
     if(e?.code==='bad_key')setGConn('bad','Key not valid');}
   finally{gbusy=false;refreshGem();}
-};
+  return made;
+}
+$('gemgo').onclick=()=>runGemini(readGemOpts());
 function renderGemGrid(){
   const wrap=$('gemwrap'),g=$('gemgrid');wrap.hidden=!grenders.length;g.innerHTML='';
   grenders.forEach(r=>{const b=document.createElement('button');b.className='thumb';b._r=r;b.title='Show this render';
     const c=document.createElement('canvas');c.width=c.height=240;c.getContext('2d').drawImage(r.cv,0,0,240,240);
     const s=document.createElement('span');s.textContent=(r.seamless?'seamless · ':'')+r.opts.close+' · '+r.opts.scale;
-    b.append(c,s);b.onclick=()=>{gimg=r.cv;gmeta=r;src='gemini';markGem();};g.append(b);});
+    b.append(c,s);b.onclick=()=>showRender(r);g.append(b);});
   markGem();
 }
 $('gemclear').onclick=()=>{grenders.length=0;toEngine();renderGemGrid();gemStatus('Renders cleared.');};
+// ---------- edit a Gemini render: recolour each colour, motif size, refine with Gemini ----------
+const GE={rec:null,base:null,lab:null,pal:[],raf:0};
+function km(px,k){ // k-means on [r,g,b] samples; returns centres + error
+  const srt=[...px].sort((a,b)=>lum(a)-lum(b));let C=Array.from({length:k},(_,i)=>[...srt[Math.floor((i+.5)/k*srt.length)]]),sse=0;
+  for(let it=0;it<10;it++){const S=C.map(()=>[0,0,0,0]);sse=0;
+    for(const p of px){let b=0,bd=1e9;for(let j=0;j<k;j++){const c=C[j],d=(p[0]-c[0])**2+(p[1]-c[1])**2+(p[2]-c[2])**2;if(d<bd){bd=d;b=j;}}sse+=bd;const s=S[b];s[0]+=p[0];s[1]+=p[1];s[2]+=p[2];s[3]++;}
+    C=C.map((c,j)=>S[j][3]?[S[j][0]/S[j][3],S[j][1]/S[j][3],S[j][2]/S[j][3]]:c);}
+  return {C,sse};
+}
+function quantizeRender(cv,kWanted){
+  const N=cv.width,img=cv.getContext('2d',{willReadFrequently:true}).getImageData(0,0,N,N),d=img.data,px=[],step=Math.max(1,Math.floor(N*N/16000));
+  for(let i=0;i<N*N;i+=step)px.push([d[i*4],d[i*4+1],d[i*4+2]]);
+  let best;
+  if(kWanted==='auto'){let prev=null;for(let k=2;k<=6;k++){const r=km(px,k);if(prev&&r.sse>prev.sse*.62){best=prev;break;}best=r;prev=r;}}
+  else best=km(px,+kWanted);
+  const C=best.C,lab=new Uint8Array(N*N),cnt=new Array(C.length).fill(0);
+  for(let i=0;i<N*N;i++){const r=d[i*4],g=d[i*4+1],b=d[i*4+2];let bi=0,bd=1e9;for(let j=0;j<C.length;j++){const c=C[j],q=(r-c[0])**2+(g-c[1])**2+(b-c[2])**2;if(q<bd){bd=q;bi=j;}}lab[i]=bi;cnt[bi]++;}
+  const order=C.map((c,i)=>i).sort((a,b)=>cnt[b]-cnt[a]),remap=new Uint8Array(C.length);order.forEach((o,i)=>remap[o]=i);
+  for(let i=0;i<lab.length;i++)lab[i]=remap[lab[i]];
+  return {base:img,lab,pal:order.map(o=>C[o]),share:order.map(o=>cnt[o]/(N*N))};
+}
+function applyGemEdits(){
+  const r=GE.rec;if(!r||!GE.base)return;
+  const N=GE.base.width,src0=GE.base.data,out=new ImageData(N,N),o=out.data,pal=GE.pal,now=r.edit.cols.map(h=>hex2rgb(h).map(v=>v*255));
+  const delta=pal.map((c,j)=>[now[j][0]-c[0],now[j][1]-c[1],now[j][2]-c[2]]);
+  for(let i=0,n=N*N;i<n;i++){const D=delta[GE.lab[i]],q=i*4;o[q]=src0[q]+D[0];o[q+1]=src0[q+1]+D[1];o[q+2]=src0[q+2]+D[2];o[q+3]=255;}
+  const c=document.createElement('canvas');c.width=c.height=N;c.getContext('2d').putImageData(out,0,0);
+  let fin=c;const t=r.edit.tiles;
+  if(t>1){fin=document.createElement('canvas');fin.width=fin.height=N;const x=fin.getContext('2d');x.imageSmoothingQuality='high';const s=N/t;
+    for(let i=0;i<t;i++)for(let j=0;j<t;j++)x.drawImage(c,Math.round(i*s),Math.round(j*s),Math.ceil(s),Math.ceil(s));}
+  r.cv=fin;gimg=fin;if(gmeta===r)gmeta.histV=0;render();
+}
+const geSoon=()=>{cancelAnimationFrame(GE.raf);GE.raf=requestAnimationFrame(applyGemEdits);};
+function buildGeChips(){
+  const box=$('gecols'),r=GE.rec;box.innerHTML='';
+  r.edit.cols.forEach((h,i)=>{const l=document.createElement('label');l.className='gechip';
+    const inp=document.createElement('input');inp.type='color';inp.value=h;inp.setAttribute('aria-label','Colour '+(i+1));
+    const code=document.createElement('code');code.textContent=h.toUpperCase();
+    const pct=document.createElement('span');pct.textContent=Math.round(GE.share[i]*100)+'%';
+    inp.oninput=()=>{r.edit.cols[i]=inp.value;code.textContent=inp.value.toUpperCase();geSoon();};
+    inp.onchange=()=>{renderGemGrid();};
+    l.append(inp,code,pct);box.append(l);});
+}
+function setupEdit(rec,force){
+  if(!rec)return;if(!rec.base)rec.base=rec.cv;
+  if(GE.rec===rec&&!force){buildGeChips();return;}
+  GE.rec=rec;const k=rec.edit?.k||'auto';
+  const q=quantizeRender(rec.base,k);GE.base=q.base;GE.lab=q.lab;GE.pal=q.pal;GE.share=q.share;
+  if(!rec.edit||force||rec.edit.cols.length!==q.pal.length)rec.edit={k,tiles:rec.edit?.tiles||1,cols:q.pal.map(c=>toHex(c))};
+  $('gek').value=String(rec.edit.k);$('getiles').value=String(rec.edit.tiles);buildGeChips();
+}
+function showRender(rec){gmeta=rec;if(!rec.base)rec.base=rec.cv;gimg=rec.cv;src='gemini';try{setupEdit(rec);}catch(e){console.error(e);}markGem();}
+$('gek').onchange=e=>{const r=GE.rec;if(!r)return;r.edit.k=e.target.value;setupEdit(r,true);r.edit.k=e.target.value;applyGemEdits();renderGemGrid();};
+$('getiles').onchange=e=>{const r=GE.rec;if(!r)return;r.edit.tiles=+e.target.value;applyGemEdits();renderGemGrid();};
+$('gereset').onclick=()=>{const r=GE.rec;if(!r)return;r.edit.tiles=1;r.edit.k='auto';setupEdit(r,true);applyGemEdits();renderGemGrid();$('gestatus').textContent='Edits cleared; back to the render as Gemini drew it.';};
+$('gerefgo').onclick=async()=>{
+  const r=GE.rec,ask=$('gerefine').value.trim().slice(0,400);
+  if(!r||!ask){$('gestatus').textContent='Describe the change first, e.g. "make the checks half the size".';return;}
+  if(gbusy||gconn!=='ok'){$('gestatus').textContent='Gemini is not connected or is busy.';return;}
+  gbusy=true;refreshGem();$('gerefgo').disabled=true;$('gestatus').textContent='Gemini is applying the change…';
+  try{
+    const prompt=`Edit this flat, seamless textile print artwork: ${ask}
+Keep everything else the same (print type, motifs, technique, colours) unless the change asks otherwise. Keep it a flat, straight-on, edge-to-edge square swatch with no garment, folds, shadows, borders or text.`;
+    const {bmp,model}=await gemImage(prompt,[await canvasBlob(r.cv)],r.opts?.size||'2K');
+    const N=r.cv.width;let cv=squareCanvas(bmp,N),how='not made seamless';
+    if(r.seamless){const s=await makeSeamless(cv,r.opts?.size||'2K',t=>$('gestatus').textContent=t);cv=s.cv;how=s.how;}
+    const rec={cv,model,how,seamless:r.seamless,prompt:r.prompt+'\nRefinement: '+ask,opts:{...r.opts,refined:ask},name:P.name||'Gemini print',at:Date.now()};
+    grenders.unshift(rec);showRender(rec);renderGemGrid();$('gerefine').value='';
+    $('gestatus').textContent='Refined. The new version is first under Gemini renders; the previous one is still there.';
+  }catch(e){console.error(e);$('gestatus').textContent=(GERR[e?.code]?GERR[e.code].replace(/\.$/,''):'Gemini could not finish')+(e?.message?` (${String(e.message).slice(0,140)})`:'')+'.';if(e?.code==='bad_key')setGConn('bad','Key not valid');}
+  finally{gbusy=false;refreshGem();$('gerefgo').disabled=false;}
+};
 $('srcback').onclick=()=>toEngine();
 async function saveGemPng(){
   const px=Math.round(P.inches*P.dpi),lim=Math.min(16384,MAXR);
@@ -1363,7 +1512,7 @@ async function saveGemPng(){
   const png=new Blob([withDpi(raw,P.dpi)],{type:'image/png'});
   const fn=`RDPAI_${slug(P.name)}_GEMINI_${P.inches}in_${P.dpi}dpi.png`;
   await saveFile(fn,png);
-  status(`Saved ${fn}. Gemini drew it at ${gimg.width} px, so it was enlarged ${(px/gimg.width).toFixed(1)}× for ${P.dpi} dpi; check fine detail before sending to the mill.`);
+  status(`Saved ${fn}. `+(px>gimg.width?`Gemini drew it at ${gimg.width} px, so it was enlarged ${(px/gimg.width).toFixed(1)}× for ${P.dpi} dpi; check fine detail before sending to the mill.`:`Drawn from Gemini's ${gimg.width} px original.`)+await recordExport('Saved Gemini repeat PNG',fn,'PNG'));
 }
 // ---------- colour suggestions from the reference ----------
 function refPixels(img){const N=96,c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d',{willReadFrequently:true});
@@ -1414,40 +1563,183 @@ $('reset').onclick=()=>{
   $('reset').textContent='Undo reset';status('Stripe, brush, colour and output settings are back to the defaults. The reference and design name are kept.');
   undoT=setTimeout(()=>{undoP=null;$('reset').textContent='Reset';},12000);
 };
-// ---------- design board (this browser) ----------
-const BKEY='rdpai.board.v1';
-const loadBoard=()=>{try{return JSON.parse(localStorage.getItem(BKEY)||'[]');}catch(e){return [];}};
-const storeBoard=b=>{try{localStorage.setItem(BKEY,JSON.stringify(b));return true;}catch(e){return false;}};
-function renderBoard(){
-  const g=$('boardgrid'),b=loadBoard();g.innerHTML='';
-  if(!b.length){const p=document.createElement('p');p.className='board-empty';p.style.gridColumn='1/-1';p.textContent='Nothing saved yet. Use "Add to board" to keep designs you like; click one to bring it back.';g.append(p);return;}
-  b.forEach((it,i)=>{
-    const w=document.createElement('div');w.className='bitem';
-    const t=document.createElement('button');t.className='thumb';t.title='Load '+it.params.name;
-    const im=document.createElement('img');im.src=it.thumb;im.alt='';im.style.cssText='width:100%;aspect-ratio:1/1;display:block;object-fit:cover';
-    const sp=document.createElement('span');const bb=document.createElement('b');bb.textContent=it.params.name||'Untitled';sp.append(bb,document.createTextNode(it.kind==='gemini'?'Gemini render':'seed '+it.params.seed));
-    t.append(im,sp);t.onclick=()=>{if(it.kind==='gemini'){const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=c.height=im.width;c.getContext('2d').drawImage(im,0,0);gimg=c;gmeta={model:it.model,seamless:it.seamless,prompt:it.prompt,opts:it.opts||{},how:''};src='gemini';markGem();};im.src=it.img;status('Loaded the Gemini render from the board.');return;}applyParams(it.params);status('Loaded '+(it.params.name||'design')+' from the board.');};
-    const x=document.createElement('button');x.className='x';x.textContent='×';x.setAttribute('aria-label','Remove '+(it.params.name||'design'));
-    x.onclick=()=>{const nb=loadBoard();nb.splice(i,1);storeBoard(nb);renderBoard();};
-    w.append(t,x);g.append(w);
-  });
+// ---------- SESSION HISTORY (IndexedDB) — modelled on SweaterVision v2.0.9 ----------
+// History, decision log, reference and settings persist across reloads in this browser.
+// FIFO eviction at MAX_HISTORY. "Reset session" is the ONLY action that wipes the persisted store;
+// uploading a new reference is non-destructive. All history deletes go through removeHistoryAt().
+const MAX_HISTORY=50,IDB_NAME='rdpatternai',IDB_STORE='session',IDB_KEY='current';
+const H={items:[],log:[],vc:0,sel:[],open:null,ref:null,ready:false};
+function idbOpen(){return new Promise((res,rej)=>{try{const r=indexedDB.open(IDB_NAME,1);r.onupgradeneeded=()=>r.result.createObjectStore(IDB_STORE);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);}catch(e){rej(e);}});}
+async function idbGet(){try{const db=await idbOpen();return await new Promise(res=>{const q=db.transaction(IDB_STORE,'readonly').objectStore(IDB_STORE).get(IDB_KEY);q.onsuccess=()=>res(q.result||null);q.onerror=()=>res(null);});}catch(e){console.warn('idbGet failed',e);return null;}}
+async function idbPut(d){try{const db=await idbOpen();return await new Promise(res=>{const tx=db.transaction(IDB_STORE,'readwrite');tx.objectStore(IDB_STORE).put(d,IDB_KEY);tx.oncomplete=()=>res(true);tx.onerror=()=>res(false);tx.onabort=()=>res(false);});}catch(e){console.warn('idbPut failed',e);return false;}}
+async function idbClear(){try{const db=await idbOpen();return await new Promise(res=>{const tx=db.transaction(IDB_STORE,'readwrite');tx.objectStore(IDB_STORE).delete(IDB_KEY);tx.oncomplete=()=>res(true);tx.onerror=()=>res(false);});}catch(e){return false;}}
+let _pt=0,_persistWarned=false;
+function persistSession(){
+  if(!H.ready)return;clearTimeout(_pt);
+  _pt=setTimeout(async()=>{
+    const ok=await idbPut({version:VERSION,savedAt:Date.now(),P:{...P},ref:H.ref,history:H.items,log:H.log,vc:H.vc,open:H.open});
+    if(!ok&&!_persistWarned){_persistWarned=true;status('This browser is not keeping saved data, so history will be lost on reload. Use Batch export to keep it.');}
+  },350);
 }
-$('addboard').onclick=()=>{
-  if(src==='gemini'&&gimg){const t=document.createElement('canvas');t.width=t.height=200;t.getContext('2d').drawImage(gimg,0,0,200,200);
-    const im=document.createElement('canvas');im.width=im.height=Math.min(1024,gimg.width);im.getContext('2d').drawImage(gimg,0,0,im.width,im.height);
-    const b=loadBoard();b.unshift({kind:'gemini',params:{...P},thumb:t.toDataURL('image/jpeg',.8),img:im.toDataURL('image/jpeg',.88),prompt:gmeta.prompt,model:gmeta.model,seamless:gmeta.seamless,opts:gmeta.opts,at:Date.now()});
-    status(storeBoard(b.slice(0,48))?'Added the Gemini render to the board (kept at '+im.width+' px).':'The board is full for this browser. Remove a few designs, or use Save repeat PNG.');renderBoard();return;}
-  draw(P,200,200,1,0,false);const thumb=rc.toDataURL('image/jpeg',.8);render();
-  const b=loadBoard();b.unshift({params:{...P},thumb,at:Date.now()});
-  status(storeBoard(b.slice(0,48))?'Added '+(P.name||'design')+' to the board.':'This browser is not keeping saved data. Use "Save recipe" instead.');renderBoard();
+const HPARAMS=Object.keys(DEF);
+const sameParams=(a,b)=>HPARAMS.every(k=>String(a[k])===String(b[k]));
+const colKey=e=>e.kind==='gemini'&&e.g?.opts?.cols!=='current'?'Gemini · reference colours':[e.params.ground,e.params.mid,e.params.stripe].map(h=>h.toUpperCase()).join(' / ');
+async function makeThumb(kind,p,cv){const c=document.createElement('canvas');c.width=c.height=240;
+  if(kind==='gemini')c.getContext('2d').drawImage(cv,0,0,240,240);else{draw(p,240,240,1,0,false);c.getContext('2d').drawImage(rc,0,0);render();}
+  return c.toDataURL('image/jpeg',.82);}
+// add the current design (engine settings or the Gemini render on screen); returns the existing version if it is already in history
+async function addHistory(source){
+  const kind=src==='gemini'&&gimg?'gemini':'engine',p={...P};
+  if(kind==='gemini'&&gmeta&&gmeta.histV){const ex=H.items.find(e=>e.v===gmeta.histV);if(ex)return {e:ex,isNew:false};}
+  if(kind==='engine'){const ex=H.items.find(e=>e.kind==='engine'&&sameParams(e.params,p));if(ex)return {e:ex,isNew:false};}
+  const e={v:++H.vc,at:Date.now(),kind,name:p.name||'Untitled',params:p,source,exports:[],thumb:await makeThumb(kind,p,gimg)};
+  if(kind==='gemini'){e.img=await canvasBlob(gimg,'image/jpeg',.95);e.size=gimg.width;
+    e.g={model:gmeta.model,prompt:gmeta.prompt,opts:gmeta.opts||{},how:gmeta.how||'',seamless:!!gmeta.seamless};gmeta.histV=e.v;}
+  H.items.unshift(e);
+  while(H.items.length>MAX_HISTORY)removeHistoryAt(H.items.length-1,true);
+  H.open=e.name;persistSession();renderHistory();return {e,isNew:true};
+}
+function logRow(e,action,file){
+  const p=e.params,g=e.g||{};
+  H.log.unshift({v:e.v,at:new Date().toISOString(),design:e.name,source:e.kind==='gemini'?'Gemini render':'Stripe engine',action,file:file||'',
+    ground:p.ground,mid:p.mid,stripe:p.stripe,seed:e.kind==='engine'?p.seed:'',density:p.density,angle:p.angle,weight:p.weight,len:p.len,brk:p.brk,warp:p.warp,hair:p.hair,sec:p.sec,halo:p.halo,mottle:p.mottle,
+    inches:p.inches,dpi:p.dpi,gmodel:g.model||'',gclose:g.opts?.close||'',gscale:g.opts?.scale||'',gcols:g.opts?.cols||'',repeat:g.how||'',prompt:g.prompt||'',app:VERSION});
+  if(H.log.length>500)H.log.length=500;persistSession();
+}
+async function recordExport(action,file,short){
+  try{const {e,isNew}=await addHistory('export');if(!e.exports.includes(short))e.exports.push(short);logRow(e,action,file);persistSession();renderHistory();
+    return ` Logged as V${e.v} in history${isNew?'':' (already there)'}.`;}catch(err){console.warn(err);return '';}
+}
+function removeHistoryAt(i,quiet){
+  if(i<0||i>=H.items.length)return;
+  const v=H.items[i].v;H.items.splice(i,1);H.sel=H.sel.filter(x=>x!==v);
+  if(gmeta&&gmeta.histV===v)gmeta.histV=0;
+  if(!quiet){persistSession();}
+}
+const idxOf=v=>H.items.findIndex(e=>e.v===v);
+async function entryCanvas(e,N){const c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d');x.imageSmoothingQuality='high';
+  if(e.kind==='gemini'){const b=await createImageBitmap(e.img);x.drawImage(b,0,0,N,N);}else{draw(e.params,N,N,1,0,false);x.drawImage(rc,0,0);render();}return c;}
+async function loadHistoryItem(v){
+  const e=H.items[idxOf(v)];if(!e)return;
+  if(e.kind==='engine'){applyParams(e.params);status(`Showing V${e.v} · ${e.name}.`);return;}
+  const b=await createImageBitmap(e.img),c=document.createElement('canvas');c.width=c.height=b.width;c.getContext('2d').drawImage(b,0,0);
+  Object.assign(P,{name:e.params.name,inches:e.params.inches,dpi:e.params.dpi});syncUI();
+  showRender({cv:c,model:e.g.model,prompt:e.g.prompt,opts:e.g.opts||{},how:e.g.how,seamless:e.g.seamless,histV:e.v,name:e.name});status(`Showing V${e.v} · ${e.name} (Gemini render).`);
+}
+async function downloadHistItem(v){
+  const e=H.items[idxOf(v)];if(!e||busy)return;setBusy(true);
+  try{const p=e.params,px=Math.round(p.inches*p.dpi),lim=Math.min(MAXR,MAXV,16384);
+    if(px>lim){status(`V${e.v} needs ${px} px; this device tops out at ${lim}.`);return;}
+    let png,fn;
+    if(e.kind==='engine'){const pw=new PngWriter(px,px,3,p.dpi);await renderStrips(p,px,-1,async(rows,y0,h)=>{await pw.rows(rows,h);status(`Rendering V${e.v}: ${Math.round((y0+h)/px*100)}%…`);});
+      png=await pw.finish();render();fn=`RDPAI_${slug(p.name)}_V${e.v}_s${p.seed}_${p.inches}in_${p.dpi}dpi.png`;}
+    else{const c=await entryCanvas(e,px);png=new Blob([withDpi(new Uint8Array(await (await canvasBlob(c)).arrayBuffer()),p.dpi)],{type:'image/png'});fn=`RDPAI_${slug(p.name)}_V${e.v}_GEMINI_${p.inches}in_${p.dpi}dpi.png`;}
+    await saveFile(fn,png);if(!e.exports.includes('PNG'))e.exports.push('PNG');logRow(e,'Downloaded repeat PNG from history',fn);renderHistory();status('Saved '+fn+'.');
+  }catch(err){render();status(errMsg(err));}finally{setBusy(false);}
+}
+function deleteHistoryItem(v){
+  const i=idxOf(v),e=H.items[i];if(!e)return;
+  if(!confirm(`Delete V${e.v} · ${e.name}?\n\nIt is removed from history and from this browser's saved session.\nThe decision log keeps its rows. This cannot be undone.`))return;
+  removeHistoryAt(i);renderHistory();if(!$('cmpmodal').hidden){H.sel.length>=2?showComparison():closeComparison();}
+}
+function useHistColours(v){const e=H.items[idxOf(v)];if(!e)return;Object.assign(P,{ground:e.params.ground,mid:e.params.mid,stripe:e.params.stripe});toEngine();syncUI();render();renderVarsSoon();status(`Using the colourway from V${e.v}.`);}
+async function useHistAsRef(v){const e=H.items[idxOf(v)];if(!e)return;const c=await entryCanvas(e,1024);setReference(c.toDataURL('image/jpeg',.92),`V${e.v} · ${e.name}`);refStatus(`V${e.v} is now the reference.`);}
+function toggleHistSelect(v){if(H.sel.includes(v))H.sel=H.sel.filter(x=>x!==v);else if(H.sel.length<4)H.sel.push(v);else{status('Compare takes up to 4 versions.');}renderHistory();}
+const esc2=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function renderHistory(){
+  const list=$('histlist'),n=H.items.length;
+  $('hcompare').hidden=H.sel.length<2;$('hcompare').textContent=`Compare (${H.sel.length})`;
+  $('histcount').textContent=n?`${n} version${n>1?'s':''} · saved in this browser, up to ${MAX_HISTORY}`:'saved in this browser';
+  if(!n){list.innerHTML='<p class="board-empty">Nothing saved yet. Exports are saved here automatically, and "Save to history" keeps the design on screen. History survives reloading the page.</p>';return;}
+  const groups=new Map();
+  H.items.forEach(e=>{if(!groups.has(e.name))groups.set(e.name,{name:e.name,top:0,cols:new Map()});const g=groups.get(e.name);g.top=Math.max(g.top,e.v);
+    const ck=colKey(e);if(!g.cols.has(ck))g.cols.set(ck,{ck,top:0,sw:e.kind==='gemini'&&ck.startsWith('Gemini')?null:[e.params.ground,e.params.mid,e.params.stripe],items:[]});const c=g.cols.get(ck);c.top=Math.max(c.top,e.v);c.items.push(e);});
+  const gs=[...groups.values()].sort((a,b)=>b.top-a.top);
+  if(H.open!=='\u0000none'&&!groups.has(H.open))H.open=gs[0].name;
+  let h='';
+  for(const g of gs){const open=H.open===g.name,cols=[...g.cols.values()].sort((a,b)=>b.top-a.top),cnt=cols.reduce((t,c)=>t+c.items.length,0);
+    h+=`<div class="hg"><button class="hg-head" data-act="group" data-k="${encodeURIComponent(g.name)}" aria-expanded="${open}"><span class="chev" aria-hidden="true">${open?'▾':'▸'}</span><b>${esc2(g.name)}</b>
+      <span class="hsw">${cols.filter(c=>c.sw).slice(0,5).map(c=>`<i style="background:${c.sw[0]}"></i>`).join('')}</span><span class="hmeta">${cols.length} colourway${cols.length>1?'s':''} · ${cnt} version${cnt>1?'s':''} · latest V${g.top}</span></button>`;
+    if(open){h+='<div class="hg-body">';
+      for(const c of cols){h+=`<div class="hc"><div class="hc-head">${c.sw?`<span class="hsw">${c.sw.map(s=>`<i style="background:${s}"></i>`).join('')}</span>`:''}<span>${esc2(c.ck)}</span></div><div class="grid hgrid">`;
+        for(const e of c.items.sort((a,b)=>b.v-a.v)){const sel=H.sel.includes(e.v),on=(e.kind==='gemini'?src==='gemini'&&gmeta?.histV===e.v:src==='engine'&&sameParams(e.params,P));
+          h+=`<div class="hcell${sel?' sel':''}${on?' on':''}"><button class="thumb htile" data-act="view" data-v="${e.v}" title="Show V${e.v}"><img src="${e.thumb}" alt=""><span class="vb">V${e.v}</span>${e.kind==='gemini'?'<span class="kb">Gemini</span>':''}</button>
+            <label class="hpick" title="Select for comparison"><input type="checkbox" data-act="pick" data-v="${e.v}" ${sel?'checked':''}> </label>
+            <div class="hfoot"><span class="hinfo">${e.kind==='engine'?'seed '+e.params.seed:esc2(e.g.opts?.close||'render')}${e.exports.length?` · <span class="hx" title="Exported">${e.exports.join(', ')}</span>`:''}<br><span class="hdate">${new Date(e.at).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span></span>
+            <span class="hmini"><button data-act="dl" data-v="${e.v}" title="Download repeat PNG at ${e.params.inches}″ / ${e.params.dpi} dpi" aria-label="Download V${e.v}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></button><button data-act="cols" data-v="${e.v}" title="Use this colourway" aria-label="Use colourway of V${e.v}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4A5.6 5.6 0 0 0 21 9.8C21 6 17 3 12 3zM7.5 12a1 1 0 1 1 0-.1M10 7.5a1 1 0 1 1 0-.1M15 7.5a1 1 0 1 1 0-.1"/></svg></button><button data-act="ref" data-v="${e.v}" title="Use as reference" aria-label="Use V${e.v} as reference"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4"/></svg></button><button class="danger" data-act="del" data-v="${e.v}" title="Delete V${e.v}" aria-label="Delete V${e.v}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></span></div></div>`;}
+        h+='</div></div>';}
+      h+='</div>';}
+    h+='</div>';}
+  list.innerHTML=h;
+}
+$('histlist').addEventListener('click',e=>{const t=e.target.closest('[data-act]');if(!t)return;const v=+t.dataset.v,a=t.dataset.act;
+  if(a==='group'){const k=decodeURIComponent(t.dataset.k);H.open=H.open===k?'\u0000none':k;renderHistory();persistSession();}
+  else if(a==='view')loadHistoryItem(v);else if(a==='dl')downloadHistItem(v);else if(a==='cols')useHistColours(v);else if(a==='ref')useHistAsRef(v);else if(a==='del')deleteHistoryItem(v);});
+$('histlist').addEventListener('change',e=>{const t=e.target.closest('[data-act="pick"]');if(t)toggleHistSelect(+t.dataset.v);});
+async function showComparison(){
+  const items=H.sel.map(v=>H.items[idxOf(v)]).filter(Boolean);if(items.length<2){closeComparison();return;}
+  const g=$('cmpgrid');g.innerHTML='';g.style.gridTemplateColumns=`repeat(${items.length===3?3:2},minmax(0,1fr))`;
+  for(const e of items){const c=await entryCanvas(e,560),big=document.createElement('canvas');big.width=big.height=560;const x=big.getContext('2d');
+    for(let i=0;i<2;i++)for(let j=0;j<2;j++)x.drawImage(c,i*280,j*280,280,280);
+    const f=document.createElement('figure');f.className='cmpitem';const cap=document.createElement('figcaption');
+    cap.textContent=`V${e.v} · ${e.name} · ${e.kind==='gemini'?'Gemini render':'seed '+e.params.seed} · ${colKey(e)}`;
+    const del=document.createElement('button');del.className='btn sm';del.textContent='Delete';del.onclick=()=>deleteHistoryItem(e.v);
+    const view=document.createElement('button');view.className='btn sm';view.textContent='Show in preview';view.onclick=()=>{closeComparison();loadHistoryItem(e.v);};
+    const bb=document.createElement('div');bb.className='btns';bb.append(view,del);f.append(big,cap,bb);g.append(f);}
+  $('cmpmodal').hidden=false;$('cmpclose').focus();
+}
+function closeComparison(){$('cmpmodal').hidden=true;}
+$('hcompare').onclick=showComparison;$('cmpclose').onclick=closeComparison;
+$('cmpmodal').addEventListener('click',e=>{if(e.target===$('cmpmodal'))closeComparison();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('cmpmodal').hidden)closeComparison();});
+const csvEsc=v=>{const s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;};
+function logCsv(){
+  const cols=[['Version','v'],['Timestamp','at'],['Design','design'],['Source','source'],['Action','action'],['Exported Filename','file'],['Ground','ground'],['Shadow','mid'],['Stripe','stripe'],['Seed','seed'],['Density','density'],['Angle','angle'],['Weight','weight'],['Stroke Length','len'],['Breakup','brk'],['Flow','warp'],['Dry Brush','hair'],['Shadow Strokes','sec'],['Halo','halo'],['Mottle','mottle'],['Repeat (in)','inches'],['DPI','dpi'],['Render Model','gmodel'],['Gemini Closeness','gclose'],['Gemini Scale','gscale'],['Gemini Colours','gcols'],['Repeat Check','repeat'],['Prompt Sent','prompt'],['App Version','app']];
+  return ['"RD Pattern AI V'+VERSION+' - Decision Log Export - '+new Date().toLocaleString()+'"',cols.map(c=>c[0]).join(','),...H.log.map(r=>cols.map(c=>csvEsc(r[c[1]])).join(','))].join('\r\n');
+}
+$('hlog').onclick=async()=>{if(!H.log.length){status('No decision-log rows yet. Exports and "Save to history" add them.');return;}
+  const fn=`RDPatternAI-V${VERSION}-DecisionLog-${new Date().toISOString().slice(0,10)}.csv`;try{await saveFile(fn,new Blob(['﻿'+logCsv()],{type:'text/csv'}));status(`Saved ${fn} (${H.log.length} rows).`);}catch(e){status(errMsg(e));}};
+$('hbatch').onclick=async()=>{
+  if(!H.items.length){status('History is empty.');return;}if(busy)return;setBusy(true);
+  try{const day=new Date().toISOString().slice(0,10),root=`RDPAI_history_${day}`,entries=[];
+    for(const e of H.items){status(`Preparing V${e.v} of ${H.items.length}…`);const base=`${root}/V${String(e.v).padStart(3,'0')}_${slug(e.name)}${e.kind==='gemini'?'_GEMINI':''}`;
+      const c=await entryCanvas(e,e.kind==='gemini'?Math.min(2048,e.size||1024):1024);entries.push({name:base+'.png',blob:await canvasBlob(c)});
+      entries.push({name:base+'_recipe.json',blob:new Blob([JSON.stringify(e.kind==='gemini'?{tool:'RD Pattern AI',version:VERSION,kind:'gemini-render',v:e.v,name:e.name,model:e.g.model,options:e.g.opts,prompt:e.g.prompt,repeat:e.g.how}:{...recipe(e.params),v:e.v},null,2)]),deflate:true});}
+    entries.push({name:`${root}/decision_log.csv`,blob:new Blob(['﻿'+logCsv()]),deflate:true});
+    const zip=await makeZip(entries,n=>status('Packing '+n.split('/').pop()+'…'));
+    await saveFile(root+'.zip',zip);status(`Saved ${root}.zip: ${H.items.length} versions as 1024 px previews with recipes, plus the decision log. Use ⇩ on a version for its full print-size PNG.`);
+  }catch(e){render();status(errMsg(e));}finally{setBusy(false);}
 };
-$('exportboard').onclick=async()=>{
-  const b=loadBoard();if(!b.length){status('The board is empty.');return;}
-  try{await saveFile(`RDPAI_board_${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({tool:'RD Pattern AI',version:VERSION,designs:b.map(x=>x.kind==='gemini'?{tool:'RD Pattern AI',kind:'gemini-render',name:x.params.name,model:x.model,prompt:x.prompt}:recipe(x.params))},null,2));status('Exported '+b.length+' designs.');}catch(e){status(errMsg(e));}
+$('hreset').onclick=async()=>{
+  if(!confirm('Reset session — are you sure?\n\nThis permanently removes:\n  • all '+H.items.length+' versions in history\n  • the decision log ('+H.log.length+' rows)\n  • the reference photo and its suggested colours\n  • Gemini renders and current settings\n  • the saved session (it will not return on reload)\n\nAPI keys are kept. This cannot be undone.'))return;
+  H.items=[];H.log=[];H.vc=0;H.sel=[];H.open=null;H.ref=null;grenders.length=0;refSug=[];showSuggestions();
+  refImg.removeAttribute('src');$('refimg').src=REF_EMPTY;$('refname').textContent='No reference yet';refStatus('');gemStatus('');
+  Object.assign(P,DEF);toEngine();renderGemGrid();syncUI();render();renderVarsSoon();refreshGem();closeComparison();
+  await idbClear();renderHistory();status('Session reset. History, decision log and reference cleared.');
 };
+$('addboard').onclick=async()=>{const {e,isNew}=await addHistory('manual');if(isNew)logRow(e,'Saved to history','');status(isNew?`Saved as V${e.v} in history.`:`Already in history as V${e.v}.`);};
+async function migrateBoard(){ // one-time move of the old "Design board" (localStorage) into history
+  let b=[];try{if(localStorage.getItem('rdpai.board.migrated'))return 0;b=JSON.parse(localStorage.getItem('rdpai.board.v1')||'[]');}catch(e){return 0;}
+  let n=0;for(const it of b.slice().reverse()){try{
+    const p={...DEF,...it.params},e={v:++H.vc,at:it.at||Date.now(),kind:it.kind==='gemini'?'gemini':'engine',name:p.name||'Untitled',params:p,source:'board',exports:[],thumb:it.thumb};
+    if(e.kind==='gemini'){e.img=await (await fetch(it.img)).blob();e.size=1024;e.g={model:it.model||'',prompt:it.prompt||'',opts:it.opts||{},how:'',seamless:!!it.seamless};}
+    H.items.unshift(e);logRow(e,'Moved from design board','');n++;}catch(err){console.warn('board item skipped',err);}}
+  H.items=H.items.slice(0,MAX_HISTORY);try{localStorage.setItem('rdpai.board.migrated','1');}catch(e){}return n;
+}
+async function historyInit(){
+  const d=await idbGet();
+  if(d){H.items=Array.isArray(d.history)?d.history.slice(0,MAX_HISTORY):[];H.log=Array.isArray(d.log)?d.log:[];H.vc=d.vc||H.items.reduce((m,e)=>Math.max(m,e.v),0);H.open=d.open||null;
+    if(d.P)Object.keys(DEF).forEach(k=>{if(d.P[k]!==undefined)P[k]=d.P[k];});
+    if(d.ref&&d.ref.data){H.ref=d.ref;setReference(d.ref.data,d.ref.name,true);}
+    syncUI();render();renderVarsSoon();}
+  const moved=await migrateBoard();
+  H.ready=true;renderHistory();
+  if(moved){persistSession();status(`Moved ${moved} design${moved>1?'s':''} from the old design board into history.`);}
+  else if(d&&(H.items.length||H.ref))status(`Session restored: ${H.items.length} version${H.items.length===1?'':'s'} in history${H.ref?', reference and settings':''}.`);
+}
 
 $('ver').textContent='v'+VERSION;
-syncUI();newVarSeeds();varSeeds[0]=DEF.seed;render();renderVars();renderBoard();
+syncUI();newVarSeeds();varSeeds[0]=DEF.seed;render();renderVars();historyInit();
 window.__ps={P,draw,rc,render,extractPalette,refImg};
 })();
 </script>
