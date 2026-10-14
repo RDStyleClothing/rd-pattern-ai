@@ -148,18 +148,49 @@ body.gem-mode .rail section.eng,body.base-mode .rail section.eng,body.base-mode 
 .linkbtn{border:0;background:none;padding:0;color:var(--accent);font:600 12px var(--f-body);text-decoration:underline;cursor:pointer}
 #gemgo:disabled{opacity:.45}
 .err{padding:16px;color:var(--ink)}
-body.engine-check .rail section.tg{display:none}
+body.engine-check .rail section.tg,body.engine-animal .rail section.tg{display:none}
 body:not(.engine-check) .rail section.ck{display:none}
+body:not(.engine-animal) .rail section.an{display:none}
+.an .row[hidden]{display:none}
+.bgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-height:430px;overflow:auto;padding:2px}
+.bgrid .bfam{grid-column:1/-1;font:700 10.5px var(--f-body);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.bcard{border:1px solid var(--line);border-radius:6px;background:var(--well);padding:0;cursor:pointer;overflow:hidden;display:flex;flex-direction:column;color:var(--ink);text-align:left}
+.bcard canvas{width:100%;aspect-ratio:1/1;display:block}
+.bcard span{font:11px var(--f-body);padding:4px 6px;line-height:1.2}
+.bcard[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:1px}
+.bcard:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+#cwrow{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+#cwrow .note{width:100%}
+.seg.full{display:flex;flex-wrap:wrap}.seg.full button{flex:1 1 auto;white-space:nowrap}
 .colors.colors4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .ckhint{font-size:11.5px;color:var(--muted);margin:0}
+.rail h2 .stepn{display:inline-grid;place-items:center;width:18px;height:18px;margin-right:6px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-size:10.5px;letter-spacing:0;vertical-align:1px}
+.rail section.step.dim h2 .stepn{background:var(--muted)}
+.pipe{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.pipe li{display:flex;gap:8px;align-items:center}.pipe li i{width:14px;text-align:center;font-style:normal}
+.pipe li.run{color:var(--ink)}.pipe li.done{color:var(--good)}.pipe li.fail{color:var(--bad)}
+.pipe li.run i{animation:pulse 1s ease-in-out infinite}
+details.adv{border-top:1px dashed var(--line);padding-top:8px}
+details.adv summary{cursor:pointer;font-size:12.5px;font-weight:600;color:var(--muted)}
+details.adv[open] summary{margin-bottom:8px}
+details.adv>div{display:flex;flex-direction:column;gap:10px}
+.ctlsum{font-size:12.5px;color:var(--ink);margin:0;background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 10px}
+.ctlsum b{font-weight:700}
+.dfield{display:flex;flex-direction:column;gap:3px}
+.dfield .dl{display:flex;justify-content:space-between;gap:8px;font-size:13px}
+.dfield .dl output{font:11.5px var(--f-mono);color:var(--muted)}
+.dfield .ends{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.dfield select{font:13px var(--f-body);padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%}
+#dfields{display:flex;flex-direction:column;gap:12px}
+.rail h3{margin:4px 0 0;font:700 11px var(--f-body);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
 <div class="wrap">
   <header>
     <div>
-      <div class="brand"><h1>RD Pattern AI</h1><span class="pill" id="ver">v1.5.0</span></div>
-      <p class="sub">Generate original prints in the spirit of a customer reference. Drop in a reference photo: it becomes the base on the preview. Press Match reference: Claude reads the print and Gemini recreates it, then checks and plaids are rebuilt in the check &amp; plaid engine (and animal stripes in the stripe engine) so every slider edits the design. Save a seamless repeat at print resolution.</p>
+      <div class="brand"><h1>RD Pattern AI</h1><span class="pill" id="ver">v1.7.0</span></div>
+      <p class="sub"><b>1</b> Upload a customer reference, or pick a base design to edit and recolour. <b>2</b> Gemini recreates it as a flat, seamless print. <b>3</b> Claude reviews the recreation and builds the settings, fields and sliders for that design. <b>4</b> Edit, then save the repeat at print resolution.</p>
     </div>
     <div class="conn">
       <button class="chip api" id="connbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="connpanel">
@@ -173,7 +204,7 @@ body:not(.engine-check) .rail section.ck{display:none}
         <p class="note">Keys are saved only in this browser on this workstation. Green light = key tested and working; red = missing or refused.</p>
         <div class="apisec">
           <h3><span class="dot" id="conndot2" data-state="off"></span>Anthropic (Claude)</h3>
-          <p class="note">Used by Match reference to read the print. Sent only to api.anthropic.com.</p>
+          <p class="note">Used in step 3: Claude reviews the recreated print and builds its controls. Sent only to api.anthropic.com.</p>
           <label class="name">API key<input id="apikey" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…"></label>
           <label class="name">Model<select id="apimodel"><option value="claude-sonnet-5-5">Claude Sonnet 5.5 (best match)</option><option value="claude-haiku-5-5">Claude Haiku 5.5 (lower cost)</option></select></label>
           <div class="btns"><button class="btn sm primary" id="keysave">Save &amp; test</button><button class="btn sm" id="keytest">Test again</button><button class="btn sm" id="keyclear">Remove key</button></div>
@@ -181,7 +212,7 @@ body:not(.engine-check) .rail section.ck{display:none}
         </div>
         <div class="apisec">
           <h3><span class="dot" id="gdot2" data-state="off"></span>Google Gemini</h3>
-          <p class="note">Used by Match reference and Render with Gemini. Sent only to generativelanguage.googleapis.com. Each render uses one or two image generations on this key.</p>
+          <p class="note">Used in step 2: Gemini recreates the print. Sent only to generativelanguage.googleapis.com. Each recreation uses one or two image generations on this key.</p>
           <label class="name">API key<input id="gkey" type="password" autocomplete="off" spellcheck="false" placeholder="AIza…"></label>
           <label class="name">Image model<select id="gmodel"></select></label>
           <div class="btns"><button class="btn sm primary" id="gkeysave">Save &amp; test</button><button class="btn sm" id="gkeytest">Test again</button><button class="btn sm" id="gkeyclear">Remove key</button></div>
@@ -208,53 +239,67 @@ body:not(.engine-check) .rail section.ck{display:none}
     </div>
 
     <aside class="rail">
-      <section>
-        <h2>Reference</h2>
-        <div class="refbox">
+      <section class="step">
+        <h2><span class="stepn">1</span>Start</h2>
+        <div class="seg full" role="group" aria-label="Start from"><button id="st-ref" aria-pressed="true">Customer reference</button><button id="st-base" aria-pressed="false">Base design</button></div>
+        <div id="basebox" hidden>
+          <p class="note">Pick a base design to edit and recolour. No reference or API key needed.</p>
+          <div class="bgrid" id="bgrid"></div>
+        </div>
+        <div class="refbox" id="refbox">
           <img id="refimg" alt="Reference image">
           <div class="rtxt"><b id="refname">No reference yet</b><span>Drop a photo anywhere on the preview, paste one, or upload it.</span>
             <div class="btns"><button class="btn sm" id="refup">Upload</button><input type="file" id="reffile" accept="image/*" hidden></div>
           </div>
         </div>
-        <div class="btns">
-          <button class="btn" id="refcols">Use reference colours</button>
-          <button class="btn primary" id="match" hidden title="Claude reads the reference; the stripe engine or Gemini recreates it in the reference colours">Match reference</button>
-        </div>
-        <p class="note" id="matchhint" hidden>Add a Claude or Gemini key under API in the top bar to use Match.</p>
         <p class="status" id="refstatus" role="status"></p>
       </section>
+      <section class="step" id="step2">
+        <h2><span class="stepn">2</span>Recreate with Gemini</h2>
+        <p class="note">Gemini redraws the reference as a flat, seamless print. Claude then reviews it and builds the controls (step 3) automatically.</p>
+        <div class="btns"><button class="btn primary" id="match" hidden>Recreate the print</button></div>
+        <p class="note" id="matchhint" hidden>Add a Gemini key (and a Claude key for step 3) under API in the top bar.</p>
+        <ol class="pipe" id="pipe" hidden></ol>
+        <details class="adv" id="gemopts"><summary>Gemini options</summary><div>
+          <div class="out">
+            <label>Closeness<select id="gclose"><option value="exact" selected>Recreate the reference</option><option value="close">Close to reference</option><option value="inspired">Inspired by</option><option value="loose">Loose</option></select></label>
+            <label>Scale<select id="gscale"><option value="ref" selected>As reference</option><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select></label>
+            <label>Colours<select id="gcols"><option value="ref">From reference</option><option value="current">Current colourway</option></select></label>
+            <label>Gemini size<select id="gsize"><option>1K</option><option selected>2K</option><option>4K</option></select></label>
+          </div>
+          <label class="name">Notes for Gemini (optional)<textarea id="gnotes" rows="2" maxlength="400" placeholder="e.g. 1 cm check, slightly softer blue"></textarea></label>
+          <label class="chk"><input type="checkbox" id="gseam" checked> Make it a seamless repeat (one extra Gemini call)</label>
+          <div class="out"><label>Extra options<select id="gcount"><option>1</option><option selected>2</option><option>4</option></select></label></div>
+          <div class="btns"><button class="btn" id="gemgo" disabled>Make extra Gemini options</button></div>
+          <p class="note" id="gemhint"></p>
+        </div></details>
+        <p class="status" id="gemstatus" role="status"></p>
+      </section>
+      <section class="step" id="step3">
+        <h2><span class="stepn">3</span>Design controls</h2>
+        <p class="ctlsum" id="ctlsum">Claude builds the settings, fields and sliders for this design after Gemini recreates it.</p>
+        <div class="btns"><button class="btn sm" id="buildctl" hidden>Rebuild controls with Claude</button></div>
+        <div id="cwrow" hidden></div>
+      </section>
       <section id="gedit" hidden>
-        <h2>Edit render</h2>
-        <p class="note">Change any colour of the render; its texture and shading follow. Motif size repeats the print more times inside the same repeat size.</p>
+        <div id="dfields"></div>
+        <div class="btns"><button class="btn primary" id="dapply" hidden>Apply design changes</button></div>
+        <h3>Colours · instant</h3>
         <div class="gecols" id="gecols"></div>
         <div class="out">
           <label>Colours found<select id="gek"><option value="auto">Auto</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option></select></label>
           <label>Motif size<select id="getiles"><option value="1">As drawn</option><option value="2">½ · 2 × 2 per repeat</option><option value="3">⅓ · 3 × 3 per repeat</option><option value="4">¼ · 4 × 4 per repeat</option></select></label>
         </div>
-        <label class="name">Ask Gemini for a change<textarea id="gerefine" rows="2" maxlength="400" placeholder="e.g. make the checks half the size, remove the herringbone texture"></textarea></label>
-        <div class="btns"><button class="btn primary" id="gerefgo">Apply change with Gemini</button><button class="btn" id="gereset">Undo colour &amp; size edits</button></div>
-        <button class="btn" id="gefit" title="Claude reads this render and rebuilds it in the check &amp; plaid engine, so every slider edits it">Make editable in the check engine</button>
+        <details class="adv"><summary>Ask Gemini for any other change</summary><div>
+          <label class="name">Change<textarea id="gerefine" rows="2" maxlength="400" placeholder="e.g. make the checks half the size, remove the herringbone texture"></textarea></label>
+          <div class="btns"><button class="btn" id="gerefgo">Apply with Gemini</button></div>
+        </div></details>
+        <div class="btns"><button class="btn sm" id="gereset">Undo colour &amp; size edits</button></div>
         <p class="status" id="gestatus" role="status"></p>
       </section>
-      <section>
-        <h2>Render with Gemini</h2>
-        <p class="note">For prints the stripe engine can't draw: checks, plaids, florals, geometrics. Gemini redraws the reference as an original, flat print.</p>
-        <div class="out">
-          <label>Closeness<select id="gclose"><option value="exact" selected>Recreate the reference</option><option value="close">Close to reference</option><option value="inspired">Inspired by</option><option value="loose">Loose</option></select></label>
-          <label>Scale<select id="gscale"><option value="ref" selected>As reference</option><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select></label>
-          <label>Colours<select id="gcols"><option value="ref">From reference</option><option value="current">Current colourway</option></select></label>
-          <label>Options<select id="gcount"><option>1</option><option selected>2</option><option>4</option></select></label>
-          <label>Gemini size<select id="gsize"><option>1K</option><option selected>2K</option><option>4K</option></select></label>
-        </div>
-        <label class="name">Notes for Gemini (optional)<textarea id="gnotes" rows="2" maxlength="400" placeholder="e.g. 1 cm check, slightly softer blue"></textarea></label>
-        <label class="chk"><input type="checkbox" id="gseam" checked> Make it a seamless repeat (one extra Gemini call)</label>
-        <div class="btns"><button class="btn primary" id="gemgo" disabled>Render with Gemini</button></div>
-        <p class="note" id="gemhint"></p>
-        <p class="status" id="gemstatus" role="status"></p>
-      </section>
       <section class="eng pe">
-        <h2>Print engine</h2>
-        <div class="seg" role="group" aria-label="Print engine"><button id="pe-tiger" aria-pressed="true">Tiger stripe</button><button id="pe-check" aria-pressed="false">Check &amp; plaid</button></div>
+        <h2>Engine</h2>
+        <div class="seg" role="group" aria-label="Print engine"><button id="pe-tiger" aria-pressed="true">Tiger stripe</button><button id="pe-check" aria-pressed="false">Check &amp; plaid</button><button id="pe-animal" aria-pressed="false">Animal</button></div>
       </section>
       <section class="eng ck">
         <h2>Check colours</h2>
@@ -278,7 +323,20 @@ body:not(.engine-check) .rail section.ck{display:none}
         <div class="row"><label for="ck-tex">Weave texture</label><input type="range" id="ck-tex" min="0" max="1" step="0.01"><output for="ck-tex"></output></div>
         <div class="row"><label for="ck-shade">Weave shadow</label><input type="range" id="ck-shade" min="0" max="1" step="0.01"><output for="ck-shade"></output></div>
         <div class="row"><label for="ck-soft">Softness</label><input type="range" id="ck-soft" min="0" max="1" step="0.01"><output for="ck-soft"></output></div>
-        <div class="out"><label>Weave<select id="ck-weave"><option value="plain">Plain</option><option value="twill">Twill 2/2</option></select></label></div>
+        <div class="out"><label>Layout<select id="ck-mode"><option value="check">Check (both ways)</option><option value="stripe">Stripes (one way)</option></select></label>
+          <label>Weave<select id="ck-weave"><option value="plain">Plain</option><option value="twill">Twill 2/2</option><option value="herringbone">Herringbone</option></select></label></div>
+        <div class="row" id="ck-hbrow"><label for="ck-hb">Herringbone width</label><input type="range" id="ck-hb" min="2" max="16" step="1"><output for="ck-hb"></output></div>
+        <p class="ckhint">Houndstooth: sett A4 B4, Twill, Weave texture at full. Herringbone: warp B8, weft A8. Stripes: angle 0 = vertical, 90 = horizontal.</p>
+      </section>
+      <section class="eng an">
+        <h2>Animal</h2>
+        <div class="seg full" role="group" aria-label="Animal type" id="an-types"></div>
+        <div class="colors colors4" id="an-cols"></div>
+      </section>
+      <section class="eng an">
+        <h2>Pattern</h2>
+        <div id="an-sliders"></div>
+        <div class="seedrow"><label for="an-seed">Seed</label><input id="an-seed" type="number" min="1" max="999999"><button class="btn" id="an-shuffle">Shuffle</button></div>
       </section>
       <section class="eng tg">
         <h2>Colourway</h2>
@@ -307,8 +365,8 @@ body:not(.engine-check) .rail section.ck{display:none}
         <div class="row"><label for="mottle">Ground mottle</label><input type="range" id="mottle" min="0" max="1.2" step="0.01"><output for="mottle"></output></div>
         <div class="seedrow"><label for="seed">Seed</label><input id="seed" type="number" min="1" max="999999"><button class="btn" id="shuffle">Shuffle</button></div>
       </section>
-      <section>
-        <h2>Output</h2>
+      <section class="step">
+        <h2><span class="stepn">4</span>Save &amp; export</h2>
         <label class="name">Design name<input id="dname" maxlength="40"></label>
         <div class="out">
           <label>Repeat size (in)<input type="number" id="inches" min="2" max="36" step="0.5"></label>
@@ -327,6 +385,13 @@ body:not(.engine-check) .rail section.ck{display:none}
         <p class="note">The layered package is a .zip with a layered PSD, each layer as a transparent PNG, the flat composite, a preview, the recipe and a spec sheet.</p>
         <p class="note">The Illustrator package traces the print into vector shapes: one layer per element, global swatches, ready to drag into Swatches as a pattern.</p>
         <p class="status" id="status" role="status"></p>
+      </section>
+      <section>
+        <details class="adv"><summary>Advanced</summary><div>
+          <p class="note">Switch engine by hand, or start the engine from the reference colours without Gemini.</p>
+          <div class="seg" role="group" aria-label="Engine"><button id="adv-tiger">Tiger stripe</button><button id="adv-check">Check &amp; plaid</button><button id="adv-animal">Animal</button></div>
+          <div class="btns"><button class="btn sm" id="refcols">Use reference colours</button></div>
+        </div></details>
       </section>
     </aside>
   </div>
@@ -462,7 +527,7 @@ precision highp float; precision highp int;
 uniform vec2 uRes; uniform vec2 uOrigin; uniform int uLayer; uniform float uTiles; uniform int uMode; uniform float uGuides;
 uniform ivec2 uL; uniform float uN; uniform float uT;
 uniform int uWN,uFN; uniform float uWE[32]; uniform float uFE[32]; uniform int uWC[32]; uniform int uFC[32];
-uniform vec3 uCol[4]; uniform int uNC; uniform int uWeave; uniform float uTex,uShade,uSoft;
+uniform vec3 uCol[4]; uniform int uNC; uniform int uWeave; uniform float uTex,uShade,uSoft; uniform int uStripe,uHB;
 out vec4 o;
 // fraction of each colour inside [s-fw/2, s+fw/2] of the sett (box filter = anti-aliasing + softness)
 vec4 bandWarp(float s,float fw){vec4 w=vec4(0.);float lo=s-fw*.5,hi=s+fw*.5;
@@ -482,12 +547,15 @@ void main(){
   float tx=xp*uT, ty=yp*uT;
   float vis=uTex*clamp((1./max(max(fwidth(tx),fwidth(ty)),1e-4)-1.5)/2.5,0.,1.);
   int ix=int(floor(tx)), iy=int(floor(ty));
-  bool up=uWeave==0?((ix+iy)&1)==0:(((ix+iy)%4+4)%4)<2;
+  bool up;
+  if(uWeave==0)up=((ix+iy)&1)==0;
+  else if(uWeave==1)up=(((ix+iy)%4+4)%4)<2;
+  else{int blk=ix>=0?ix/uHB:(ix-uHB+1)/uHB;int sg=(blk%2+2)%2==0?1:-1;up=(((ix+sg*iy)%4+4)%4)<2;}
   float ww=mix(.5,up?1.:0.,vis);
-  vec4 w=wW*ww+wF*(1.-ww);
+  vec4 w=uStripe==1?wW:wW*ww+wF*(1.-ww);
   vec3 col=vec3(0.);for(int k=0;k<4;k++){if(k>=uNC)break;col+=w[k]*uCol[k];}
   float f=up?fract(tx):fract(ty);
-  float shade=uShade*vis*.35*pow(abs(f-.5)*2.,2.);
+  float shade=uStripe==1?0.:uShade*vis*.35*pow(abs(f-.5)*2.,2.);
   if(uLayer>=0){
     // flat-colour layers in Normal mode: stacked in order they rebuild the composite exactly
     if(uLayer==0)o=vec4(uCol[0],1.);
@@ -507,9 +575,68 @@ void main(){
 }
 </script>
 
+<script id="fsa" type="x-shader">#version 300 es
+precision highp float; precision highp int;
+uniform vec2 uRes; uniform vec2 uOrigin; uniform int uLayer; uniform float uTiles; uniform int uMode; uniform float uGuides;
+uniform int uType; uniform float uN,uSize,uRing,uBreak,uIrreg,uFill,uBlotch,uSoft; uniform uint uSeed;
+uniform vec3 uCol[4];
+out vec4 o;
+uint pcg(uint v){uint s=v*747796405u+2891336453u;uint w=((s>>((s>>28u)+4u))^s)*277803737u;return (w>>22u)^w;}
+float hs(vec2 w,uint k){uvec2 q=uvec2(ivec2(floor(w+.5))+ivec2(4096));return float(pcg(q.x*1973u^pcg(q.y*9277u+k*7919u)^(uSeed*26699u)))/4294967295.;}
+// periodic value noise: the lattice wraps every 'per' cells so the print tiles exactly
+float vn(vec2 p,float per,uint k){vec2 i=floor(p),f=fract(p);vec2 u=f*f*(3.-2.*f);
+  float a=hs(mod(i,per),k),b=hs(mod(i+vec2(1.,0.),per),k),c=hs(mod(i+vec2(0.,1.),per),k),d=hs(mod(i+vec2(1.,1.),per),k);
+  return mix(mix(a,b,u.x),mix(c,d,u.x),u.y);}
+float fb(vec2 p,float per,uint k){return vn(p,per,k)*.6+vn(p*2.,per*2.,k+7u)*.3+vn(p*4.,per*4.,k+13u)*.1;}
+void main(){
+  vec2 sc=(gl_FragCoord.xy+uOrigin)/uRes; vec2 g=sc*uTiles;
+  vec2 q=g*uN*2.;float per=uN*2.;
+  vec2 p=g*uN+(vec2(fb(q,per,1u),fb(q,per,2u))-.5)*uIrreg*.55;
+  // periodic Voronoi (cells wrap every uN)
+  vec2 ic=floor(p),fc=fract(p);float f1=9.,f2=9.;vec2 v1=vec2(0.),id1=vec2(0.);
+  for(int j=-1;j<=1;j++)for(int i=-1;i<=1;i++){vec2 o2=vec2(float(i),float(j));vec2 w=mod(ic+o2,uN);
+    vec2 h=vec2(hs(w,3u),hs(w,5u));vec2 d=o2+.5+(h-.5)*.8-fc;float l=length(d);
+    if(l<f1){f2=f1;f1=l;v1=d;id1=w;}else if(l<f2)f2=l;}
+  float aa=fwidth(p.x)*1.2+uSoft*.08;
+  float cB=0.,cC=0.,cD=0.;
+  float h=hs(id1,9u),a=atan(v1.y,v1.x);
+  float wob=max(.4,1.+.22*uIrreg*(sin(a*3.+h*6.2832)+.5*sin(a*5.+h*12.566)));
+  if(uType==0){ // leopard rosettes
+    float R=(.24+.24*uSize)*(.8+.4*hs(id1,11u));float r=length(v1)/R/wob,ar=aa/R;
+    r*=1.+.16*uIrreg*(vn(p*5.,uN*5.,31u)-.5);
+    if(hs(id1,17u)<.2){cC=1.-smoothstep(.45-ar,.45+ar,r);}
+    else{float rin=.42+.4*(1.-uRing);float k=3.+floor(hs(id1,13u)*3.);
+      // the ring is a chain of irregular blobs: thickness swells and pinches around the rosette, Breakup opens gaps
+      float sw=.5+.5*sin(a*k+h*6.2832+.9*sin(a*2.+h*3.1));
+      float th=(1.-rin+.12)*(uBreak>.001?smoothstep(uBreak*.75,uBreak*.75+.22,sw)*(.75+.5*sw):1.);
+      cC=smoothstep(rin-ar,rin+ar,r)*(1.-smoothstep(rin+th-ar,rin+th+ar,r))*step(.02,th);
+      cB=(1.-smoothstep(rin-ar,rin+ar,r))*uFill;}
+  }else if(uType==1){ // cheetah spots
+    float R=(.12+.25*uSize)*(.75+.5*hs(id1,11u));float r=length(v1)/R/wob,ar=aa/R;
+    cC=1.-smoothstep(1.-ar,1.+ar,r);float hr=1.+uRing*.6;cB=(1.-smoothstep(hr-ar,hr+ar,r))*uFill*.7;
+  }else if(uType==2){ // snakeskin scales
+    float e=f2-f1,ae=fwidth(e)+uSoft*.05,t=.03+uRing*.22;
+    cC=1.-smoothstep(t-ae,t+ae,e);
+    float fr=floor(mix(6.,2.,uSize)+.5);
+    float bn=fb(id1/uN*fr,fr,21u);cB=smoothstep(1.-uBlotch-.04,1.-uBlotch+.04,bn)*step(.001,uBlotch);
+    cD=uFill*.6*(1.-smoothstep(t,t+.6,e));
+  }else{ // giraffe patches
+    float e=f2-f1,ae=fwidth(e)+uSoft*.05,gp=.06+uRing*.3;
+    cB=smoothstep(gp-ae,gp+ae,e);cC=cB*uFill*.6*smoothstep(gp+.08,gp+.7,e);
+  }
+  if(uLayer>=0){if(uLayer==0)o=vec4(uCol[0],1.);else if(uLayer==1)o=vec4(uCol[1],cB);else if(uLayer==2)o=vec4(uCol[2],cC);else o=vec4(uCol[3],cD);return;}
+  vec3 col=mix(mix(mix(uCol[0],uCol[1],cB),uCol[2],cC),uCol[3],cD);
+  if(uMode==2){float P=uTiles*16.;float t=fract(sc.x*P);
+    float lit=t<.5?mix(.80,1.10,smoothstep(0.,.5,t)):mix(1.10,.70,smoothstep(.5,1.,t));
+    float crest=exp(-pow((t-.5)*28.,2.))*.18;float sheen=.08*sin(sc.y*3.1+sc.x*1.7);col=col*(lit+sheen)+crest*mix(vec3(1.),uCol[0],.4);}
+  if(uGuides>.5&&uTiles>1.){vec2 dd=min(fract(g),1.-fract(g))*uRes/uTiles;float l=1.-smoothstep(.5,1.5,min(dd.x,dd.y));col=mix(col,vec3(0.2,.85,.95),l*.85);}
+  o=vec4(clamp(col,0.,1.),1.);
+}
+</script>
+
 <script>
 (()=>{
-const VERSION='1.5.0';
+const VERSION='1.7.0';
 const PRESETS=[
   {name:'Reference bronze',ground:'#94714a',mid:'#55392a',stripe:'#15100c'},
   {name:'Camel / espresso',ground:'#b48a5a',mid:'#6e4c30',stripe:'#2a1a10'},
@@ -520,8 +647,9 @@ const PRESETS=[
   {name:'Ivory / black',ground:'#e3dccd',mid:'#b9ae99',stripe:'#141210'},
 ];
 const DEF={name:'Untitled print',ground:PRESETS[0].ground,mid:PRESETS[0].mid,stripe:PRESETS[0].stripe,density:9,angle:62,weight:0.5,len:2.6,brk:0.36,warp:0.6,hair:1.0,sec:0.6,halo:0.75,mottle:0.8,seed:7,inches:18,dpi:300,
-  print:'tiger',ck_A:'#f4f7f8',ck_B:'#7fb8d4',ck_C:'#2f4a7a',ck_D:'#b8322a',ck_warp:'A8 B8',ck_weft:'',ck_sym:false,ck_count:24,ck_angle:0,ck_balance:1,ck_weave:'plain',ck_tex:0.6,ck_shade:0.3,ck_soft:0.2};
-let P={...DEF};
+  print:'tiger',ck_A:'#f4f7f8',ck_B:'#7fb8d4',ck_C:'#2f4a7a',ck_D:'#b8322a',ck_warp:'A8 B8',ck_weft:'',ck_sym:false,ck_count:24,ck_angle:0,ck_balance:1,ck_weave:'plain',ck_tex:0.6,ck_shade:0.3,ck_soft:0.2,ck_mode:'check',ck_hb:4,
+  an_type:'leopard',an_count:8,an_size:0.65,an_ring:0.45,an_break:0.45,an_irreg:0.55,an_fill:0.8,an_blotch:0.35,an_soft:0.15,an_seed:11,an_A:'#d8b27c',an_B:'#b57a3a',an_C:'#2a1c12',an_D:'#3a2a1c'};
+let P={...DEF};let autoNamed=true;
 let mode='grid', guides=false;
 
 const $=id=>document.getElementById(id);
@@ -547,7 +675,12 @@ const progC=gl.createProgram();
 gl.attachShader(progC,sh(gl.VERTEX_SHADER,vs));gl.attachShader(progC,sh(gl.FRAGMENT_SHADER,$('fsc').textContent.trim()));
 gl.bindAttribLocation(progC,loc,'p');gl.linkProgram(progC);
 if(!gl.getProgramParameter(progC,gl.LINK_STATUS))console.error(gl.getProgramInfoLog(progC));
-const UC={};['uRes','uOrigin','uLayer','uTiles','uMode','uGuides','uL','uN','uT','uWN','uFN','uWE','uFE','uWC','uFC','uCol','uNC','uWeave','uTex','uShade','uSoft'].forEach(n=>UC[n]=gl.getUniformLocation(progC,n));
+const UC={};['uRes','uOrigin','uLayer','uTiles','uMode','uGuides','uL','uN','uT','uWN','uFN','uWE','uFE','uWC','uFC','uCol','uNC','uWeave','uTex','uShade','uSoft','uStripe','uHB'].forEach(n=>UC[n]=gl.getUniformLocation(progC,n));
+const progA=gl.createProgram();
+gl.attachShader(progA,sh(gl.VERTEX_SHADER,vs));gl.attachShader(progA,sh(gl.FRAGMENT_SHADER,$('fsa').textContent.trim()));
+gl.bindAttribLocation(progA,loc,'p');gl.linkProgram(progA);
+if(!gl.getProgramParameter(progA,gl.LINK_STATUS))console.error(gl.getProgramInfoLog(progA));
+const UA={};['uRes','uOrigin','uLayer','uTiles','uMode','uGuides','uType','uN','uSize','uRing','uBreak','uIrreg','uFill','uBlotch','uSoft','uSeed','uCol'].forEach(n=>UA[n]=gl.getUniformLocation(progA,n));
 gl.useProgram(prog);
 const MAXR=gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
 const MAXV=gl.getParameter(gl.MAX_VIEWPORT_DIMS)[0];
@@ -571,8 +704,31 @@ function setU(p,v,w,h,tiles,md,gd,layer){
   gl.uniform1f(U.uHair,p.hair);gl.uniform1f(U.uHalo,p.halo);gl.uniform1f(U.uMottle,p.mottle);gl.uniform1f(U.uGuides,gd?1:0);gl.uniform1f(U.uSec,p.sec??0);
   gl.uniform3fv(U.cGround,hex2rgb(p.ground));gl.uniform3fv(U.cMid,hex2rgb(p.mid));gl.uniform3fv(U.cStripe,hex2rgb(p.stripe));
 }
+// ---------- engine registry: each engine declares its colours, sliders and layers; the panel, history and exports read from it ----------
+const ANIMALS={
+  leopard:{label:'Leopard',cols:['Ground','Rosette centre','Rosette'],layers:['Ground','Rosette centres','Rosettes'],count:'Rosettes / repeat',ring:'Ring thickness',fill:'Centre fill',use:['an_count','an_size','an_ring','an_break','an_irreg','an_fill','an_soft']},
+  cheetah:{label:'Cheetah',cols:['Ground','Spot halo','Spot'],layers:['Ground','Spot halos','Spots'],count:'Spots / repeat',ring:'Halo width',fill:'Halo strength',use:['an_count','an_size','an_ring','an_irreg','an_fill','an_soft']},
+  snake:{label:'Snakeskin',cols:['Ground','Blotch','Scale outline','Scale shading'],layers:['Ground','Blotches','Scale outlines','Scale shading'],count:'Scales / repeat',ring:'Outline thickness',fill:'Scale shading',size:'Blotch size',use:['an_count','an_size','an_ring','an_irreg','an_fill','an_blotch','an_soft']},
+  giraffe:{label:'Giraffe',cols:['Ground','Patch','Patch centre'],layers:['Ground','Patches','Patch centres'],count:'Patches / repeat',ring:'Gap width',fill:'Centre shading',use:['an_count','an_ring','an_irreg','an_fill','an_soft']}};
+const AN_SLIDERS=[['an_count',null,3,60,1],['an_size','Spot size',0,1,.01],['an_ring',null,0,1,.01],['an_break','Ring breaks',0,1,.01],['an_irreg','Irregularity',0,1,.01],['an_fill',null,0,1,.01],['an_blotch','Blotches',0,1,.01],['an_soft','Softness',0,1,.01]];
+const ENGINES={
+  tiger:{label:'Tiger stripe',section:'tg',colours:[['ground','Ground'],['mid','Shadow'],['stripe','Stripe']]},
+  check:{label:'Check & plaid',section:'ck',colours:[['ck_A','A'],['ck_B','B'],['ck_C','C'],['ck_D','D']]},
+  animal:{label:'Animal',section:'an',colours:[['an_A','A'],['an_B','B'],['an_C','C'],['an_D','D']]}};
+const animalNC=p=>p.an_type==='snake'?4:3;
+const engineColours=p=>p.print==='check'?['ck_A','ck_B','ck_C','ck_D'].slice(0,checkSetup(p).nc).map(k=>p[k]):p.print==='animal'?['an_A','an_B','an_C','an_D'].slice(0,animalNC(p)).map(k=>p[k]):[p.ground,p.mid,p.stripe];
+function setA(p,w,h,tiles,md,gd,layer){
+  gl.useProgram(progA);const t=['leopard','cheetah','snake','giraffe'].indexOf(p.an_type);
+  gl.uniform2f(UA.uRes,w,h);gl.uniform2f(UA.uOrigin,0,0);gl.uniform1i(UA.uLayer,layer??-1);gl.uniform1f(UA.uTiles,tiles);gl.uniform1i(UA.uMode,md);gl.uniform1f(UA.uGuides,gd?1:0);
+  gl.uniform1i(UA.uType,Math.max(0,t));gl.uniform1f(UA.uN,Math.max(2,Math.round(p.an_count)));
+  ['Size','Ring','Break','Irreg','Fill','Blotch','Soft'].forEach(k=>gl.uniform1f(UA['u'+k],+p['an_'+k.toLowerCase()]||0));
+  gl.uniform1ui(UA.uSeed,(p.an_seed||1)>>>0);
+  gl.uniform3fv(UA.uCol,new Float32Array(['an_A','an_B','an_C','an_D'].flatMap(k=>hex2rgb(p[k]||'#000000'))));
+  return {n:Math.round(p.an_count),nc:animalNC(p)};
+}
 function draw(p,w,h,tiles,md,gd){
   rc.width=w;rc.height=h;gl.viewport(0,0,w,h);
+  if(p.print==='animal'){const S=setA(p,w,h,tiles,md,gd,-1);gl.drawArrays(gl.TRIANGLES,0,3);return S;}
   if(p.print==='check'){const S=setC(p,w,h,tiles,md,gd,-1);gl.drawArrays(gl.TRIANGLES,0,3);return S;}
   const v=vecs(p);setU(p,v,w,h,tiles,md,gd,-1);
   gl.drawArrays(gl.TRIANGLES,0,3);
@@ -599,7 +755,10 @@ function checkSetup(p){
   const W=cum(warp),F=cum(weft);
   const T=Math.max(2,Math.round(warp.reduce((t,x)=>t+x.t,0)));
   const nc=Math.max(1,...warp.map(x=>x.c+1),...weft.map(x=>x.c+1));
-  return {L:[lat.a,lat.b],len:lat.len,ang:lat.ang,n,checks:n*lat.len,W,F,T,nc,Kl:n*lat.len};
+  // herringbone: the zigzag width must divide the threads across the repeat so it closes seamlessly
+  const tot=n*T*Math.max(1,lat.a+lat.b);let hb=Math.max(1,Math.round(p.ck_hb||4));while(hb>1&&tot%(2*hb))hb--;
+  const ncs=p.ck_mode==='stripe'?Math.max(1,...warp.map(x=>x.c+1)):nc;
+  return {L:[lat.a,lat.b],len:lat.len,ang:lat.ang,n,checks:n*lat.len,W,F,T,nc:ncs,Kl:n*lat.len,hb};
 }
 const pad32=(a,f)=>{const o=new Array(32).fill(f);a.slice(0,32).forEach((v,i)=>o[i]=v);return o;};
 function setC(p,w,h,tiles,md,gd,layer){
@@ -610,20 +769,20 @@ function setC(p,w,h,tiles,md,gd,layer){
   gl.uniform1fv(UC.uWE,new Float32Array(pad32(S.W.E,1)));gl.uniform1fv(UC.uFE,new Float32Array(pad32(S.F.E,1)));
   gl.uniform1iv(UC.uWC,new Int32Array(pad32(S.W.C,0)));gl.uniform1iv(UC.uFC,new Int32Array(pad32(S.F.C,0)));
   gl.uniform3fv(UC.uCol,new Float32Array(['ck_A','ck_B','ck_C','ck_D'].flatMap(k=>hex2rgb(p[k]||'#000000'))));
-  gl.uniform1i(UC.uNC,S.nc);gl.uniform1i(UC.uWeave,p.ck_weave==='twill'?1:0);
+  gl.uniform1i(UC.uNC,S.nc);gl.uniform1i(UC.uWeave,p.ck_weave==='twill'?1:p.ck_weave==='herringbone'?2:0);gl.uniform1i(UC.uStripe,p.ck_mode==='stripe'?1:0);gl.uniform1i(UC.uHB,S.hb);
   gl.uniform1f(UC.uTex,p.ck_tex);gl.uniform1f(UC.uShade,p.ck_shade);gl.uniform1f(UC.uSoft,p.ck_soft);
   return S;
 }
 // full-resolution render of one repeat in horizontal strips; hands back top-down RGBA rows
 const STRIP=256;
 async function renderStrips(p,W,layer,onRows){
-  rc.width=W;rc.height=STRIP;let UO;
-  if(p.print==='check'){setC(p,W,W,1,0,false,layer);UO=UC.uOrigin;}else{setU(p,vecs(p),W,W,1,0,false,layer);UO=U.uOrigin;}
+  // the preview can redraw between strips (it shares this canvas and the programs), so the canvas size, program and uniforms are set again for every strip
+  const setup=()=>{if(p.print==='animal'){setA(p,W,W,1,0,false,layer);return UA.uOrigin;}if(p.print==='check'){setC(p,W,W,1,0,false,layer);return UC.uOrigin;}setU(p,vecs(p),W,W,1,0,false,layer);return U.uOrigin;};
   const buf=new Uint8Array(W*STRIP*4),out=new Uint8Array(W*STRIP*4);
   for(let r0=0;r0<W;r0+=STRIP){
     const h=Math.min(STRIP,W-r0);
-    if(rc.height!==h)rc.height=h;
-    gl.viewport(0,0,W,h);gl.uniform2f(UO,0,W-r0-h);
+    if(rc.width!==W)rc.width=W;if(rc.height!==h)rc.height=h;
+    const UO=setup();gl.viewport(0,0,W,h);gl.uniform2f(UO,0,W-r0-h);
     gl.drawArrays(gl.TRIANGLES,0,3);
     gl.readPixels(0,0,W,h,gl.RGBA,gl.UNSIGNED_BYTE,buf);
     const row=W*4;for(let y=0;y<h;y++)out.set(buf.subarray((h-1-y)*row,(h-y)*row),y*row);
@@ -635,7 +794,25 @@ async function renderStrips(p,W,layer,onRows){
 // ---------- UI ----------
 const view=$('view'), vctx=view.getContext('2d');
 const sliders=['density','angle','weight','len','brk','warp','hair','sec','halo','mottle'];
-const CKS=[['ck-count','ck_count',v=>String(v)],['ck-angle','ck_angle',v=>v+'°'],['ck-balance','ck_balance',v=>(+v).toFixed(2)+'×'],['ck-tex','ck_tex',v=>(+v).toFixed(2)],['ck-shade','ck_shade',v=>(+v).toFixed(2)],['ck-soft','ck_soft',v=>(+v).toFixed(2)]];
+const CKS=[['ck-hb','ck_hb',v=>v+' threads'],['ck-count','ck_count',v=>String(v)],['ck-angle','ck_angle',v=>v+'°'],['ck-balance','ck_balance',v=>(+v).toFixed(2)+'×'],['ck-tex','ck_tex',v=>(+v).toFixed(2)],['ck-shade','ck_shade',v=>(+v).toFixed(2)],['ck-soft','ck_soft',v=>(+v).toFixed(2)]];
+const engineMsg=()=>P.print==='check'?'Showing the check & plaid engine print. Every slider edits it.':P.print==='animal'?`Showing the animal engine (${ANIMALS[P.an_type]?.label||''}). Every slider edits it.`:'Showing the stripe engine print.';
+// animal panel is generated from the registry
+(function buildAnimalUI(){
+  const ty=$('an-types');Object.entries(ANIMALS).forEach(([k,a])=>{const b=document.createElement('button');b.id='an-t-'+k;b.textContent=a.label;b.onclick=()=>{P.an_type=k;toEngine();syncUI();render();renderVarsSoon();};ty.append(b);});
+  const cb=$('an-cols');['A','B','C','D'].forEach(L=>{const l=document.createElement('label');l.id='an-l-'+L;l.innerHTML=`<span></span><input type="color" id="an-${L}"><code id="xa-${L}"></code>`;cb.append(l);
+    l.querySelector('input').addEventListener('input',e=>{P['an_'+L]=e.target.value;syncUI();render();renderVarsSoon();});});
+  const sb=$('an-sliders');AN_SLIDERS.forEach(([k,lab,mn,mx,st])=>{const r=document.createElement('div');r.className='row';r.id='row-'+k;
+    r.innerHTML=`<label for="${k}"></label><input type="range" id="${k}" min="${mn}" max="${mx}" step="${st}"><output for="${k}"></output>`;sb.append(r);
+    r.querySelector('input').addEventListener('input',e=>{P[k]=+e.target.value;syncUI();render();renderVarsSoon();});});
+  $('an-seed').addEventListener('change',e=>{P.an_seed=Math.max(1,Math.floor(+e.target.value)||1);syncUI();render();});
+  $('an-shuffle').onclick=()=>{P.an_seed=1+Math.floor(Math.random()*999999);toEngine();syncUI();render();};
+})();
+function syncAnimal(){const a=ANIMALS[P.an_type]||ANIMALS.leopard;
+  Object.keys(ANIMALS).forEach(k=>$('an-t-'+k).setAttribute('aria-pressed',String(k===P.an_type)));
+  ['A','B','C','D'].forEach((L,i)=>{const l=$('an-l-'+L);l.hidden=i>=a.cols.length;l.querySelector('span').textContent=a.cols[i]||'';$('an-'+L).value=P['an_'+L];$('xa-'+L).textContent=String(P['an_'+L]).toUpperCase();});
+  AN_SLIDERS.forEach(([k,lab])=>{const r=$('row-'+k);r.hidden=!a.use.includes(k);const key=k.slice(3);r.querySelector('label').textContent=a[key]||lab||key;
+    $(k).value=P[k];r.querySelector('output').textContent=k==='an_count'?String(Math.round(P[k])):(+P[k]).toFixed(2);});
+  $('an-seed').value=P.an_seed;}
 const fmt={density:v=>v,angle:v=>v+'°',weight:v=>(+v).toFixed(2),len:v=>(+v).toFixed(1),brk:v=>(+v).toFixed(2),warp:v=>(+v).toFixed(2),hair:v=>(+v).toFixed(2),sec:v=>(+v).toFixed(2),halo:v=>(+v).toFixed(2),mottle:v=>(+v).toFixed(2)};
 function syncUI(){
   sliders.forEach(k=>{$(k).value=P[k];document.querySelector(`output[for=${k}]`).textContent=fmt[k](P[k]);});
@@ -643,8 +820,11 @@ function syncUI(){
   CKS.forEach(([id,k,f])=>{$(id).value=P[k];document.querySelector(`output[for=${id}]`).textContent=f(P[k]);});
   ['A','B','C','D'].forEach(L=>{$('ck-'+L).value=P['ck_'+L];$('xk-'+L).textContent=String(P['ck_'+L]).toUpperCase();});
   $('ck-warp').value=P.ck_warp;$('ck-weft').value=P.ck_weft;$('ck-sym').checked=!!P.ck_sym;$('ck-weave').value=P.ck_weave;
-  const isC=P.print==='check';document.body.classList.toggle('engine-check',isC);$('pe-tiger').setAttribute('aria-pressed',String(!isC));$('pe-check').setAttribute('aria-pressed',String(isC));
-  try{if(src==='engine')$('srctext').textContent=isC?'Showing the check & plaid engine print. Every slider edits it.':'Showing the stripe engine print.';}catch(e){}
+  const isC=P.print==='check',isA=P.print==='animal';document.body.classList.toggle('engine-check',isC);document.body.classList.toggle('engine-animal',isA);
+  ['tiger','check','animal'].forEach(k=>$('pe-'+k).setAttribute('aria-pressed',String(P.print===k||(k==='tiger'&&!isC&&!isA))));
+  $('ck-mode').value=P.ck_mode||'check';$('ck-hbrow').hidden=P.ck_weave!=='herringbone';
+  syncAnimal();
+  try{if(src==='engine')$('srctext').textContent=engineMsg();}catch(e){}
   $('seed').value=P.seed;$('dname').value=P.name||'';$('inches').value=P.inches;$('dpi').value=String(P.dpi);
   document.querySelectorAll('#presets .sw').forEach((b,i)=>b.setAttribute('aria-pressed',String(PRESETS[i].ground===P.ground&&PRESETS[i].mid===P.mid&&PRESETS[i].stripe===P.stripe)));
   const px=Math.round(P.inches*P.dpi);
@@ -675,7 +855,8 @@ function render(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{
     v=draw(P,size,size,tiles,mode==='pleat'?2:0,guides);
     vctx.drawImage(rc,0,0);
   }
-  if(P.print==='check'){$('m-stripes').textContent=`${v.checks.toFixed(1)} checks / repeat`;$('m-angle').textContent=`angle ${v.ang.toFixed(1)}° (snapped for seamless) · ${v.nc} colour${v.nc>1?'s':''}`;}
+  if(P.print==='animal'){$('m-stripes').textContent=`${ANIMALS[P.an_type]?.label} · ${v.n} cells / repeat`;$('m-angle').textContent=`${v.nc} colours · seed ${P.an_seed}`;}
+  else if(P.print==='check'){$('m-stripes').textContent=`${v.checks.toFixed(1)} ${P.ck_mode==='stripe'?'stripe repeats':'checks'} / repeat`;$('m-angle').textContent=`angle ${v.ang.toFixed(1)}° (snapped for seamless) · ${v.nc} colour${v.nc>1?'s':''}`;}
   else{$('m-stripes').textContent=`${v.Kl.toFixed(1)} stripes / repeat`;
   $('m-angle').textContent=`angle ${v.ang.toFixed(1)}° (snapped for seamless)`;}
   $('m-repeat').textContent=mode==='cmp'?'reference vs. part of one repeat':`showing ${tiles}×${tiles} repeats`;
@@ -692,12 +873,13 @@ function renderVars(){
       const cv=document.createElement('canvas');cv.width=cv.height=240;draw({...P,...ov},240,240,1,0,false);cv.getContext('2d').drawImage(rc,0,0);
       const t=document.createElement('span');t.textContent=lab;b.append(cv,t);b.onclick=()=>{Object.assign(P,ov);syncUI();render();renderVarsSoon();};g.append(b);});
     return;}
+  const sk=P.print==='animal'?'an_seed':'seed';
   varSeeds.forEach(s=>{
     const b=document.createElement('button');b.className='thumb';b.title='Use seed '+s;
     const c=document.createElement('canvas');c.width=c.height=240;
-    draw({...P,seed:s},240,240,1,0,false);c.getContext('2d').drawImage(rc,0,0);
+    draw({...P,[sk]:s},240,240,1,0,false);c.getContext('2d').drawImage(rc,0,0);
     const t=document.createElement('span');t.textContent='seed '+s;
-    b.append(c,t);b.onclick=()=>{P.seed=s;syncUI();render();};
+    b.append(c,t);b.onclick=()=>{P[sk]=s;syncUI();render();};
     g.append(b);
   });
 }
@@ -711,10 +893,15 @@ CKS.forEach(([id,k])=>$(id).addEventListener('input',e=>{P[k]=+e.target.value;sy
 ['A','B','C','D'].forEach(L=>$('ck-'+L).addEventListener('input',e=>{P['ck_'+L]=e.target.value;syncUI();render();renderVarsSoon();}));
 ['ck-warp','ck-weft'].forEach(id=>$(id).addEventListener('input',e=>{P[id.replace('-','_')]=e.target.value;render();renderVarsSoon();persistSession();}));
 $('ck-sym').onchange=e=>{P.ck_sym=e.target.checked;syncUI();render();renderVarsSoon();};
-$('ck-weave').onchange=e=>{P.ck_weave=e.target.value;syncUI();render();renderVarsSoon();};
+$('ck-weave').onchange=e=>{P.ck_weave=e.target.value;if(P.ck_weave!=='plain'&&P.ck_tex<.5)P.ck_tex=.75;syncUI();render();renderVarsSoon();};
+$('ck-mode').onchange=e=>{P.ck_mode=e.target.value;syncUI();render();renderVarsSoon();};
+$('pe-animal').onclick=()=>{P.print='animal';toEngine();syncUI();render();renderVarsSoon();};
+$('adv-animal').onclick=()=>{P.print='animal';toEngine();syncUI();render();renderVarsSoon();};
+$('adv-tiger').onclick=()=>{P.print='tiger';toEngine();syncUI();render();renderVarsSoon();};
+$('adv-check').onclick=()=>{P.print='check';toEngine();syncUI();render();renderVarsSoon();};
 $('pe-tiger').onclick=()=>{P.print='tiger';toEngine();syncUI();render();renderVarsSoon();};
 $('pe-check').onclick=()=>{P.print='check';toEngine();syncUI();render();renderVarsSoon();};
-$('dname').addEventListener('input',e=>{P.name=e.target.value;});
+$('dname').addEventListener('input',e=>{P.name=e.target.value;autoNamed=false;});
 $('seed').addEventListener('change',e=>{P.seed=Math.max(1,Math.floor(+e.target.value)||1);syncUI();render();});
 $('shuffle').onclick=()=>{P.seed=1+Math.floor(Math.random()*999999);syncUI();render();};
 $('inches').addEventListener('change',e=>{P.inches=Math.min(36,Math.max(2,+e.target.value||18));syncUI();});
@@ -744,7 +931,7 @@ function withDpi(bytes,dpi){ // insert a pHYs chunk after IHDR so print software
   const out=new Uint8Array(bytes.length+21);out.set(bytes.subarray(0,33));out.set(ch,33);out.set(bytes.subarray(33),54);return out;
 }
 const slug=t=>(t||'Tiger').trim().replace(/[^A-Za-z0-9]+/g,'-').replace(/^-|-$/g,'')||'Tiger';
-const seedTag=p=>p.print==='check'?'':`_s${p.seed}`;
+const seedTag=p=>p.print==='check'?'':p.print==='animal'?`_s${p.an_seed}`:`_s${p.seed}`;
 const fname=ext=>`RDPAI_${slug(P.name)}${seedTag(P)}_${P.inches}in_${P.dpi}dpi.${ext}`;
 const errMsg=e=>e&&e.code==='declined'?'Save cancelled.':'Could not save the file ('+(e&&e.code||'error')+').';
 // ---------- encoders: PNG (streamed deflate), PSD (PackBits), ZIP ----------
@@ -831,7 +1018,30 @@ async function makeZip(entries,onStep){
   return new Blob([...parts,...cen,eo],{type:'application/zip'});
 }
 const LAYERS=['01 Ground','02 Ground shadow mottle','03 Ground highlight mottle','04 Stroke halo','05 Shadow strokes','06 Main stripes'];
-function layersFor(p){if(p.print!=='check')return LAYERS;const nc=checkSetup(p).nc,l=[];for(let i=0;i<nc;i++)l.push(`0${i+1} Colour ${'ABCD'[i]}${i===0?' (ground)':''}`);l.push(`0${nc+1} Weave shadow`);return l;}
+function layersFor(p){if(p.print==='animal')return (ANIMALS[p.an_type]||ANIMALS.leopard).layers.map((n,i)=>`0${i+1} ${n}`);if(p.print!=='check')return LAYERS;const nc=checkSetup(p).nc,l=[];for(let i=0;i<nc;i++)l.push(`0${i+1} Colour ${'ABCD'[i]}${i===0?' (ground)':''}`);l.push(`0${nc+1} Weave shadow`);return l;}
+function specAnimal(base,px){const a=ANIMALS[P.an_type]||ANIMALS.leopard;
+  return `RD PATTERN AI — PRINT SPEC
+Design:        ${P.name||'Untitled'}
+Print family:  ${a.label} (procedural, original)
+Generated:     ${new Date().toISOString().slice(0,16).replace('T',' ')} · RD Pattern AI v${VERSION}
+
+REPEAT
+Size:          ${P.inches} x ${P.inches} in  (${px} x ${px} px @ ${P.dpi} dpi)
+Repeat type:   Straight, seamless on all four edges
+Cells:         ${Math.round(P.an_count)} x ${Math.round(P.an_count)} per repeat, seed ${P.an_seed}
+Settings:      ${a.use.map(k=>`${(a[k.slice(3)]||AN_SLIDERS.find(x=>x[0]===k)[1]||k).toLowerCase()} ${k==='an_count'?Math.round(P[k]):(+P[k]).toFixed(2)}`).join(', ')}
+
+COLOURS
+${a.cols.map((c,i)=>`${c.padEnd(15)}${P['an_'+'ABCD'[i]].toUpperCase()}`).join('\n')}
+
+LAYERS (bottom to top, all Normal 100%)
+${layersFor(P).map((n,i)=>n.padEnd(28)+(i?' flat colour with transparency':' opaque')).join('\n')}
+
+Each layer is one flat colour, so a colourway change is a fill or Color Overlay per
+layer. Stacked in order they rebuild the composite exactly.
+
+Colours are on-screen sRGB values. Confirm against a lab dip or strike-off before bulk.
+`;}
 function specCheck(base,px){const S=checkSetup(P),fmtS=s=>s.bands.map(b=>'ABCD'[b.c]+(+b.w.toFixed(2))).join(' ');
   return `RD PATTERN AI — PRINT SPEC
 Design:        ${P.name||'Untitled'}
@@ -868,8 +1078,8 @@ let busy=false;
 function sizeCheck(){const px=Math.round(P.inches*P.dpi),lim=Math.min(MAXR,MAXV);
   if(px>lim){status(`That repeat needs ${px} px; this device tops out at ${lim}. Lower the size or resolution.`);return 0;}return px;}
 function setBusy(b){busy=b;['savepkg','saveai','savepng'].forEach(id=>$(id).disabled=b);}
-const BASE_EXPORT='The reference photo is the base, not a print yet. Press Match reference (or Render with Gemini) first, then export.';
-const baseBlock=()=>{if(src==='ref'||src==='empty'){status(src==='empty'?'Add a reference photo first, then press Match reference.':BASE_EXPORT);return true;}return false;};
+const BASE_EXPORT='The reference photo is the base, not a print yet. Press Recreate the print (step 2) first, then export.';
+const baseBlock=()=>{if(src==='ref'||src==='empty'){status(src==='empty'?'Add a reference photo first (step 1).':BASE_EXPORT);return true;}return false;};
 $('savepng').onclick=async()=>{
   if(baseBlock())return;
   if(src==='gemini'&&gimg){if(busy)return;setBusy(true);try{await saveGemPng();}catch(e){status(errMsg(e));}finally{setBusy(false);}return;}
@@ -950,7 +1160,7 @@ $('savepkg').onclick=async()=>{
     entries.unshift({name:`${base}/${base}_LAYERED.psd`,blob:psd,deflate:true});
     entries.push({name:`${base}/${base}_preview_2x2.jpg`,blob:prev});
     entries.push({name:`${base}/${base}_recipe.json`,blob:new Blob([JSON.stringify(recipe(P),null,2)]),deflate:true});
-    entries.push({name:`${base}/README_SPEC.txt`,blob:new Blob([(P.print==='check'?specCheck(base,px):specText(base,px)).replace(/\n/g,'\r\n')]),deflate:true});
+    entries.push({name:`${base}/README_SPEC.txt`,blob:new Blob([(P.print==='check'?specCheck(base,px):P.print==='animal'?specAnimal(base,px):specText(base,px)).replace(/\n/g,'\r\n')]),deflate:true});
     const zip=await makeZip(entries,n=>status('Packing '+n.split('/').pop()+'…'));
     status(`Package ready (${(zip.size/1048576).toFixed(1)} MB). Saving…`);
     await saveFile(base+'.zip',zip);status(`Saved ${base}.zip (${(zip.size/1048576).toFixed(1)} MB).`+await recordExport('Exported layered package',base+'.zip','PSD'));
@@ -1240,6 +1450,7 @@ function buildCheckSvg(p){
   for(let k=Math.floor(x0/D)-1;k<=Math.ceil(x1/D)+1;k++)S.W.E.forEach((e,i)=>{if(S.W.C[i]===0)return;const xa=(k+st[i])*D,w=(e-st[i])*D;out.push(`<rect x="${f(xa)}" y="${f(y0)}" width="${f(w)}" height="${f(y1-y0)}" fill="${col(S.W.C[i])}"/>\n`);nw++;});
   out.push('</g></g>\n');
   out.push(`<g id="RDL_3" data-name="03 Weft stripes" clip-path="url(#rdtile)"><g transform="rotate(${rot})">\n`);
+  if(p.ck_mode==='stripe'){out.push('</g></g>\n</svg>\n');return {svg:new Blob(out,{type:'image/svg+xml'}),S,nw,nf};}
   const sf=[0,...S.F.E.slice(0,-1)],ka=Math.floor(-y1/D)-1,kb=Math.ceil(-y0/D)+1;
   for(let k=ka;k<=kb;k++)S.F.E.forEach((e,i)=>{const ya=-(k+e)*D,h=(e-sf[i])*D;out.push(`<rect x="${f(x0)}" y="${f(ya)}" width="${f(x1-x0)}" height="${f(h)}" fill="${col(S.F.C[i])}" opacity="0.5"/>\n`);nf++;});
   out.push('</g></g>\n</svg>\n');
@@ -1319,7 +1530,113 @@ COLOURS (sRGB)
 ${['A','B','C','D'].slice(0,S.nc).map(L=>`Colour ${L}       ${p['ck_'+L].toUpperCase()}`).join('\n')}
 Confirm against a lab dip or strike-off before bulk.
 `;}
+// traced vector: each flat-colour layer is traced into solid shapes cut on the repeat edge
+async function buildTracedSvg(p,onStep){
+  const names=layersFor(p),cols=engineColours(p),N=TRACE,size=p.inches*72,sc=size/N,tr=makeTracer(N),out=[],stats=[];
+  out.push(`<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${p.inches}in" height="${p.inches}in" viewBox="0 0 ${size} ${size}">\n<title>${esc(p.name||'RD Pattern AI')} - RD Pattern AI v${VERSION}</title>\n`);
+  out.push(`<g id="RDL_1" data-name="${esc(names[0])}"><rect x="0" y="0" width="${size}" height="${size}" fill="${cols[0]}"/></g>\n`);
+  for(let li=1;li<names.length;li++){
+    if(p.print==='check'&&li>=cols.length)break; // weave shadow is not traced
+    onStep(`Tracing ${names[li]}`,li,names.length);
+    const a=new Uint8Array(N*N);
+    await renderStrips(p,N,li,async(rows,y0,h)=>{const o=y0*N;for(let i=0,m=h*N;i<m;i++)a[o+i]=rows[i*4+3];});
+    tr.load(a);const shapes=toShapes(tr.trace(128),N,2,.5);
+    out.push(`<g id="RDL_${li+1}" data-name="${esc(names[li])}">\n`);
+    for(const s2 of shapes)out.push(`<path fill="${cols[li]}"${s2.holes.length?' fill-rule="evenodd"':''} d="${ringPath(s2.p,N,sc)+s2.holes.map(hh=>ringPath(hh,N,sc)).join('')}"/>\n`);
+    out.push('</g>\n');stats.push({name:names[li],paths:shapes.length});await new Promise(r=>setTimeout(r,0));
+  }
+  out.push('</svg>\n');
+  return {svg:new Blob(out,{type:'image/svg+xml'}),stats,names:names.slice(0,(p.print==='check'?cols.length:names.length)),cols};
+}
+// exact vector for weave-structure checks (houndstooth, glen plaid, herringbone): one square per thread crossing, merged into runs
+function buildWeaveSvg(p){
+  const S=checkSetup(p),size=p.inches*72,D=size/(S.len*S.n),T=S.T,d=D/T,a=S.L[0],b=S.L[1],len=S.len,cols=engineColours(p);
+  const fx=(X,Y)=>(X*a-Y*b)/len,fy=(X,Y)=>(X*b+Y*a)/len,C=[[0,0],[size,0],[0,size],[size,size]];
+  const x0=Math.min(...C.map(c=>fx(...c))),x1=Math.max(...C.map(c=>fx(...c))),y0=Math.min(...C.map(c=>fy(...c))),y1=Math.max(...C.map(c=>fy(...c)));
+  const band=(E,Cc,t)=>{const f=((t%1)+1)%1;for(let i=0;i<E.length;i++)if(f<E[i])return Cc[i];return Cc[Cc.length-1];};
+  const wv=p.ck_weave==='twill'?1:p.ck_weave==='herringbone'?2:0,hb=S.hb,md=(v,m)=>((v%m)+m)%m;
+  const up=(ix,iy)=>{if(wv===0)return md(ix+iy,2)===0;if(wv===1)return md(ix+iy,4)<2;const blk=Math.floor(ix/hb),sg=md(blk,2)===0?1:-1;return md(ix+sg*iy,4)<2;};
+  const ia=Math.floor(x0/d)-1,ib=Math.ceil(x1/d)+1,ja=Math.floor(-y1/d)-1,jb=Math.ceil(-y0/d)+1;
+  const groups=cols.map(()=>[]),f=v=>+v.toFixed(3);let n=0;
+  for(let iy=ja;iy<=jb;iy++){let run=null;
+    const flush=()=>{if(run&&run.c>0){groups[run.c].push(`<rect x="${f(run.s*d)}" y="${f(-(iy+1)*d)}" width="${f((run.e-run.s)*d)}" height="${f(d)}" fill="${cols[run.c]}"/>`);n++;}run=null;};
+    for(let ix=ia;ix<=ib;ix++){const c=up(ix,iy)?band(S.W.E,S.W.C,(ix+.5)/T):band(S.F.E,S.F.C,(iy+.5)/T);
+      if(run&&run.c===c)run.e=ix+1;else{flush();run={c,s:ix,e:ix+1};}}
+    flush();}
+  const names=layersFor(p).slice(0,cols.length),rot=f(-S.ang),out=[];
+  out.push(`<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${p.inches}in" height="${p.inches}in" viewBox="0 0 ${size} ${size}">\n<title>${esc(p.name||'RD Pattern AI')} - RD Pattern AI v${VERSION}</title>\n<defs><clipPath id="rdtile"><rect x="0" y="0" width="${size}" height="${size}"/></clipPath></defs>\n`);
+  out.push(`<g id="RDL_1" data-name="${esc(names[0])}"><rect x="0" y="0" width="${size}" height="${size}" fill="${cols[0]}"/></g>\n`);
+  for(let k=1;k<cols.length;k++)out.push(`<g id="RDL_${k+1}" data-name="${esc(names[k])}" clip-path="url(#rdtile)"><g transform="rotate(${rot})">\n${groups[k].join('\n')}\n</g></g>\n`);
+  out.push('</svg>\n');
+  return {svg:new Blob(out,{type:'image/svg+xml'}),stats:names.slice(1).map((nm,i)=>({name:nm,paths:groups[i+1].length})),names,cols};
+}
+function aiScriptGeneric(svgName,p,layers,swatches){
+  const rgb=h=>hex2rgb(h).map(v=>Math.round(v*255)).join(',');const nm=String(p.name||'Untitled').replace(/["\\\r\n]/g,'');
+  return `// RD Pattern AI v${VERSION} - Illustrator setup script
+// In Illustrator: File > Scripts > Other Script... and pick this file. Keep it in the same folder as ${svgName}.
+// It opens the SVG, puts each colour on its own named layer, sizes the artboard to the ${p.inches} in repeat,
+// and links every shape to a global swatch so one swatch edit recolours it everywhere.
+#target illustrator
+(function () {
+  var SVG_NAME = "${svgName}", DESIGN = "${nm}", REPEAT_PT = ${p.inches*72};
+  var LAYERS = [${layers.map(n=>`"${String(n).replace(/"/g,'')}"`).join(', ')}];
+  var SWATCHES = [${swatches.map(([a,h])=>`["${a}", ${rgb(h)}]`).join(', ')}];
+  var f = new File(File($.fileName).parent + "/" + SVG_NAME);
+  if (!f.exists) { f = File.openDialog("Find " + SVG_NAME); if (!f) { return; } }
+  var doc = app.open(f), found = [], i, k, g, m;
+  for (i = 0; i < doc.groupItems.length; i++) {
+    g = doc.groupItems[i]; m = /^RDL[_ ]?(\\d)$/.exec(g.name); k = -1;
+    if (m) { k = parseInt(m[1], 10) - 1; } else { for (var j = 0; j < LAYERS.length; j++) { if (g.name === LAYERS[j] || g.name === LAYERS[j].replace(/ /g, "_")) { k = j; } } }
+    if (k >= 0 && k < LAYERS.length && !found[k]) { found[k] = g; }
+  }
+  for (i = 0; i < LAYERS.length; i++) { if (!found[i]) { alert("RD Pattern AI: could not find " + LAYERS[i] + " in the SVG. The artwork is open as-is."); return; } }
+  var gb = found[0].geometricBounds, w = gb[2] - gb[0];
+  if (Math.abs(w - REPEAT_PT) > 0.5) { var pct = REPEAT_PT / w * 100; for (i = 0; i < found.length; i++) { found[i].resize(pct, pct, true, true, true, true, pct, Transformation.DOCUMENTORIGIN); } gb = found[0].geometricBounds; }
+  doc.artboards[0].artboardRect = gb;
+  var spots = [], grp = null;
+  try { grp = doc.swatchGroups.add(); grp.name = "RD " + DESIGN; } catch (e0) { grp = null; }
+  for (i = 0; i < SWATCHES.length; i++) {
+    var sp = doc.spots.add(); sp.name = "RD " + SWATCHES[i][0]; sp.colorType = ColorModel.PROCESS;
+    var c = new RGBColor(); c.red = SWATCHES[i][1]; c.green = SWATCHES[i][2]; c.blue = SWATCHES[i][3]; sp.color = c;
+    if (grp) { try { grp.addSpot(sp); } catch (e1) {} }
+    var sc = new SpotColor(); sc.spot = sp; sc.tint = 100; spots.push([SWATCHES[i][1], SWATCHES[i][2], SWATCHES[i][3], sc]);
+  }
+  var old = []; for (i = 0; i < doc.layers.length; i++) { old.push(doc.layers[i]); }
+  for (i = 0; i < LAYERS.length; i++) { var L = doc.layers.add(); L.name = LAYERS[i]; found[i].move(L, ElementPlacement.PLACEATBEGINNING); found[i].name = LAYERS[i]; }
+  var all = doc.pathItems;
+  for (k = 0; k < all.length; k++) {
+    try { var fc = all[k].fillColor; if (!all[k].filled || fc.typename !== "RGBColor") { continue; }
+      var best = null, bd = 1e9;
+      for (i = 0; i < spots.length; i++) { var d = Math.abs(fc.red - spots[i][0]) + Math.abs(fc.green - spots[i][1]) + Math.abs(fc.blue - spots[i][2]); if (d < bd) { bd = d; best = spots[i][3]; } }
+      if (best && bd < 24) { all[k].fillColor = best; } } catch (e2) {}
+  }
+  for (i = 0; i < old.length; i++) { try { old[i].locked = false; old[i].visible = true; old[i].remove(); } catch (e3) {} }
+  doc.selectObjectsOnActiveArtboard();
+  alert("RD Pattern AI: " + DESIGN + " is ready.\\n\\n- Each colour is on its own layer.\\n- Edit an 'RD' swatch to recolour it everywhere.\\n- To make the pattern swatch: everything is selected, drag it into the Swatches panel.\\n\\nSave as .ai to keep the layers and swatches.");
+})();
+`;
+}
 $('saveai').onclick=async()=>{
+  const traced=!baseBlock()&&src==='engine'&&(P.print==='animal'||(P.print==='check'&&P.ck_weave!=='plain'&&P.ck_tex>=.8&&P.ck_mode!=='stripe'));
+  if(traced){
+    if(busy)return;setBusy(true);
+    try{const p={...P},base=`RDPAI_${slug(p.name)}_${p.inches}in`;
+      const {svg,stats,names,cols}=p.print==='check'?buildWeaveSvg(p):await buildTracedSvg(p,(t,i,n)=>status(`${t}… (${i} of ${n-1})`));render();
+      status('Drawing the vector preview…');const pc=await svgToCanvas(svg,800);const prev=await new Promise(r=>pc.toBlob(r,'image/jpeg',.88));
+      const sw=names.map((n,i)=>[n.replace(/^\d+ /,''),cols[i]]);
+      const readme=`RD PATTERN AI - ILLUSTRATOR PACKAGE\r\nDesign:   ${p.name||'Untitled'}\r\nRepeat:   ${p.inches} x ${p.inches} in, seamless on all four edges (vector)\r\nMade by:  RD Pattern AI v${VERSION}\r\n\r\nOPEN IN ILLUSTRATOR\r\n1. Unzip and keep the files together.\r\n2. File > Scripts > Other Script... and choose ${base}_Illustrator_setup.jsx\r\n3. One named layer per colour, one global RD swatch per colour, artboard = repeat.\r\n4. Pattern swatch: with everything selected, drag it into the Swatches panel.\r\n\r\nLAYERS\r\n${names[0]}  1 rectangle\r\n${stats.map(x=>`${x.name}  ${x.paths} shapes`).join('\r\n')}\r\n\r\n${p.print==='check'?'Every thread crossing is an exact square (merged into runs), cut on the repeat edge by a clipping mask. The weave shadow is left out (the PSD keeps it).':'Shapes are traced from the print and cut exactly on the repeat edge. Soft edges become crisp.'}\r\n\r\nCOLOURS (sRGB)\r\n${sw.map(([n,h])=>`${n.padEnd(18)}${h.toUpperCase()}`).join('\r\n')}\r\nConfirm against a lab dip or strike-off before bulk.\r\n`;
+      const entries=[{name:`${base}/${base}_VECTOR.svg`,blob:svg,deflate:true},
+        {name:`${base}/${base}_Illustrator_setup.jsx`,blob:new Blob([aiScriptGeneric(`${base}_VECTOR.svg`,p,names,sw).replace(/\n/g,'\r\n')]),deflate:true},
+        {name:`${base}/${base}_vector_preview_2x2.jpg`,blob:prev},
+        {name:`${base}/${base}_recipe.json`,blob:new Blob([JSON.stringify(recipe(p),null,2)]),deflate:true},
+        {name:`${base}/README_ILLUSTRATOR.txt`,blob:new Blob([readme]),deflate:true}];
+      const zip=await makeZip(entries,n=>status('Packing '+n.split('/').pop()+'…'));
+      await saveFile(base+'_ILLUSTRATOR.zip',zip);
+      status(`Saved ${base}_ILLUSTRATOR.zip (${stats.reduce((t,x)=>t+x.paths,0)+1} vector shapes).`+await recordExport('Exported Illustrator package',base+'_ILLUSTRATOR.zip','AI'));
+    }catch(e){console.error(e);render();status(e&&e.code?errMsg(e):'Could not build the Illustrator package ('+(e&&e.message||'error')+').');}
+    finally{setBusy(false);}
+    return;
+  }
   if(!baseBlock()&&src==='engine'&&P.print==='check'){
     if(busy)return;setBusy(true);
     try{const p={...P},base=`RDPAI_${slug(p.name)}_${p.inches}in`,{svg,S,nw,nf}=buildCheckSvg(p);
@@ -1363,7 +1680,7 @@ $('saveai').onclick=async()=>{
   }catch(e){console.error(e);render();status(e&&e.code?errMsg(e):'Could not build the Illustrator package ('+(e&&e.message||'error')+').');}
   finally{setBusy(false);}
 };
-const recipe=p=>({tool:'RD Pattern AI',version:VERSION,print:p.print==='check'?'check-plaid':'tiger-stripe',params:p});
+const recipe=p=>({tool:'RD Pattern AI',version:VERSION,print:p.print==='check'?(p.ck_mode==='stripe'?'stripe':'check-plaid'):p.print==='animal'?'animal-'+p.an_type:'tiger-stripe',params:p});
 $('saverec').onclick=async()=>{
   if(src==='gemini'&&gmeta){try{const fn=`RDPAI_${slug(P.name)}_GEMINI_recipe.json`;await saveFile(fn,JSON.stringify({tool:'RD Pattern AI',version:VERSION,kind:'gemini-render',model:gmeta.model,options:gmeta.opts,prompt:gmeta.prompt,note:'Gemini renders are not exactly repeatable; re-running the prompt gives a new variation.'},null,2));status('Saved '+fn);}catch(e){status(errMsg(e));}return;}
   try{await saveFile(fname('json'),JSON.stringify(recipe(P),null,2));status('Saved recipe '+fname('json'));}catch(e){status(errMsg(e));}
@@ -1408,7 +1725,7 @@ function extractPalette(img){ // k-means on the centre of the photo, then ground
 }
 $('refcols').onclick=()=>{
   if(!refImg.naturalWidth){refStatus('Add a reference photo first.');return;}
-  const pal=extractPalette(refImg);Object.assign(P,pal);if(P.print==='check')Object.assign(P,{ck_A:pal.ground,ck_B:pal.stripe,ck_C:pal.mid});syncUI();render();renderVarsSoon();
+  const pal=extractPalette(refImg);Object.assign(P,pal);if(P.print==='check')Object.assign(P,{ck_A:pal.ground,ck_B:pal.stripe,ck_C:pal.mid});if(P.print==='animal')Object.assign(P,{an_A:pal.ground,an_B:pal.mid,an_C:pal.stripe});syncUI();render();renderVarsSoon();
   refStatus(`Pulled ${pal.ground.toUpperCase()} / ${pal.mid.toUpperCase()} / ${pal.stripe.toUpperCase()} from the photo. Lighting shifts colour, so check against the physical swatch.`);
 };
 
@@ -1429,6 +1746,8 @@ function refreshMatch(){
   let gok=false;try{gok=gconn==='ok';}catch(e){}
   const any=!!matchVia||gok;
   $('match').hidden=!any;$('matchhint').hidden=any;
+  $('match').textContent=gok?'Recreate the print':'Read the reference with Claude';
+  $('step2').classList.toggle('dim',!refImg.naturalWidth);
 }
 const apiHeaders=k=>({'x-api-key':k,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'});
 async function testKey(){ // free check: list models with the key
@@ -1461,7 +1780,7 @@ $('keysave').onclick=async()=>{const v=$('apikey').value.trim();
     $('apikey').value='';
   } else if(!lsGet(KKEY)){connStatus('Paste a key first.');return;}
   connStatus('Testing…');const ok=await testKey();
-  connStatus(ok?'Connected. Match reference is ready.':'The key did not work. Check it in the Anthropic console.');
+  connStatus(ok?'Connected. Claude will build the design controls in step 3.':'The key did not work. Check it in the Anthropic console.');
 };
 $('keytest').onclick=async()=>{connStatus('Testing…');const ok=await testKey();connStatus(ok?'Connected.':(lsGet(KKEY)?'The key did not work.':'No key saved.'));};
 $('keyclear').onclick=()=>{lsSet(KKEY,'');$('apikey').value='';setConn('off','Not connected');connStatus('Key removed from this browser.');};
@@ -1501,7 +1820,8 @@ Reply with only one JSON object with exactly these keys: density, angle, weight,
 - print = "stripe" for brush-stroke animal stripes, "check" for prints built only from straight crossing bands (gingham, check, buffalo check, windowpane, plaid, tartan, madras), "other" for everything else (florals, houndstooth, dots, geometrics, conversationals...).
 - check = when print is "check": ${CHECK_SCHEMA}; otherwise null.
 - notes = one or two precise sentences describing the print: print type, motif construction and shapes, proportions, scale relative to the garment, texture and colours.`;
-const CHECK_SCHEMA=`an object {warp, weft, sym, A, B, C, D, count, angle, weave}. warp = the vertical stripes of ONE full repeat from left to right as a thread-count sett: a letter A-D for the colour followed by a number for its relative width, e.g. "A8 B8" for a simple gingham, "A12 B4 A2 C2 A2 B4" for a plaid. weft = the horizontal stripes of one repeat from top to bottom in the same notation, or "" if they are the same as the warp. sym = false (true only if you wrote a mirrored tartan as a half-sett). A, B, C, D = hex colours; A is the ground (most common colour); use null for unused letters. Woven checks mix colours where bands cross, so do NOT list the in-between crossing tones as extra colours or stripes: for a gingham give only A = the lightest squares and B = the strongest squares (where the coloured bands cross). count = how many full warp repeats span the width of the image. angle = 0 for straight checks, 45 for bias (diagonal) checks. weave = "twill" if diagonal twill lines are visible, otherwise "plain"`;
+const CHECK_SCHEMA=`an object {mode, warp, weft, sym, A, B, C, D, count, angle, weave, structure}. mode = "stripe" if the bands run in one direction only (stripes: breton, pinstripe, awning, multi-stripe), otherwise "check". warp = the vertical stripes of ONE full repeat from left to right as a thread-count sett: a letter A-D for the colour followed by a number for its relative width, e.g. "A8 B8" for a simple gingham, "A12 B4 A2 C2 A2 B4" for a plaid. weft = the horizontal stripes of one repeat from top to bottom in the same notation, or "" if they are the same as the warp. sym = false (true only if you wrote a mirrored tartan as a half-sett). A, B, C, D = hex colours; A is the ground (most common colour); use null for unused letters. Woven checks mix colours where bands cross, so do NOT list the in-between crossing tones as extra colours or stripes: for a gingham give only A = the lightest squares and B = the strongest squares (where the coloured bands cross). count = how many full warp repeats span the width of the image. angle = 0 for straight checks, 45 for bias (diagonal) checks. weave = "herringbone" for herringbone, "twill" if diagonal twill lines are visible or for houndstooth and glen plaid, otherwise "plain". structure = true when the weave itself forms the pattern (houndstooth = warp "A4 B4" twill; glen plaid; herringbone = warp "B8" weft "A8"), otherwise false. For stripes: angle 0 = vertical stripes, 90 = horizontal stripes, and count = stripe repeats across the image in that direction`;
+const ANIMAL_SCHEMA=`an object {kind, count, size, ring, break, irreg, fill, blotch, A, B, C, D}. kind = "leopard" (rosettes), "cheetah" (solid spots), "snake" (snakeskin / python scales), "giraffe" (patches) or "zebra". count = how many rosettes / spots / scales / patches span the width of the image (3-60). size 0-1 = spot size relative to spacing. ring 0-1 = rosette ring thickness (leopard), halo width (cheetah), scale outline thickness (snake), gap width between patches (giraffe). break 0-1 = gaps in the rosette rings. irreg 0-1 = how irregular the shapes are. fill 0-1 = rosette centre fill (leopard), halo strength (cheetah), scale shading (snake), patch centre shading (giraffe). blotch 0-1 = amount of large dark blotches (snake only). Colours as hex: A = ground; leopard B = rosette centre, C = rosette; cheetah B = spot halo, C = spot; snake B = blotch, C = scale outline, D = scale shading; giraffe B = patch, C = patch centre; zebra A = ground, C = stripes`;
 // ---------- check engine fitting: Claude reads a clean render (or the photo) into sett + colours ----------
 const CHECK_PROMPT=desc=>`The attached image is one repeat of a flat, seamless woven check / plaid textile print. Describe it so a woven-check generator can redraw it exactly.${desc?`\nA textile analyst described the original print as: ${String(desc).slice(0,400)}`:''}
 Reply with only ${CHECK_SCHEMA}.`;
@@ -1517,6 +1837,19 @@ function findChecks(cv){ // checks across the tile from the circular autocorrela
   for(let T=4;T<=S/2;T++)if(r[T]>=mx*.9&&r[T]>=r[T-1]&&r[T]>=r[T+1])return S/T;
   return 0;
 }
+function applyAnimal(c,cv){
+  c=c||{};const kind=String(c.kind||'').toLowerCase();const hex=v=>/^#[0-9a-fA-F]{6}$/.test(v||'')?v.toLowerCase():null;
+  if(kind==='zebra'){const z=BASES.find(b=>b.id==='zebra');const p={...DEF,...z.params,name:P.name,inches:P.inches,dpi:P.dpi};
+    if(hex(c.A))p.ground=hex(c.A);if(hex(c.C))p.stripe=hex(c.C);applyParams(p);return p;}
+  const p={print:'animal',an_type:['leopard','cheetah','snake','giraffe'].includes(kind)?kind:'leopard'};
+  const num=(k,lo,hi,dflt)=>{const v=Number(c[k]);return Number.isFinite(v)?Math.min(hi,Math.max(lo,v)):dflt;};
+  p.an_count=Math.round(num('count',3,60,DEF.an_count));p.an_size=num('size',0,1,.6);p.an_ring=num('ring',0,1,.45);p.an_break=num('break',0,1,.4);
+  p.an_irreg=num('irreg',0,1,.5);p.an_fill=num('fill',0,1,.6);p.an_blotch=num('blotch',0,1,.3);p.an_soft=.15;
+  ['A','B','C','D'].forEach(L=>{if(hex(c[L]))p['an_'+L]=hex(c[L]);});
+  if(cv){try{const pal=quantizeRender(cv,'auto').pal;['A','B','C','D'].forEach(L=>{const h=p['an_'+L];if(!h)return;const c0=hex2rgb(h).map(v=>v*255);
+    let best=null,bd=1e9;pal.forEach(cc=>{const dd=cdist(c0,cc);if(dd<bd){bd=dd;best=cc;}});if(best&&bd<90)p['an_'+L]=toHex(best);});}catch(e){}}
+  applyParams(p);return p;
+}
 function applyCheck(c,cv){
   c=c||{};const p={print:'check',ck_balance:1};
   const sett=v=>String(v||'').replace(/[^A-Da-d0-9.\s]/g,' ').replace(/\s+/g,' ').trim().slice(0,200);
@@ -1526,13 +1859,15 @@ function applyCheck(c,cv){
   ['A','B','C','D'].forEach(L=>{if(/^#[0-9a-fA-F]{6}$/.test(c[L]||''))p['ck_'+L]=c[L].toLowerCase();});
   const n=Number(c.count);if(Number.isFinite(n)&&n>0)p.ck_count=Math.max(1,Math.min(60,Math.round(n)));
   const a=Number(c.angle);p.ck_angle=Number.isFinite(a)?Math.max(0,Math.min(90,Math.round(a))):0;
-  p.ck_weave=String(c.weave).toLowerCase()==='twill'?'twill':'plain';p.ck_tex=p.ck_weave==='twill'?.75:.5;p.ck_shade=.3;p.ck_soft=.15;
+  const wv=String(c.weave).toLowerCase();p.ck_weave=wv==='herringbone'?'herringbone':wv==='twill'?'twill':'plain';
+  const struct=c.structure===true||String(c.structure).toLowerCase()==='true';
+  p.ck_tex=struct?1:p.ck_weave==='plain'?.5:.75;p.ck_shade=.3;p.ck_soft=struct?.05:.15;p.ck_mode=String(c.mode).toLowerCase()==='stripe'?'stripe':'check';p.ck_hb=4;
   if(cv){
     try{ // snap colours to the render's real colours, and measure the check size from the render itself
       const q=quantizeRender(cv,'auto'),pal=q.pal;
       ['A','B','C','D'].forEach(L=>{const h=p['ck_'+L];if(!h)return;const c0=hex2rgb(h).map(v=>v*255);
         let best=null,bd=1e9;pal.forEach(cc=>{const dd=cdist(c0,cc);if(dd<bd){bd=dd;best=cc;}});if(best&&bd<90)p['ck_'+L]=toHex(best);});
-      if(p.ck_angle<5){const k=findChecks(cv);if(k>=1)p.ck_count=Math.max(1,Math.min(60,Math.round(k)));}
+      if(p.ck_angle<5&&!struct){const k=findChecks(cv);if(k>=1)p.ck_count=Math.max(1,Math.min(60,Math.round(k)));}
     }catch(e){console.warn(e);}
   }
   applyParams(p);return p;
@@ -1549,49 +1884,21 @@ async function fitCheckFromRender(cv,desc,prior){
 $('match').onclick=async()=>{
   if(!refImg.naturalWidth){refStatus('Add a reference photo first.');return;}
   const claudeOK=!!matchVia,gemOK=gconn==='ok'&&!!lsGet(GKEY);
-  if(!claudeOK&&!gemOK){refStatus('Add a Claude or Gemini key under API in the top bar.');return;}
+  if(!claudeOK&&!gemOK){refStatus('Add a Gemini key (and a Claude key) under API in the top bar.');return;}
   const btn=$('match');btn.disabled=true;
+  const steps=[['Gemini recreates the print',gemOK?'run':'skip'],['Claude reviews it and builds the controls',claudeOK?'wait':'skip']];
+  setPipe(steps);setCtl('Working…');
   try{
-    let out=null;
-    if(claudeOK){
-      refStatus('Claude is reading the reference…');
-      try{const img=await refBlob();out=matchVia==='claude'?await sample.json(matchPrompt(curParams()),{images:img}):await askAnthropic(img,matchPrompt(curParams()));}
-      catch(e){
-        const m={not_granted:'Claude was not allowed for this page.',rate_limited:'Claude is busy just now.',invalid_json:'Claude did not return usable settings.',
-          image_rejected:'Claude could not read that image.',bad_key:'The Claude key was refused.',no_credit:'The Anthropic account has no credit left.',cancelled:''};
-        if(e?.code==='bad_key')setConn('bad','Key not valid');
-        const msg=m[e?.code]??('Claude could not finish ('+(e?.code||'error')+').');
-        if(!gemOK){refStatus(msg+' Try again, or add a Gemini key under API.');return;}
-        refStatus(msg+' Going straight to Gemini…');
-      }
+    if(gemOK){
+      const made=await runGemini({...readGemOpts(),count:1});
+      steps[0][1]=made?'done':'fail';setPipe(steps);
+      if(!made){setCtl('Gemini could not recreate the print; see the message above.');return;}
+      if(!claudeOK){setCtl('Gemini recreated it. Add a Claude key under API so Claude can build design-specific controls; for now you can change colours and motif size below.');return;}
+      steps[1][1]='run';setPipe(steps);
+      const ok=await buildControls(gmeta);steps[1][1]=ok?'done':'fail';setPipe(steps);
+    }else{
+      steps[1][1]='run';setPipe(steps);const ok=await buildFromPhoto();steps[1][1]=ok?'done':'fail';setPipe(steps);
     }
-    const p={};
-    if(out){Object.entries(RANGES).forEach(([k,[lo,hi]])=>{const v=Number(out?.[k]);if(Number.isFinite(v))p[k]=Math.min(hi,Math.max(lo,k==='density'||k==='angle'?Math.round(v):Math.round(v*100)/100));});
-      ['ground','mid','stripe'].forEach(k=>{if(/^#[0-9a-fA-F]{6}$/.test(out?.[k]||''))p[k]=out[k].toLowerCase();});}
-    const isCheck=!!out&&String(out.print||'').toLowerCase()==='check';
-    const fit=out&&!isCheck&&!(out.fit===false||String(out.fit).toLowerCase()==='false');
-    if(fit){p.print='tiger';applyParams(p);refStatus('Recreated with the stripe engine'+(out?.notes?': '+String(out.notes).slice(0,200):'.')+' Edit with the sliders and colours.');return;}
-    if(out){['ground','mid','stripe'].forEach(k=>{if(p[k])P[k]=p[k];});syncUI();}
-    const seen=out?.notes?'Claude sees: '+String(out.notes).slice(0,240)+' ':'';
-    if(isCheck){
-      if(gemOK){
-        refStatus(seen+'Gemini is recreating the check as a flat, seamless repeat…');
-        $('gclose').value='exact';$('gcols').value='ref';$('gscale').value='ref';
-        const made=await runGemini({...readGemOpts(),close:'exact',cols:'ref',scale:'ref',count:1,seam:true,notes:$('gnotes').value.trim().slice(0,400)},out?.notes);
-        if(made){
-          refStatus(seen+'Claude is reading the Gemini render into the check & plaid engine…');
-          const ok=await fitCheckFromRender(gimg,out?.notes,out?.check);
-          if(ok){refStatus(seen+'Recreated with Gemini, then rebuilt in the check & plaid engine: the sliders and colours now match it and edit it directly. The Gemini render is kept under Gemini renders.');return;}
-          refStatus(seen+'Recreated with Gemini, but it could not be rebuilt in the check engine. Edit it under Edit render, or try "Make editable in the check engine".');return;
-        }
-      }
-      if(out?.check){applyCheck(out.check,null);refStatus(seen+'Rebuilt in the check & plaid engine from the photo. Check the check size against the swatch'+(gemOK?'.':'; with a Gemini key Match reads a clean Gemini recreation instead, which is more accurate.'));return;}
-    }
-    if(!gemOK){renderVarsSoon();refStatus(seen+'That is not a brush-stroke stripe print, so the stripe engine cannot recreate it. Add a Gemini key under API and press Match again.');return;}
-    refStatus(seen+'Gemini is recreating it in the reference colours as a seamless repeat…');
-    $('gclose').value='exact';$('gcols').value='ref';$('gscale').value='ref';
-    const made=await runGemini({...readGemOpts(),close:'exact',cols:'ref',scale:'ref',count:1,seam:true,notes:$('gnotes').value.trim().slice(0,400)},out?.notes);
-    refStatus(made?seen+'Recreated with Gemini in the reference colours ('+(gmeta?.how||'')+'). Edit it under Edit render: change any colour, the motif size, or ask Gemini for a change.':seen+'Gemini could not recreate it; see the message under Render with Gemini.');
   }finally{btn.disabled=false;}
 };
 
@@ -1612,14 +1919,14 @@ function drawBase(size){ // the reference itself is the base until Match / Gemin
   if(mode==='cmp'){const half=Math.floor(size/2),ar=half/size;let sw=iw,sh=iw/ar;if(sh>ih){sh=ih;sw=ih*ar;}
     vctx.drawImage(refImg,(iw-sw)/2,(ih-sh)/2,sw,sh,0,0,half,size);
     vctx.fillStyle='#2a2723';vctx.fillRect(half,0,size-half,size);vctx.fillStyle='#d8d2c8';vctx.textAlign='center';
-    vctx.font=`500 ${Math.round(size/44)}px Archivo, system-ui, sans-serif`;vctx.fillText('Press Match reference',half+half/2,size/2);vctx.textAlign='start';
+    vctx.font=`500 ${Math.round(size/44)}px Archivo, system-ui, sans-serif`;vctx.fillText('Press Recreate the print',half+half/2,size/2);vctx.textAlign='start';
     vctx.fillStyle='rgba(0,0,0,.55)';vctx.fillRect(0,size-34,size,34);vctx.fillStyle='#fff';vctx.font=`600 ${Math.round(size/48)}px Archivo, system-ui, sans-serif`;
     vctx.fillText('REFERENCE',14,size-12);vctx.fillText('RECREATED PRINT',half+14,size-12);}
   else{const s=Math.min(size/iw,size/ih),w=iw*s,h=ih*s;vctx.drawImage(refImg,(size-w)/2,(size-h)/2,w,h);}
   $('m-stripes').textContent='Reference photo (base)';$('m-angle').textContent=`${iw} × ${ih} px`;
-  $('m-repeat').textContent='not a repeat yet: Match reference recreates it as a seamless print';
+  $('m-repeat').textContent='not a repeat yet: step 2 recreates it as a seamless print';
 }
-['input','change'].forEach(ev=>document.addEventListener(ev,e=>{if(e.target.closest&&e.target.closest('.rail')&&!e.target.closest('#gedit')&&(e.target.matches('input[type=range],input[type=color],#seed')||e.target.closest('section.ck')))toEngine();},true));
+['input','change'].forEach(ev=>document.addEventListener(ev,e=>{if(e.target.closest&&e.target.closest('.rail')&&!e.target.closest('#gedit')&&(e.target.matches('input[type=range],input[type=color],#seed')||e.target.closest('section.ck,section.an')))toEngine();},true));
 document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.sw,#shuffle,#vargrid .thumb'))toEngine();},true);
 function drawGem(size){
   vctx.imageSmoothingEnabled=true;vctx.imageSmoothingQuality='high';
@@ -1647,15 +1954,16 @@ function drawGem(size){
   $('m-angle').textContent=`${gimg.width} px source · ${gmeta.model}`;
   if(mode==='cmp')$('m-repeat').textContent='reference vs. part of one repeat';
 }
-const SRCTXT={empty:['Start by dropping in a reference photo. It becomes the base for the print.',''],
-  ref:['Showing your reference as the base. Press Match reference to recreate it as an editable, seamless print.',''],
+const SRCTXT={empty:['Step 1: drop in a customer reference photo.',''],
+  ref:['Showing your reference. Step 2: press Recreate the print.',''],
   engine:['Showing the stripe engine print.','Back to the reference'],
-  gemini:['Showing a Gemini render. Save repeat PNG and Save to history work for renders; the layered and Illustrator exports are built from engine prints.','Back to the reference']};
+  gemini:['Showing the Gemini recreation. Its controls are in step 3.','Back to the reference']};
 function markGem(){document.querySelectorAll('#gemgrid .thumb').forEach(b=>b.setAttribute('aria-pressed',String(src==='gemini'&&b._r===gmeta)));
   const base=src==='ref'||src==='empty',hasRef=!!(refImg.naturalWidth||H.ref),t=[...SRCTXT[src]];
-  if(src==='engine')t[0]=P.print==='check'?'Showing the check & plaid engine print. Every slider edits it.':'Showing the stripe engine print.';
+  if(src==='engine')t[0]=engineMsg();
   $('srctext').textContent=t[0];$('srcback').textContent=t[1];$('srcback').hidden=!t[1]||!hasRef;$('srceng').hidden=!base;
   document.body.classList.toggle('gem-mode',src==='gemini');document.body.classList.toggle('base-mode',base);$('gedit').hidden=src!=='gemini';
+  try{$('buildctl').hidden=!(gmeta&&matchVia&&src!=='ref'&&src!=='empty');$('step3').classList.toggle('dim',base);}catch(e){}
   persistSession();render();}
 
 // ---------- Gemini connection (this workstation's Google AI key, saved in this browser) ----------
@@ -1769,7 +2077,7 @@ const CLOSE={close:'Stay very close to the reference: the same print type, the s
   loose:'Use the reference only as a starting point: a fresh design in the same print family and colour story.'};
 function gemPrompt(o,desc){
   const exact=o.close==='exact';
-  const cols=o.cols==='current'&&P.print==='check'?`Use exactly this palette and no other hues: ${['A','B','C','D'].slice(0,checkSetup(P).nc).map(L=>P['ck_'+L].toUpperCase()).join(', ')} (tints and blends of these are fine).`
+  const cols=o.cols==='current'&&P.print!=='tiger'?`Use exactly this palette and no other hues: ${engineColours(P).map(h=>h.toUpperCase()).join(', ')} (tints and blends of these are fine).`
     :o.cols==='current'?`Use exactly this palette and no other hues: ground ${P.ground.toUpperCase()}, secondary ${P.mid.toUpperCase()}, main motif ${P.stripe.toUpperCase()} (tints and blends of these are fine).`
     :'Match the colours of the print in the reference exactly as they would look on flat fabric in neutral light (ignore shadows, folds and highlights on the garment).';
   const head=exact?`Recreate the textile print shown in the attached reference photo as clean, flat, seamless print artwork.
@@ -1806,7 +2114,7 @@ async function runGemini(o,desc){
       grenders.unshift(rec);made++;
       showRender(rec);renderGemGrid();
     }
-    gemStatus(`Done. ${made} render${made>1?'s':''} added below the preview${o.seam?'; repeat check: '+gmeta.how:''}. Edit it under Edit render; "Back to the reference" under the preview leaves Gemini mode.`);
+    gemStatus(`Done. ${made} render${made>1?'s':''} added below the preview${o.seam?'; repeat check: '+gmeta.how:''}. Its controls are in step 3.`);
   }catch(e){console.error(e);
     gemStatus((GERR[e?.code]?GERR[e.code].replace(/\.$/,''):'Gemini could not finish')+(e?.message?` (${String(e.message).slice(0,160)})`:'')+'.'+(made?` ${made} render${made>1?'s were':' was'} kept.`:''));
     if(e?.code==='bad_key')setGConn('bad','Key not valid');}
@@ -1874,34 +2182,155 @@ function setupEdit(rec,force){
   if(!rec.edit||force||rec.edit.cols.length!==q.pal.length)rec.edit={k,tiles:rec.edit?.tiles||1,cols:q.pal.map(c=>toHex(c))};
   $('gek').value=String(rec.edit.k);$('getiles').value=String(rec.edit.tiles);buildGeChips();
 }
-function showRender(rec){gmeta=rec;if(!rec.base)rec.base=rec.cv;gimg=rec.cv;src='gemini';try{setupEdit(rec);}catch(e){console.error(e);}markGem();}
+function showRender(rec){gmeta=rec;if(!rec.base)rec.base=rec.cv;gimg=rec.cv;src='gemini';try{setupEdit(rec);}catch(e){console.error(e);}try{renderFields(rec);}catch(e){console.error(e);}markGem();}
 $('gek').onchange=e=>{const r=GE.rec;if(!r)return;r.edit.k=e.target.value;setupEdit(r,true);r.edit.k=e.target.value;applyGemEdits();renderGemGrid();};
 $('getiles').onchange=e=>{const r=GE.rec;if(!r)return;r.edit.tiles=+e.target.value;applyGemEdits();renderGemGrid();};
 $('gereset').onclick=()=>{const r=GE.rec;if(!r)return;r.edit.tiles=1;r.edit.k='auto';setupEdit(r,true);applyGemEdits();renderGemGrid();$('gestatus').textContent='Edits cleared; back to the render as Gemini drew it.';};
-$('gerefgo').onclick=async()=>{
-  const r=GE.rec,ask=$('gerefine').value.trim().slice(0,400);
-  if(!r||!ask){$('gestatus').textContent='Describe the change first, e.g. "make the checks half the size".';return;}
-  if(gbusy||gconn!=='ok'){$('gestatus').textContent='Gemini is not connected or is busy.';return;}
-  gbusy=true;refreshGem();$('gerefgo').disabled=true;$('gestatus').textContent='Gemini is applying the change…';
+async function geminiEdit(ask,say){
+  const r=GE.rec;if(!r||!ask)return false;
+  if(gbusy||gconn!=='ok'){say('Gemini is not connected or is busy.');return false;}
+  gbusy=true;refreshGem();say('Gemini is applying the change…');
   try{
     const prompt=`Edit this flat, seamless textile print artwork: ${ask}
 Keep everything else the same (print type, motifs, technique, colours) unless the change asks otherwise. Keep it a flat, straight-on, edge-to-edge square swatch with no garment, folds, shadows, borders or text.`;
     const {bmp,model}=await gemImage(prompt,[await canvasBlob(r.cv)],r.opts?.size||'2K');
     const N=r.cv.width;let cv=squareCanvas(bmp,N),how='not made seamless';
-    if(r.seamless){const s=await makeSeamless(cv,r.opts?.size||'2K',t=>$('gestatus').textContent=t);cv=s.cv;how=s.how;}
-    const rec={cv,model,how,seamless:r.seamless,prompt:r.prompt+'\nRefinement: '+ask,opts:{...r.opts,refined:ask},name:P.name||'Gemini print',at:Date.now()};
-    grenders.unshift(rec);showRender(rec);renderGemGrid();$('gerefine').value='';
-    $('gestatus').textContent='Refined. The new version is first under Gemini renders; the previous one is still there.';
-  }catch(e){console.error(e);$('gestatus').textContent=(GERR[e?.code]?GERR[e.code].replace(/\.$/,''):'Gemini could not finish')+(e?.message?` (${String(e.message).slice(0,140)})`:'')+'.';if(e?.code==='bad_key')setGConn('bad','Key not valid');}
-  finally{gbusy=false;refreshGem();$('gerefgo').disabled=false;}
+    if(r.seamless){const sm=await makeSeamless(cv,r.opts?.size||'2K',say);cv=sm.cv;how=sm.how;}
+    const rec={cv,model,how,seamless:r.seamless,prompt:r.prompt+'\nRefinement: '+ask,opts:{...r.opts,refined:ask},name:P.name||'Gemini print',at:Date.now(),ctl:r.ctl?{...r.ctl,controls:r.ctl.controls.map(c=>({...c}))}:null};
+    grenders.unshift(rec);showRender(rec);renderGemGrid();
+    say('Done. The new version is first under Gemini renders; the previous one is still there.');return true;
+  }catch(e){console.error(e);say((GERR[e?.code]?GERR[e.code].replace(/\.$/,''):'Gemini could not finish')+(e?.message?` (${String(e.message).slice(0,140)})`:'')+'.');if(e?.code==='bad_key')setGConn('bad','Key not valid');return false;}
+  finally{gbusy=false;refreshGem();}
+}
+$('gerefgo').onclick=async()=>{const ask=$('gerefine').value.trim().slice(0,400);const say=t=>$('gestatus').textContent=t;
+  if(!ask){say('Describe the change first, e.g. "make the checks half the size".');return;}
+  $('gerefgo').disabled=true;const ok=await geminiEdit(ask,say);$('gerefgo').disabled=false;if(ok)$('gerefine').value='';};
+// ---------- base designs (no reference needed) ----------
+const ck=(o)=>({print:'check',ck_mode:'check',ck_weft:'',ck_sym:false,ck_angle:0,ck_balance:1,ck_weave:'plain',ck_tex:.5,ck_shade:.3,ck_soft:.15,ck_hb:4,...o});
+const an=(o)=>({print:'animal',an_seed:11,an_soft:.05,an_break:.4,an_blotch:.3,...o});
+const BASES=[
+  {id:'gingham',fam:'Checks',name:'Classic gingham',params:ck({ck_warp:'A8 B8',ck_count:24,ck_A:'#f6f7f4',ck_B:'#2e5e9e'}),cw:[{ck_A:'#f6f7f4',ck_B:'#2e5e9e'},{ck_A:'#fbf7f2',ck_B:'#c0392b'},{ck_A:'#f4f2ea',ck_B:'#1a1a1a'},{ck_A:'#f5f8f2',ck_B:'#7aa36b'}]},
+  {id:'buffalo',fam:'Checks',name:'Buffalo check',params:ck({ck_warp:'A8 B8',ck_count:6,ck_weave:'twill',ck_tex:.6,ck_A:'#b3202a',ck_B:'#161616'}),cw:[{ck_A:'#b3202a',ck_B:'#161616'},{ck_A:'#f2efe8',ck_B:'#161616'},{ck_A:'#3c5a3a',ck_B:'#161616'}]},
+  {id:'windowpane',fam:'Checks',name:'Windowpane',params:ck({ck_warp:'A22 B2',ck_count:6,ck_A:'#e9e4d8',ck_B:'#3b3b3b'}),cw:[{ck_A:'#e9e4d8',ck_B:'#3b3b3b'},{ck_A:'#2b3346',ck_B:'#c9b37e'},{ck_A:'#f3efe6',ck_B:'#b0413e'}]},
+  {id:'tartan',fam:'Checks',name:'Tartan',params:ck({ck_warp:'A12 B2 A2 B2 A12 C12 D2 C12',ck_count:3,ck_weave:'twill',ck_tex:.6,ck_A:'#23452f',ck_B:'#111111',ck_C:'#1a2440',ck_D:'#d8b83a'}),cw:[{ck_A:'#23452f',ck_B:'#111111',ck_C:'#1a2440',ck_D:'#d8b83a'},{ck_A:'#9e1b22',ck_B:'#111111',ck_C:'#1c2a4a',ck_D:'#e9e1cf'},{ck_A:'#6b6f73',ck_B:'#1d1d1d',ck_C:'#b9b4aa',ck_D:'#8a1c2b'}]},
+  {id:'madras',fam:'Checks',name:'Madras plaid',params:ck({ck_warp:'A6 B2 C4 A2 D6 B2 C2',ck_count:5,ck_A:'#f2c14e',ck_B:'#d9483b',ck_C:'#2f6db3',ck_D:'#3a9a5b'}),cw:[{ck_A:'#f2c14e',ck_B:'#d9483b',ck_C:'#2f6db3',ck_D:'#3a9a5b'},{ck_A:'#f4a7b9',ck_B:'#7fc8a9',ck_C:'#f7e08a',ck_D:'#5b8bd9'}]},
+  {id:'glen',fam:'Checks',name:'Glen plaid',params:ck({ck_warp:'A4 B4 A4 B4 A4 B4 A4 B4 A2 B2 A2 B2 A2 B2 A2 B2',ck_count:2,ck_weave:'twill',ck_tex:1,ck_soft:.05,ck_shade:.2,ck_A:'#ecebe6',ck_B:'#2b2b2b'}),cw:[{ck_A:'#ecebe6',ck_B:'#2b2b2b'},{ck_A:'#d9cdb6',ck_B:'#5a4632'},{ck_A:'#c9d1db',ck_B:'#1f2a44'}]},
+  {id:'houndstooth',fam:'Checks',name:'Houndstooth',params:ck({ck_warp:'A4 B4',ck_count:10,ck_weave:'twill',ck_tex:1,ck_soft:.05,ck_shade:.15,ck_A:'#f3f1ea',ck_B:'#1a1a1a'}),cw:[{ck_A:'#f3f1ea',ck_B:'#1a1a1a'},{ck_A:'#efe6d6',ck_B:'#7a1f2b'},{ck_A:'#e8e2d4',ck_B:'#5b4a36'}]},
+  {id:'herringbone',fam:'Checks',name:'Herringbone',params:ck({ck_warp:'B8',ck_weft:'A8',ck_count:10,ck_weave:'herringbone',ck_tex:1,ck_soft:.05,ck_shade:.25,ck_hb:4,ck_A:'#cfc6b6',ck_B:'#4a4038'}),cw:[{ck_A:'#cfc6b6',ck_B:'#4a4038'},{ck_A:'#b9bec6',ck_B:'#2b3240'},{ck_A:'#e2d7c3',ck_B:'#7b5a3a'}]},
+  {id:'breton',fam:'Stripes',name:'Breton stripe',params:ck({ck_mode:'stripe',ck_warp:'A6 B3',ck_angle:90,ck_count:18,ck_A:'#f7f5ef',ck_B:'#1f2a44'}),cw:[{ck_A:'#f7f5ef',ck_B:'#1f2a44'},{ck_A:'#f7f5ef',ck_B:'#c0392b'},{ck_A:'#1f2a44',ck_B:'#f2efe6'}]},
+  {id:'pinstripe',fam:'Stripes',name:'Pinstripe',params:ck({ck_mode:'stripe',ck_warp:'A23 B1',ck_count:30,ck_A:'#2b3346',ck_B:'#d9d9d9'}),cw:[{ck_A:'#2b3346',ck_B:'#d9d9d9'},{ck_A:'#1c1c1c',ck_B:'#c9c9c9'},{ck_A:'#f4f2ec',ck_B:'#2b3346'}]},
+  {id:'awning',fam:'Stripes',name:'Awning stripe',params:ck({ck_mode:'stripe',ck_warp:'A1 B1',ck_count:12,ck_A:'#f4efe4',ck_B:'#3f7f6a'}),cw:[{ck_A:'#f4efe4',ck_B:'#3f7f6a'},{ck_A:'#f4efe4',ck_B:'#d4573f'},{ck_A:'#f4efe4',ck_B:'#e2b23c'}]},
+  {id:'multistripe',fam:'Stripes',name:'Multi stripe',params:ck({ck_mode:'stripe',ck_warp:'A6 B2 C3 A2 D1 B4',ck_angle:90,ck_count:8,ck_A:'#f3eee2',ck_B:'#c8553d',ck_C:'#2d4a6b',ck_D:'#e8b04a'}),cw:[{ck_A:'#f3eee2',ck_B:'#c8553d',ck_C:'#2d4a6b',ck_D:'#e8b04a'},{ck_A:'#1e2430',ck_B:'#6e8fb3',ck_C:'#e6dccb',ck_D:'#c96f4a'}]},
+  {id:'leopard',fam:'Animal',name:'Leopard',params:an({an_type:'leopard',an_count:8,an_size:.65,an_ring:.45,an_break:.45,an_irreg:.55,an_fill:.8,an_A:'#d8b27c',an_B:'#b57a3a',an_C:'#2a1c12'}),cw:[{an_A:'#d8b27c',an_B:'#b57a3a',an_C:'#2a1c12'},{an_A:'#e9e6df',an_B:'#bdb6aa',an_C:'#2b2b2b'},{an_A:'#c9a7a0',an_B:'#9b6b62',an_C:'#3a2422'},{an_A:'#2b2b2b',an_B:'#4a4038',an_C:'#0f0f0f'}]},
+  {id:'cheetah',fam:'Animal',name:'Cheetah',params:an({an_type:'cheetah',an_count:14,an_size:.5,an_ring:.3,an_irreg:.45,an_fill:.15,an_A:'#e2c08a',an_B:'#b98a4f',an_C:'#1e1610'}),cw:[{an_A:'#e2c08a',an_B:'#b98a4f',an_C:'#1e1610'},{an_A:'#f1ece2',an_B:'#cfc5b5',an_C:'#1e1e1e'},{an_A:'#c96f4a',an_B:'#9a4f33',an_C:'#2a1610'}]},
+  {id:'snake',fam:'Animal',name:'Snakeskin',params:an({an_type:'snake',an_count:26,an_size:.5,an_ring:.35,an_irreg:.4,an_fill:.7,an_blotch:.35,an_A:'#cfc4ad',an_B:'#6b5a43',an_C:'#3a3128',an_D:'#2b241c'}),cw:[{an_A:'#cfc4ad',an_B:'#6b5a43',an_C:'#3a3128',an_D:'#2b241c'},{an_A:'#d9d6cf',an_B:'#5f6a6e',an_C:'#2f3336',an_D:'#1c1f21'},{an_A:'#b9c4a3',an_B:'#4f5a3a',an_C:'#2e3522',an_D:'#1f2417'}]},
+  {id:'giraffe',fam:'Animal',name:'Giraffe',params:an({an_type:'giraffe',an_count:7,an_ring:.3,an_irreg:.6,an_fill:.5,an_A:'#efe3c8',an_B:'#9b5b2a',an_C:'#6e3c18'}),cw:[{an_A:'#efe3c8',an_B:'#9b5b2a',an_C:'#6e3c18'},{an_A:'#f2efe8',an_B:'#3b3b3b',an_C:'#1a1a1a'}]},
+  {id:'zebra',fam:'Animal',name:'Zebra',params:{print:'tiger',density:14,angle:80,weight:.5,len:8,brk:0,warp:1.6,hair:.15,sec:0,halo:0,mottle:0,seed:21,ground:'#f2f0ea',mid:'#d9d6ce',stripe:'#121212'},cw:[{ground:'#f2f0ea',mid:'#d9d6ce',stripe:'#121212'},{ground:'#e8d9c4',mid:'#cbb79a',stripe:'#4a3524'},{ground:'#f2f0ea',mid:'#d9d6ce',stripe:'#1f2a44'}]},
+  {id:'tiger',fam:'Animal',name:'Tiger',params:{print:'tiger',density:9,angle:62,weight:.5,len:2.6,brk:.36,warp:.6,hair:1,sec:.6,halo:.75,mottle:.8,seed:7,ground:'#94714a',mid:'#55392a',stripe:'#15100c'},cw:[{ground:'#94714a',mid:'#55392a',stripe:'#15100c'},{ground:'#e3dccd',mid:'#b9ae99',stripe:'#141210'},{ground:'#d98c3f',mid:'#8a4a1c',stripe:'#1a0f08'}]}];
+let curBase=null;
+function renderBaseGrid(){
+  const g=$('bgrid');g.innerHTML='';let fam='';
+  BASES.forEach(b=>{if(b.fam!==fam){fam=b.fam;const h=document.createElement('div');h.className='bfam';h.textContent=fam;g.append(h);}
+    const btn=document.createElement('button');btn.className='bcard';btn.title='Start from '+b.name;btn.setAttribute('aria-pressed',String(curBase===b));
+    const c=document.createElement('canvas');c.width=c.height=150;draw({...DEF,...b.params,...(b.cw?b.cw[0]:{})},150,150,b.params.ck_tex>=.9?.4:1,0,false);c.getContext('2d').drawImage(rc,0,0);
+    const t=document.createElement('span');t.textContent=b.name;btn.append(c,t);btn.onclick=()=>useBase(b);g.append(btn);});
+  render();
+}
+function renderColourways(b){
+  const row=$('cwrow');row.innerHTML='';if(!b||!b.cw){row.hidden=true;return;}row.hidden=false;
+  const n=document.createElement('p');n.className='note';n.textContent='Colourways';row.append(n);
+  b.cw.forEach((cw,i)=>{const bt=document.createElement('button');bt.className='sw';bt.title=`Colourway ${i+1}`;bt.setAttribute('aria-label',`Colourway ${i+1}`);
+    bt.innerHTML=Object.values(cw).slice(0,4).map(h=>`<span style="background:${h}"></span>`).join('');
+    bt.onclick=()=>{Object.assign(P,cw);toEngine();syncUI();render();renderVarsSoon();};row.append(bt);});
+}
+function useBase(b){
+  curBase=b;applyParams({...DEF,...b.params,...(b.cw?b.cw[0]:{}),name:b.name,inches:P.inches,dpi:P.dpi});autoNamed=false;P.name=b.name;syncUI();
+  setPipe(null);renderColourways(b);
+  setCtl(`<b>${esc(b.name)}</b> · base design (${esc(b.fam.toLowerCase())}). Every slider and colour below edits it live. Pick a colourway or set your own colours, then export in step 4.`);
+  document.querySelectorAll('#bgrid .bcard').forEach(x=>x.setAttribute('aria-pressed',String(x.title==='Start from '+b.name)));
+  newVarSeeds();renderVars();
+}
+function setStart(mode){const base=mode==='base';$('st-ref').setAttribute('aria-pressed',String(!base));$('st-base').setAttribute('aria-pressed',String(base));
+  $('basebox').hidden=!base;$('refbox').hidden=base;$('step2').hidden=base;if(base&&!$('bgrid').children.length)renderBaseGrid();}
+$('st-ref').onclick=()=>setStart('ref');$('st-base').onclick=()=>setStart('base');
+// ---------- Claude-built design controls ----------
+const SLIDER_WORD=['much ','slightly ','','slightly ','much '];
+function fieldValueText(c){if(c.kind==='select')return String(c.options?.[c.value]??'');if(c.value===2)return 'as drawn';return SLIDER_WORD[c.value]+(c.value<2?c.less:c.more);}
+function renderFields(rec){
+  const box=$('dfields');box.innerHTML='';const ctl=rec&&rec.ctl;const list=ctl&&Array.isArray(ctl.controls)?ctl.controls:[];
+  $('dapply').hidden=!list.length;
+  list.forEach((c,i)=>{const d=document.createElement('div');d.className='dfield';
+    const head=document.createElement('div');head.className='dl';const lb=document.createElement('label');lb.textContent=c.label;lb.htmlFor='df'+i;const out=document.createElement('output');
+    head.append(lb,out);d.append(head);
+    if(c.kind==='select'){const sel=document.createElement('select');sel.id='df'+i;(c.options||[]).forEach((o,k)=>{const op=document.createElement('option');op.value=k;op.textContent=o;sel.append(op);});
+      sel.value=String(c.value);sel.onchange=()=>{c.value=+sel.value;out.textContent=c.value===c.start?'':'changed';};d.append(sel);}
+    else{const r=document.createElement('input');r.type='range';r.min=0;r.max=4;r.step=1;r.id='df'+i;r.value=c.value;
+      const ends=document.createElement('div');ends.className='ends';ends.innerHTML=`<span></span><span></span>`;ends.children[0].textContent=c.less;ends.children[1].textContent=c.more;
+      r.oninput=()=>{c.value=+r.value;out.textContent=fieldValueText(c);};d.append(r,ends);}
+    out.textContent=c.kind==='select'?'':fieldValueText(c);box.append(d);});
+}
+function normControls(arr){
+  return (Array.isArray(arr)?arr:[]).slice(0,6).map(c=>{const kind=c?.kind==='select'&&Array.isArray(c.options)&&c.options.length>1?'select':'slider';
+    const o={label:String(c?.label||'Control').slice(0,40),kind,instruction:String(c?.instruction||'Adjust the print: {value}.').slice(0,300)};
+    if(kind==='select'){o.options=c.options.slice(0,5).map(x=>String(x).slice(0,30));o.value=0;o.start=0;}else{o.less=String(c?.less||'less').slice(0,24);o.more=String(c?.more||'more').slice(0,24);o.value=2;o.start=2;}
+    return o;}).filter(c=>c.label);
+}
+$('dapply').onclick=async()=>{
+  const r=GE.rec;if(!r||!r.ctl)return;const say=t=>$('gestatus').textContent=t;
+  const ch=r.ctl.controls.filter(c=>c.value!==c.start);
+  if(!ch.length){say('Move a slider or pick an option first.');return;}
+  const ask=ch.map(c=>c.instruction.includes('{value}')?c.instruction.replace(/\{value\}/g,fieldValueText(c)):`${c.instruction} (${c.label}: ${fieldValueText(c)})`).join(' ');
+  $('dapply').disabled=true;const ok=await geminiEdit(ask,say);$('dapply').disabled=false;
+  if(ok&&gmeta?.ctl){gmeta.ctl.controls.forEach(c=>{c.value=c.start;});renderFields(gmeta);say('Applied. The sliders are back in the middle: they now adjust from the new version.');}
 };
-$('gefit').onclick=async()=>{
-  const r=GE.rec;if(!r){return;}
-  if(!matchVia){$('gestatus').textContent='Add a Claude key under API: Claude reads the render to rebuild it in the check engine.';return;}
-  const b=$('gefit');b.disabled=true;$('gestatus').textContent='Claude is reading the render into the check & plaid engine…';
-  const ok=await fitCheckFromRender(r.cv,null,null);b.disabled=false;
-  $('gestatus').textContent=ok?'':'Claude could not read it as a check. This works for ginghams, checks and plaids; other prints stay as Gemini renders.';
-  if(ok)status('Rebuilt in the check & plaid engine: the sliders and colours now edit it directly. The Gemini render is still under Gemini renders.');
+const DESIGN_PROMPT=desc=>`The attached image is one repeat of a flat, seamless textile print recreated from a customer reference. Set up the edit controls a print designer will use on THIS design.${desc?`\nNotes about the original reference: ${String(desc).slice(0,400)}`:''}
+Reply with only one JSON object with exactly these keys: type, name, notes, check, animal, stripe, controls.
+- type: "check" if the print is built only from straight bands (gingham, check, buffalo check, windowpane, plaid, tartan, madras, glen plaid, houndstooth, herringbone, and one-way stripes such as breton, pinstripe, awning); "animal" for leopard, cheetah, snakeskin, giraffe or zebra; "stripe" for brush-stroke tiger stripes; otherwise "other".
+- name: a short design name of 2 to 4 words, e.g. "Blue gingham", "Watercolour roses".
+- notes: one or two precise sentences describing the print: type, motifs, proportions, scale, technique and colours.
+- check: when type is "check", ${CHECK_SCHEMA}; otherwise null.
+- animal: when type is "animal", ${ANIMAL_SCHEMA}; otherwise null.
+- stripe: when type is "stripe", an object with density 4-22 (stripe bands across the image, integer), angle 0-180 (long axis of the strokes, degrees counter-clockwise from horizontal), weight 0.12-0.7 (stroke thickness as a fraction of spacing), len 1-8 (stroke length in spacings), brk 0-0.75 (how broken up), warp 0-3 (curvature), hair 0-1.5 (dry-brush edges), sec 0-1 (soft secondary strokes), halo 0-1 (shadow glow), mottle 0-1.2 (cloudy ground), ground, mid, stripe (hex colours); otherwise null.
+- controls: when type is "other", 3 to 6 design-specific controls a print designer would want for this exact print, such as motif size, motif density or spacing, amount of a secondary motif, line or outline thickness, background texture, painterly softness. No colour controls (colours are edited separately) and no overall repeat size. Each is {"label": short label, "kind": "slider" or "select", "less": for sliders, one or two words for the low end such as "smaller", "more": for the high end such as "larger", "options": for selects, 2 to 5 short choices with the current look first, "instruction": one sentence telling an image model how to apply it, with {value} where the chosen value goes, e.g. "Make the roses {value}, keeping their style, colours and layout."}. For other types use [].`;
+function resetCtl(){try{$('ctlsum').textContent='Claude builds the settings, fields and sliders for this design after Gemini recreates it.';setPipe(null);}catch(e){}}
+function setCtl(html){$('ctlsum').innerHTML=html;}
+function setPipe(items){const el=$('pipe');if(!items){el.hidden=true;el.innerHTML='';return;}el.hidden=false;
+  el.innerHTML=items.map(([t,st])=>`<li class="${st}"><i>${st==='done'?'✓':st==='fail'?'✕':st==='run'?'●':st==='skip'?'–':'○'}</i><span>${esc(t)}</span></li>`).join('');}
+function nameFrom(out){if(out?.name&&autoNamed){P.name=String(out.name).slice(0,40);syncUI();}}
+function applyStripe(st){const p={print:'tiger'};Object.entries(RANGES).forEach(([k,[lo,hi]])=>{const v=Number(st?.[k]);if(Number.isFinite(v))p[k]=Math.min(hi,Math.max(lo,k==='density'||k==='angle'?Math.round(v):Math.round(v*100)/100));});
+  ['ground','mid','stripe'].forEach(k=>{if(/^#[0-9a-fA-F]{6}$/.test(st?.[k]||''))p[k]=st[k].toLowerCase();});applyParams(p);}
+async function askClaude(blob,prompt){return matchVia==='claude'?await sample.json(prompt,{images:blob}):await askAnthropic(blob,prompt);}
+async function buildControls(rec,desc){
+  if(!matchVia||!rec)return false;
+  try{
+    const out=await askClaude(await cvBlob(rec.cv),DESIGN_PROMPT(desc));const type=String(out?.type||'').toLowerCase();nameFrom(out);
+    const notes=out?.notes?esc(String(out.notes).slice(0,260)):'';
+    if(type==='check'&&out.check){rec.ctl={type:'check',notes:out.notes,controls:[]};applyCheck(out.check,rec.cv);
+      setCtl(`<b>${esc(P.name)}</b> · check &amp; plaid. ${notes}<br>Claude set up the check engine below: sett, colours and sliders all edit the design live, and it exports as layers and vectors.`);return true;}
+    if(type==='animal'&&out.animal){rec.ctl={type:'animal',notes:out.notes,controls:[]};applyAnimal(out.animal,rec.cv);
+      setCtl(`<b>${esc(P.name)}</b> · ${esc(P.print==='animal'?ANIMALS[P.an_type].label:'zebra')}. ${notes}<br>Claude set up the ${P.print==='animal'?'animal':'stripe'} engine below: every slider and colour edits the design live, and it exports as layers and vectors.`);return true;}
+    if(type==='stripe'&&out.stripe){rec.ctl={type:'stripe',notes:out.notes,controls:[]};applyStripe(out.stripe);
+      setCtl(`<b>${esc(P.name)}</b> · animal stripe. ${notes}<br>Claude set up the stripe engine below: every slider edits the design live.`);return true;}
+    rec.ctl={type:'other',notes:out?.notes||'',controls:normControls(out?.controls)};
+    if(gmeta!==rec)showRender(rec);else renderFields(rec);markGem();
+    setCtl(`<b>${esc(P.name)}</b>. ${notes}<br>Claude built ${rec.ctl.controls.length} controls for this design: move them, then press Apply design changes (Gemini redraws it). Colours below change instantly.`);
+    return true;
+  }catch(e){console.warn('controls failed',e);if(e?.code==='bad_key')setConn('bad','Key not valid');
+    setCtl('Claude could not build the controls ('+esc(e?.code||'error')+'). Colours and motif size below still work; try Rebuild controls with Claude.');return false;}
+}
+async function buildFromPhoto(){
+  try{const out=await askClaude(await refBlob(),DESIGN_PROMPT(null).replace('one repeat of a flat, seamless textile print recreated from a customer reference','a photo of a garment or fabric (a customer reference); look only at the print, ignore folds, pleats and lighting'));
+    const type=String(out?.type||'').toLowerCase();nameFrom(out);const notes=out?.notes?esc(String(out.notes).slice(0,260)):'';
+    if(type==='check'&&out.check){applyCheck(out.check,null);setCtl(`<b>${esc(P.name)}</b> · check &amp; plaid. ${notes}<br>Read from the photo: check the size against the swatch. A Gemini key gives a closer read from a clean recreation.`);return true;}
+    if(type==='animal'&&out.animal){applyAnimal(out.animal,null);setCtl(`<b>${esc(P.name)}</b> · animal. ${notes}<br>Claude set up the engine below from the photo.`);return true;}
+    if(type==='stripe'&&out.stripe){applyStripe(out.stripe);setCtl(`<b>${esc(P.name)}</b> · animal stripe. ${notes}<br>Claude set up the stripe engine below from the photo.`);return true;}
+    setCtl(`${notes}<br>This print needs Gemini to recreate it first. Add a Gemini key under API.`);return false;
+  }catch(e){setCtl('Claude could not read the reference ('+esc(e?.code||'error')+').');return false;}
+}
+$('buildctl').onclick=async()=>{
+  if(!gmeta||!matchVia){return;}
+  const b=$('buildctl');b.disabled=true;setPipe([['Claude reviews the print and builds the controls','run']]);
+  const ok=await buildControls(gmeta);setPipe([['Claude reviews the print and builds the controls',ok?'done':'fail']]);b.disabled=false;
 };
 $('srcback').onclick=()=>showBase();
 $('srceng').onclick=()=>{toEngine();renderVarsSoon();};
@@ -1954,9 +2383,10 @@ function suggestFromReference(){
   if(!refImg.naturalWidth)return;
   refSug=suggestPalettes(refImg);showSuggestions();
   const p=refSug[0];Object.assign(P,{ground:p.ground,mid:p.mid,stripe:p.stripe});
-  if(!P.name||P.name==='Untitled print'||P.name==='Tiger Bronze')P.name=String(H.ref?.name||'').replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ').trim().slice(0,40)||P.name;
+  if(!P.name||P.name==='Untitled print'||P.name==='Tiger Bronze'||autoNamed){autoNamed=true;}else autoNamed=false;
+  if(autoNamed)P.name=String(H.ref?.name||'').replace(/\.[^.]+$/,'').replace(/[-_]+/g,' ').trim().slice(0,40)||P.name;
   syncUI();render();renderVarsSoon();
-  refStatus(`Reference loaded as the base. `+($('match').hidden?'Add a Claude or Gemini key under API, then press Match reference to recreate it as an editable print.':'Press Match reference to recreate it as an editable, seamless print.')+` Colours found: ${p.ground.toUpperCase()} / ${p.mid.toUpperCase()} / ${p.stripe.toUpperCase()}. Lighting shifts colour, so check against the physical swatch.`);
+  curBase=null;renderColourways(null);resetCtl();refStatus(`Reference loaded. `+($('match').hidden?'Add a Gemini key (and a Claude key) under API, then press Recreate the print.':'Next: press Recreate the print (step 2).')+` Colours found: ${p.ground.toUpperCase()} / ${p.mid.toUpperCase()} / ${p.stripe.toUpperCase()}. Lighting shifts colour, so check against the physical swatch.`);
 }
 function setSrc(s){if(s==='gemini'&&!gimg)s='ref';if(s==='ref'&&!(refImg.naturalWidth||H.ref))s='empty';src=s;markGem();}
 // ---------- reset (with undo) ----------
@@ -1988,8 +2418,8 @@ function persistSession(){
 }
 const HPARAMS=Object.keys(DEF);
 const sameParams=(a,b)=>HPARAMS.every(k=>String(a[k])===String(b[k]));
-const histSw=e=>e.params.print==='check'?['ck_A','ck_B','ck_C'].map(k=>e.params[k]||'#000000'):[e.params.ground,e.params.mid,e.params.stripe];
-const colKey=e=>e.kind==='gemini'&&e.g?.opts?.cols!=='current'?'Gemini · reference colours':(e.params.print==='check'?'Check · ':'')+histSw(e).map(h=>h.toUpperCase()).join(' / ');
+const histSw=e=>e.params.print==='check'?['ck_A','ck_B','ck_C'].map(k=>e.params[k]||'#000000'):e.params.print==='animal'?['an_A','an_B','an_C'].map(k=>e.params[k]||'#000000'):[e.params.ground,e.params.mid,e.params.stripe];
+const colKey=e=>e.kind==='gemini'&&e.g?.opts?.cols!=='current'?'Gemini · reference colours':(e.params.print==='check'?'Check · ':e.params.print==='animal'?'Animal · ':'')+histSw(e).map(h=>h.toUpperCase()).join(' / ');
 async function makeThumb(kind,p,cv){const c=document.createElement('canvas');c.width=c.height=240;
   if(kind==='gemini')c.getContext('2d').drawImage(cv,0,0,240,240);else{draw(p,240,240,1,0,false);c.getContext('2d').drawImage(rc,0,0);render();}
   return c.toDataURL('image/jpeg',.82);}
@@ -2007,7 +2437,7 @@ async function addHistory(source){
 }
 function logRow(e,action,file){
   const p=e.params,g=e.g||{};
-  H.log.unshift({v:e.v,at:new Date().toISOString(),design:e.name,source:e.kind==='gemini'?'Gemini render':(p.print==='check'?'Check engine · '+p.ck_warp+(p.ck_weft?' / '+p.ck_weft:''):'Stripe engine'),action,file:file||'',
+  H.log.unshift({v:e.v,at:new Date().toISOString(),design:e.name,source:e.kind==='gemini'?'Gemini render':p.print==='animal'?'Animal engine · '+p.an_type:(p.print==='check'?'Check engine · '+p.ck_warp+(p.ck_weft?' / '+p.ck_weft:''):'Stripe engine'),action,file:file||'',
     ground:p.ground,mid:p.mid,stripe:p.stripe,seed:e.kind==='engine'?p.seed:'',density:p.density,angle:p.angle,weight:p.weight,len:p.len,brk:p.brk,warp:p.warp,hair:p.hair,sec:p.sec,halo:p.halo,mottle:p.mottle,
     inches:p.inches,dpi:p.dpi,gmodel:g.model||'',gclose:g.opts?.close||'',gscale:g.opts?.scale||'',gcols:g.opts?.cols||'',repeat:g.how||'',prompt:g.prompt||'',app:VERSION});
   if(H.log.length>500)H.log.length=500;persistSession();
@@ -2048,7 +2478,7 @@ function deleteHistoryItem(v){
   if(!confirm(`Delete V${e.v} · ${e.name}?\n\nIt is removed from history and from this browser's saved session.\nThe decision log keeps its rows. This cannot be undone.`))return;
   removeHistoryAt(i);renderHistory();if(!$('cmpmodal').hidden){H.sel.length>=2?showComparison():closeComparison();}
 }
-function useHistColours(v){const e=H.items[idxOf(v)];if(!e)return;Object.assign(P,{ground:e.params.ground,mid:e.params.mid,stripe:e.params.stripe});['ck_A','ck_B','ck_C','ck_D'].forEach(k=>{if(e.params[k])P[k]=e.params[k];});toEngine();syncUI();render();renderVarsSoon();status(`Using the colourway from V${e.v}.`);}
+function useHistColours(v){const e=H.items[idxOf(v)];if(!e)return;Object.assign(P,{ground:e.params.ground,mid:e.params.mid,stripe:e.params.stripe});['ck_A','ck_B','ck_C','ck_D','an_A','an_B','an_C','an_D'].forEach(k=>{if(e.params[k])P[k]=e.params[k];});toEngine();syncUI();render();renderVarsSoon();status(`Using the colourway from V${e.v}.`);}
 async function useHistAsRef(v){const e=H.items[idxOf(v)];if(!e)return;const c=await entryCanvas(e,1024);setReference(c.toDataURL('image/jpeg',.92),`V${e.v} · ${e.name}`);refStatus(`V${e.v} is now the reference.`);}
 function toggleHistSelect(v){if(H.sel.includes(v))H.sel=H.sel.filter(x=>x!==v);else if(H.sel.length<4)H.sel.push(v);else{status('Compare takes up to 4 versions.');}renderHistory();}
 const esc2=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -2069,9 +2499,9 @@ function renderHistory(){
     if(open){h+='<div class="hg-body">';
       for(const c of cols){h+=`<div class="hc"><div class="hc-head">${c.sw?`<span class="hsw">${c.sw.map(s=>`<i style="background:${s}"></i>`).join('')}</span>`:''}<span>${esc2(c.ck)}</span></div><div class="grid hgrid">`;
         for(const e of c.items.sort((a,b)=>b.v-a.v)){const sel=H.sel.includes(e.v),on=(e.kind==='gemini'?src==='gemini'&&gmeta?.histV===e.v:src==='engine'&&sameParams(e.params,P));
-          h+=`<div class="hcell${sel?' sel':''}${on?' on':''}"><button class="thumb htile" data-act="view" data-v="${e.v}" title="Show V${e.v}"><img src="${e.thumb}" alt=""><span class="vb">V${e.v}</span>${e.kind==='gemini'?'<span class="kb">Gemini</span>':e.params.print==='check'?'<span class="kb">Check</span>':''}</button>
+          h+=`<div class="hcell${sel?' sel':''}${on?' on':''}"><button class="thumb htile" data-act="view" data-v="${e.v}" title="Show V${e.v}"><img src="${e.thumb}" alt=""><span class="vb">V${e.v}</span>${e.kind==='gemini'?'<span class="kb">Gemini</span>':e.params.print==='check'?'<span class="kb">Check</span>':e.params.print==='animal'?'<span class="kb">Animal</span>':''}</button>
             <label class="hpick" title="Select for comparison"><input type="checkbox" data-act="pick" data-v="${e.v}" ${sel?'checked':''}> </label>
-            <div class="hfoot"><span class="hinfo">${e.kind==='engine'?(e.params.print==='check'?esc2(e.params.ck_warp):'seed '+e.params.seed):esc2(e.g.opts?.close||'render')}${e.exports.length?` · <span class="hx" title="Exported">${e.exports.join(', ')}</span>`:''}<br><span class="hdate">${new Date(e.at).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span></span>
+            <div class="hfoot"><span class="hinfo">${e.kind==='engine'?(e.params.print==='check'?esc2(e.params.ck_warp):e.params.print==='animal'?esc2(e.params.an_type)+' · seed '+e.params.an_seed:'seed '+e.params.seed):esc2(e.g.opts?.close||'render')}${e.exports.length?` · <span class="hx" title="Exported">${e.exports.join(', ')}</span>`:''}<br><span class="hdate">${new Date(e.at).toLocaleString([], {month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span></span>
             <span class="hmini"><button data-act="dl" data-v="${e.v}" title="Download repeat PNG at ${e.params.inches}″ / ${e.params.dpi} dpi" aria-label="Download V${e.v}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg></button><button data-act="cols" data-v="${e.v}" title="Use this colourway" aria-label="Use colourway of V${e.v}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 0 18c1.1 0 2-.9 2-2 0-.5-.2-1-.5-1.3-.3-.4-.5-.8-.5-1.3 0-1.1.9-2 2-2h2.4A5.6 5.6 0 0 0 21 9.8C21 6 17 3 12 3zM7.5 12a1 1 0 1 1 0-.1M10 7.5a1 1 0 1 1 0-.1M15 7.5a1 1 0 1 1 0-.1"/></svg></button><button data-act="ref" data-v="${e.v}" title="Use as reference" aria-label="Use V${e.v} as reference"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v14H4zM4 15l5-5 4 4 3-3 4 4"/></svg></button><button class="danger" data-act="del" data-v="${e.v}" title="Delete V${e.v}" aria-label="Delete V${e.v}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button></span></div></div>`;}
         h+='</div></div>';}
       h+='</div>';}
@@ -2147,7 +2577,7 @@ async function historyInit(){
 
 $('ver').textContent='v'+VERSION;
 syncUI();newVarSeeds();varSeeds[0]=DEF.seed;markGem();renderVars();historyInit();
-window.__ps={P,draw,rc,render,extractPalette,refImg,get src(){return src;},applyCheck,checkSetup,findChecks,showRender,syncUI,toEngine,buildCheckSvg,layersFor};
+window.__ps={buildWeaveSvg,BASES,useBase,applyAnimal,buildTracedSvg,setStart,renderFields,get gmeta(){return gmeta;},P,draw,rc,render,extractPalette,refImg,get src(){return src;},applyCheck,checkSetup,findChecks,showRender,syncUI,toEngine,buildCheckSvg,layersFor};
 })();
 </script>
 
