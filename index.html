@@ -93,6 +93,19 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 .thumb{border:1px solid var(--line);border-radius:6px;padding:0;background:var(--well);cursor:pointer;overflow:hidden;display:flex;flex-direction:column;color:var(--ink)}
 .thumb canvas{width:100%;aspect-ratio:1/1;display:block}
 .thumb span{font:11px var(--f-mono);padding:4px 6px;text-align:left;color:var(--muted)}
+.chip.api .clabel{gap:2px}
+.lrow{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.lrow .dot,.apisec h3 .dot{width:9px;height:9px}
+.connpanel{width:min(380px,calc(100vw - 32px))!important;max-height:calc(100vh - 120px);overflow:auto}
+.apisec{display:flex;flex-direction:column;gap:8px;border-top:1px solid var(--line);padding-top:12px}
+.apisec h3{margin:0;display:flex;align-items:center;gap:8px;font:700 13px var(--f-body)}
+.conns{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tright{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.name textarea{font:13px var(--f-body);padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%;resize:vertical}
+.thumb[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:2px}
+.srcnote{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center}
+.linkbtn{border:0;background:none;padding:0;color:var(--accent);font:600 12px var(--f-body);text-decoration:underline;cursor:pointer}
+#gemgo:disabled{opacity:.45}
 .err{padding:16px;color:var(--ink)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -100,21 +113,35 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <div class="wrap">
   <header>
     <div>
-      <div class="brand"><h1>RD Pattern AI</h1><span class="pill" id="ver">v1.0.1</span></div>
-      <p class="sub">Generate original prints in the spirit of a customer reference. Drop in a reference photo, pull its colours, let Claude set the stripe, then save a seamless repeat at print resolution.</p>
+      <div class="brand"><h1>RD Pattern AI</h1><span class="pill" id="ver">v1.2.1</span></div>
+      <p class="sub">Generate original prints in the spirit of a customer reference. Drop in a reference photo and its colours load as a starting point. Let Claude set the stripe engine, or render other print types with Gemini, then save a seamless repeat at print resolution.</p>
     </div>
     <div class="conn">
-      <button class="chip" id="connbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="connpanel">
+      <button class="chip api" id="connbtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="connpanel">
         <svg class="plug" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 2v5M15 2v5M6 7h12v4a6 6 0 0 1-12 0V7zM12 17v5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span class="dot" id="conndot" data-state="off"></span>
-        <span class="clabel"><b>Claude API</b><span id="conntext">Not connected</span></span>
+        <span class="clabel"><b>API</b>
+          <span class="lrow"><span class="dot" id="conndot" data-state="off"></span>Claude · <span id="conntext">Not connected</span></span>
+          <span class="lrow"><span class="dot" id="gdot" data-state="off"></span>Gemini · <span id="gtext">Not connected</span></span>
+        </span>
       </button>
-      <div class="connpanel" id="connpanel" role="dialog" aria-label="Claude API key" hidden>
-        <p class="note">Match with Claude uses this workstation's Anthropic API key. It is saved only in this browser and sent only to api.anthropic.com.</p>
-        <label class="name">API key<input id="apikey" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…"></label>
-        <label class="name">Model<select id="apimodel"><option value="claude-sonnet-5-5">Claude Sonnet 5.5 (best match)</option><option value="claude-haiku-5-5">Claude Haiku 5.5 (lower cost)</option></select></label>
-        <div class="btns"><button class="btn sm primary" id="keysave">Save &amp; test</button><button class="btn sm" id="keytest">Test again</button><button class="btn sm" id="keyclear">Remove key</button></div>
-        <p class="status" id="connstatus" role="status"></p>
+      <div class="connpanel" id="connpanel" role="dialog" aria-label="API keys" hidden>
+        <p class="note">Keys are saved only in this browser on this workstation. Green light = key tested and working; red = missing or refused.</p>
+        <div class="apisec">
+          <h3><span class="dot" id="conndot2" data-state="off"></span>Anthropic (Claude)</h3>
+          <p class="note">Used by Match with Claude. Sent only to api.anthropic.com.</p>
+          <label class="name">API key<input id="apikey" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…"></label>
+          <label class="name">Model<select id="apimodel"><option value="claude-sonnet-5-5">Claude Sonnet 5.5 (best match)</option><option value="claude-haiku-5-5">Claude Haiku 5.5 (lower cost)</option></select></label>
+          <div class="btns"><button class="btn sm primary" id="keysave">Save &amp; test</button><button class="btn sm" id="keytest">Test again</button><button class="btn sm" id="keyclear">Remove key</button></div>
+          <p class="status" id="connstatus" role="status"></p>
+        </div>
+        <div class="apisec">
+          <h3><span class="dot" id="gdot2" data-state="off"></span>Google Gemini</h3>
+          <p class="note">Used by Render with Gemini. Sent only to generativelanguage.googleapis.com. Each render uses one or two image generations on this key.</p>
+          <label class="name">API key<input id="gkey" type="password" autocomplete="off" spellcheck="false" placeholder="AIza…"></label>
+          <label class="name">Image model<select id="gmodel"></select></label>
+          <div class="btns"><button class="btn sm primary" id="gkeysave">Save &amp; test</button><button class="btn sm" id="gkeytest">Test again</button><button class="btn sm" id="gkeyclear">Remove key</button></div>
+          <p class="status" id="gconnstatus" role="status"></p>
+        </div>
       </div>
     </div>
   </header>
@@ -128,10 +155,11 @@ input[type=range]{width:100%;accent-color:var(--accent)}
           <button id="m-pleat" aria-pressed="false">Pleated</button>
           <button id="m-cmp" aria-pressed="false">Compare</button>
         </div>
-        <label class="chk"><input type="checkbox" id="guides"> Show repeat lines</label>
+        <div class="tright"><label class="chk"><input type="checkbox" id="guides"> Show repeat lines</label><button class="btn sm" id="reset" title="Put the print settings back to the defaults">Reset</button></div>
       </div>
       <div class="canvasbox"><canvas id="view" width="900" height="900"></canvas></div>
       <div class="meta"><span id="m-stripes"></span><span id="m-angle"></span><span id="m-repeat"></span></div>
+      <p class="note srcnote" id="srcnote" hidden>Showing a Gemini render. Save repeat PNG and Add to board work for renders; the layered and Illustrator exports are built from engine prints. <button class="linkbtn" id="srcback">Back to the stripe engine</button></p>
     </div>
 
     <aside class="rail">
@@ -147,11 +175,28 @@ input[type=range]{width:100%;accent-color:var(--accent)}
           <button class="btn" id="refcols">Use reference colours</button>
           <button class="btn primary" id="match" hidden>Match with Claude</button>
         </div>
-        <p class="note" id="matchhint" hidden>Connect Claude in the top bar to use Match with Claude.</p>
+        <p class="note" id="matchhint" hidden>Add a Claude key under API in the top bar to use Match with Claude.</p>
         <p class="status" id="refstatus" role="status"></p>
       </section>
       <section>
+        <h2>Render with Gemini</h2>
+        <p class="note">For prints the stripe engine can't draw: checks, plaids, florals, geometrics. Gemini redraws the reference as an original, flat print.</p>
+        <div class="out">
+          <label>Closeness<select id="gclose"><option value="close">Close to reference</option><option value="inspired" selected>Inspired by</option><option value="loose">Loose</option></select></label>
+          <label>Scale<select id="gscale"><option value="ref" selected>As reference</option><option value="small">Small</option><option value="medium">Medium</option><option value="large">Large</option></select></label>
+          <label>Colours<select id="gcols"><option value="ref">From reference</option><option value="current">Current colourway</option></select></label>
+          <label>Options<select id="gcount"><option>1</option><option selected>2</option><option>4</option></select></label>
+          <label>Gemini size<select id="gsize"><option>1K</option><option selected>2K</option><option>4K</option></select></label>
+        </div>
+        <label class="name">Notes for Gemini (optional)<textarea id="gnotes" rows="2" maxlength="400" placeholder="e.g. 1 cm check, slightly softer blue"></textarea></label>
+        <label class="chk"><input type="checkbox" id="gseam" checked> Make it a seamless repeat (one extra Gemini call)</label>
+        <div class="btns"><button class="btn primary" id="gemgo" disabled>Render with Gemini</button></div>
+        <p class="note" id="gemhint"></p>
+        <p class="status" id="gemstatus" role="status"></p>
+      </section>
+      <section>
         <h2>Colourway</h2>
+        <div id="refsug" hidden><p class="note" style="margin:0 0 6px">From reference</p><div class="swatches" id="refsw"></div></div>
         <div class="swatches" id="presets"></div>
         <div class="colors">
           <label>Ground<input type="color" id="c-ground"><code id="x-ground"></code></label>
@@ -186,16 +231,23 @@ input[type=range]{width:100%;accent-color:var(--accent)}
         <p class="note" id="pxnote"></p>
         <div class="btns">
           <button class="btn primary" id="savepkg">Export layered package</button>
+          <button class="btn primary" id="saveai">Export for Illustrator</button>
           <button class="btn" id="savepng">Save repeat PNG</button>
           <button class="btn" id="saverec">Save recipe</button>
           <button class="btn" id="addboard">Add to board</button>
           <button class="btn" id="loadrec">Load recipe</button>
           <input type="file" id="recfile" accept=".json,application/json" hidden>
         </div>
-        <p class="note">The package is a .zip with a layered PSD, each layer as a transparent PNG, the flat composite, a preview, the recipe and a spec sheet.</p>
+        <p class="note">The layered package is a .zip with a layered PSD, each layer as a transparent PNG, the flat composite, a preview, the recipe and a spec sheet.</p>
+        <p class="note">The Illustrator package traces the print into vector shapes: one layer per element, global swatches, ready to drag into Swatches as a pattern.</p>
         <p class="status" id="status" role="status"></p>
       </section>
     </aside>
+  </div>
+
+  <div class="vars" id="gemwrap" hidden>
+    <div class="head"><h2>Gemini renders</h2><button class="btn" id="gemclear">Clear renders</button></div>
+    <div class="grid" id="gemgrid"></div>
   </div>
 
   <div class="vars">
@@ -317,7 +369,7 @@ void main(){
 
 <script>
 (()=>{
-const VERSION='1.0.1';
+const VERSION='1.2.1';
 const PRESETS=[
   {name:'Reference bronze',ground:'#94714a',mid:'#55392a',stripe:'#15100c'},
   {name:'Camel / espresso',ground:'#b48a5a',mid:'#6e4c30',stripe:'#2a1a10'},
@@ -401,7 +453,7 @@ function syncUI(){
   sliders.forEach(k=>{$(k).value=P[k];document.querySelector(`output[for=${k}]`).textContent=fmt[k](P[k]);});
   ['ground','mid','stripe'].forEach(k=>{$('c-'+k).value=P[k];$('x-'+k).textContent=P[k].toUpperCase();});
   $('seed').value=P.seed;$('dname').value=P.name||'';$('inches').value=P.inches;$('dpi').value=String(P.dpi);
-  document.querySelectorAll('.sw').forEach((b,i)=>b.setAttribute('aria-pressed',String(PRESETS[i].ground===P.ground&&PRESETS[i].mid===P.mid&&PRESETS[i].stripe===P.stripe)));
+  document.querySelectorAll('#presets .sw').forEach((b,i)=>b.setAttribute('aria-pressed',String(PRESETS[i].ground===P.ground&&PRESETS[i].mid===P.mid&&PRESETS[i].stripe===P.stripe)));
   const px=Math.round(P.inches*P.dpi);
   $('pxnote').textContent=`${P.inches}″ × ${P.inches}″ at ${P.dpi} dpi = ${px.toLocaleString()} × ${px.toLocaleString()} px, seamless on all four edges.`+(px>Math.min(MAXR,MAXV)?` This device can render up to ${Math.min(MAXR,MAXV)} px; lower the size or resolution.`:'');
 }
@@ -409,6 +461,7 @@ let raf=0;
 function render(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{
   const size=Math.min(1100,Math.round(view.clientWidth*(window.devicePixelRatio||1))||900);
   view.width=size;view.height=size;
+  if(src==='gemini'&&gimg){drawGem(size);return;}
   const tiles=mode==='tile'||mode==='cmp'?1:mode==='grid'?2:3;
   let v;
   if(mode==='cmp'){
@@ -570,8 +623,9 @@ const LAYERS=['01 Ground','02 Ground shadow mottle','03 Ground highlight mottle'
 let busy=false;
 function sizeCheck(){const px=Math.round(P.inches*P.dpi),lim=Math.min(MAXR,MAXV);
   if(px>lim){status(`That repeat needs ${px} px; this device tops out at ${lim}. Lower the size or resolution.`);return 0;}return px;}
-function setBusy(b){busy=b;['savepkg','savepng'].forEach(id=>$(id).disabled=b);}
+function setBusy(b){busy=b;['savepkg','saveai','savepng'].forEach(id=>$(id).disabled=b);}
 $('savepng').onclick=async()=>{
+  if(src==='gemini'&&gimg){if(busy)return;setBusy(true);try{await saveGemPng();}catch(e){status(errMsg(e));}finally{setBusy(false);}return;}
   if(busy)return;const px=sizeCheck();if(!px)return;setBusy(true);
   try{
     const pw=new PngWriter(px,px,3,P.dpi);
@@ -623,6 +677,7 @@ ${base}_recipe.json        load into RD Pattern AI to regenerate or recolour exa
 Colours are on-screen sRGB values. Confirm against a lab dip or strike-off before bulk.
 `;}
 $('savepkg').onclick=async()=>{
+  if(src==='gemini'){status('The layered package is built from engine prints. For a Gemini render use Save repeat PNG, or go back to the stripe engine.');return;}
   if(busy)return;const px=sizeCheck();if(!px)return;
   if(typeof CompressionStream==='undefined'){status('This browser cannot build the package. Use a current Chrome, Edge or Safari.');return;}
   setBusy(true);
@@ -654,11 +709,309 @@ $('savepkg').onclick=async()=>{
   }catch(e){console.error(e);render();status(e&&e.code?errMsg(e):'Could not build the package ('+(e&&e.message||'error')+').');}
   finally{setBusy(false);}
 };
+// ---------- Illustrator export: traced vector layers (SVG) + Illustrator setup script ----------
+const TRACE=1800; // trace grid per repeat; vector output scales to any size
+function makeTracer(N){
+  const M=N+3,val=new Uint8Array(M*M),nb1=new Int32Array(M*M*2),nb2=new Int32Array(M*M*2),seen=new Uint8Array(M*M*2);
+  // samples 0..N wrap (sample N = sample 0) so shapes cut identically on opposite edges; outer ring stays 0
+  function load(a){val.fill(0);for(let j=0;j<=N;j++){const r=(j%N)*N,o=(j+1)*M+1;for(let i=0;i<=N;i++)val[o+i]=a[r+(i%N)];}}
+  function trace(thr){
+    const t=thr+.5;nb1.fill(-1);nb2.fill(-1);seen.fill(0);
+    const link=(a,b)=>{if(nb1[a]<0)nb1[a]=b;else nb2[a]=b;if(nb1[b]<0)nb1[b]=a;else nb2[b]=a;};
+    for(let j=0;j<M-1;j++)for(let i=0;i<M-1;i++){
+      const k=j*M+i,c=(val[k]>t?1:0)|(val[k+1]>t?2:0)|(val[k+M+1]>t?4:0)|(val[k+M]>t?8:0);
+      if(c===0||c===15)continue;
+      const T=k*2,R=(k+1)*2+1,B=(k+M)*2,L=k*2+1;
+      switch(c){
+        case 1:case 14:link(T,L);break;
+        case 2:case 13:link(T,R);break;
+        case 3:case 12:link(L,R);break;
+        case 4:case 11:link(R,B);break;
+        case 6:case 9:link(T,B);break;
+        case 7:case 8:link(L,B);break;
+        case 5:{const ctr=(val[k]+val[k+1]+val[k+M]+val[k+M+1])/4>t;if(ctr){link(T,R);link(B,L);}else{link(T,L);link(R,B);}break;}
+        case 10:{const ctr=(val[k]+val[k+1]+val[k+M]+val[k+M+1])/4>t;if(ctr){link(T,L);link(R,B);}else{link(T,R);link(L,B);}break;}
+      }
+    }
+    const loops=[];
+    for(let e=0;e<nb1.length;e++){
+      if(nb1[e]<0||seen[e])continue;
+      const pts=[];let prev=-1,cur=e,g=0;
+      do{seen[cur]=1;
+        const k=cur>>1,i=k%M,j=(k-i)/M;let x,y;
+        if(cur&1){const v0=val[k],v1=val[k+M];x=i;y=j+(t-v0)/(v1-v0);}else{const v0=val[k],v1=val[k+1];x=i+(t-v0)/(v1-v0);y=j;}
+        pts.push(Math.min(N,Math.max(0,x-1)),Math.min(N,Math.max(0,y-1)));
+        const n1=nb1[cur],n2=nb2[cur],nx=n1!==prev?n1:n2;prev=cur;cur=nx;
+      }while(cur!==e&&cur>=0&&++g<5e6);
+      loops.push(pts);
+    }
+    return loops;
+  }
+  return {load,trace};
+}
+function ringArea(p){let a=0;for(let i=0,n=p.length;i<n;i+=2){const j=(i+2)%n;a+=p[i]*p[j+1]-p[j]*p[i+1];}return a/2;}
+function simplifyRing(p,tol){ // Douglas-Peucker on a closed ring, first point fixed
+  const n=p.length/2;if(n<4)return p;
+  const keep=new Uint8Array(n+1);keep[0]=keep[n]=1;const X=i=>p[(i%n)*2],Y=i=>p[(i%n)*2+1];
+  const st=[[0,n]],t2=tol*tol;
+  while(st.length){const [a,b]=st.pop();if(b-a<2)continue;
+    const ax=X(a),ay=Y(a),dx=X(b)-ax,dy=Y(b)-ay,L=dx*dx+dy*dy;let md=-1,mi=-1;
+    for(let i=a+1;i<b;i++){const px=X(i)-ax,py=Y(i)-ay;let d;
+      if(L===0)d=px*px+py*py;else{const c=px*dy-py*dx;d=c*c/L;}
+      if(d>md){md=d;mi=i;}}
+    if(md>t2){keep[mi]=1;st.push([a,mi],[mi,b]);}}
+  const o=[];for(let i=0;i<n;i++)if(keep[i])o.push(X(i),Y(i));
+  return o.length>=6?o:p;
+}
+function pip(x,y,p){let c=false;for(let i=0,n=p.length,j=n-2;i<n;j=i,i+=2){const yi=p[i+1],yj=p[j+1];
+  if((yi>y)!==(yj>y)&&x<(p[j]-p[i])*(y-yi)/(yj-yi)+p[i])c=!c;}return c;}
+function bbox(p){let a=1e9,b=1e9,c=-1e9,d=-1e9;for(let i=0;i<p.length;i+=2){a=Math.min(a,p[i]);b=Math.min(b,p[i+1]);c=Math.max(c,p[i]);d=Math.max(d,p[i+1]);}return [a,b,c,d];}
+// loops -> shapes: each outer boundary with its holes, so every stroke is its own editable path
+function toShapes(loops,N,minA,tol){
+  const L=[];for(const p of loops){const a=Math.abs(ringArea(p));if(a<minA)continue;const s=simplifyRing(p,tol);L.push({p:s,a,b:bbox(s)});}
+  L.sort((u,v)=>v.a-u.a);
+  for(let i=0;i<L.length;i++){const q=L[i],p=q.p;
+    let tx=p[0],ty=p[1];for(let k=0;k<p.length;k+=2)if(p[k]>0&&p[k]<N&&p[k+1]>0&&p[k+1]<N){tx=p[k];ty=p[k+1];break;}
+    q.depth=0;q.parent=null;
+    for(let j=0;j<i;j++){const c=L[j],b=c.b;if(b[0]>q.b[0]||b[1]>q.b[1]||b[2]<q.b[2]||b[3]<q.b[3])continue;
+      if(pip(tx,ty,c.p)){q.depth++;q.parent=c;}}
+  }
+  const shapes=[];
+  L.forEach(q=>{if(q.depth%2===0){q.holes=[];shapes.push(q);}});
+  L.forEach(q=>{if(q.depth%2===1&&q.parent&&q.parent.holes)q.parent.holes.push(q.p);});
+  return shapes;
+}
+function ringPath(q,N,s){ // smooth Catmull-Rom curves; straight runs along the repeat edge stay straight
+  const n=q.length/2,X=i=>q[((i+n)%n)*2],Y=i=>q[((i+n)%n)*2+1],cl=v=>Math.min(N,Math.max(0,v)),f=v=>+(v*s).toFixed(2);
+  const edge=(i,j)=>(X(i)===0&&X(j)===0)||(X(i)===N&&X(j)===N)||(Y(i)===0&&Y(j)===0)||(Y(i)===N&&Y(j)===N);
+  let d=`M${f(X(0))} ${f(Y(0))}`;
+  for(let i=0;i<n;i++){const j=i+1;
+    if(edge(i,j)||n<4){d+=`L${f(X(j))} ${f(Y(j))}`;continue;}
+    const c1x=cl(X(i)+(X(j)-X(i-1))/6),c1y=cl(Y(i)+(Y(j)-Y(i-1))/6),c2x=cl(X(j)-(X(j+1)-X(i))/6),c2y=cl(Y(j)-(Y(j+1)-Y(i))/6);
+    d+=`C${f(c1x)} ${f(c1y)} ${f(c2x)} ${f(c2y)} ${f(X(j))} ${f(Y(j))}`;}
+  return d+'Z';
+}
+function bandPlan(a,n){ // n tone steps spread evenly over the layer's real alpha range; nested band opacities stack back to each band's mean alpha
+  const h=new Float64Array(256);let tot=0;for(let i=0;i<a.length;i++)if(a[i]>4){h[a[i]]++;tot++;}
+  if(tot<a.length*.002)return [];
+  const qv=q=>{let acc=0;for(let v=5;v<256;v++){acc+=h[v];if(acc>=q*tot)return v;}return 255;};
+  const lo=Math.max(6,qv(.06)),hi=Math.max(lo+n,qv(.985));
+  const th=[];for(let i=0;i<n;i++){const t=Math.round(lo+(hi-lo)*i/n);if(!th.length||t>th[th.length-1])th.push(t);}
+  const lv=th.map((t,i)=>{const top=th[i+1]??256;let s=0,c=0;for(let v=t;v<top;v++){s+=h[v]*v;c+=h[v];}return c?s/c/255:t/255;});
+  let prev=0;return th.map((t,i)=>{const op=Math.min(1,Math.max(.01,1-(1-lv[i])/(1-prev)));prev=lv[i];return {thr:t,op:+op.toFixed(3),lvl:lv[i]};});
+}
+function aiColours(p){
+  const g=hex2rgb(p.ground),m=hex2rgb(p.mid),st=hex2rgb(p.stripe);
+  return {ground:p.ground,mid:p.mid,stripe:p.stripe,light:toHex(g.map(c=>Math.min(1,c*1.18+.02)*255)),sec:toHex(m.map((c,i)=>(c*.65+st[i]*.35)*255))};
+}
+const AI_LAYERS=[
+  {layer:1,name:'02 Ground shadow mottle',col:'mid',sw:'Shadow',mode:'bands',q:4,minA:14,tol:1.1},
+  {layer:2,name:'03 Ground highlight mottle',col:'light',sw:'Highlight',mode:'bands',q:4,minA:14,tol:1.1},
+  {layer:3,name:'04 Stroke halo',col:'mid',sw:'Shadow',mode:'bands',q:4,minA:10,tol:1},
+  {layer:4,name:'05 Shadow strokes',col:'sec',sw:'Shadow stroke',mode:'solid',thr:108,op:.85,minA:2,tol:.5},
+  {layer:5,name:'06 Main stripes',col:'stripe',sw:'Stripe',mode:'solid',thr:128,op:1,minA:2,tol:.5},
+];
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function buildVectorSvg(p,onStep){
+  const N=TRACE,size=p.inches*72,s=size/N,C=aiColours(p),tr=makeTracer(N),out=[],stats=[];
+  out.push(`<?xml version="1.0" encoding="UTF-8"?>\n<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${p.inches}in" height="${p.inches}in" viewBox="0 0 ${size} ${size}">\n<title>${esc(p.name||'RD Pattern AI')} - RD Pattern AI v${VERSION}</title>\n`);
+  out.push(`<g id="RDL_1" data-name="01 Ground"><rect x="0" y="0" width="${size}" height="${size}" fill="${C.ground}"/></g>\n`);
+  for(let li=0;li<AI_LAYERS.length;li++){
+    const Ld=AI_LAYERS[li],tag=`RDL_${li+2}`;
+    onStep(`Rendering ${Ld.name}`,li);
+    const a=new Uint8Array(N*N);
+    await renderStrips(p,N,Ld.layer,async(rows,y0,h)=>{const o=y0*N;for(let i=0,m=h*N;i<m;i++)a[o+i]=rows[i*4+3];});
+    tr.load(a);
+    const bands=Ld.mode==='bands'?bandPlan(a,Ld.q):[{thr:Ld.thr,op:Ld.op}];
+    out.push(`<g id="${tag}" data-name="${Ld.name}">\n`);let np=0;
+    for(let bi=0;bi<bands.length;bi++){const b=bands[bi];
+      onStep(`Tracing ${Ld.name}${bands.length>1?` (tone ${bi+1} of ${bands.length})`:''}`,li);await new Promise(r=>setTimeout(r,0));
+      const shapes=toShapes(tr.trace(b.thr),N,Ld.minA,Ld.tol);
+      const nm=bands.length>1?`Tone ${bi+1}`:'Shapes';
+      out.push(`<g id="${tag}_${bi+1}" data-name="${nm}">\n`);
+      const op=b.op<1?` opacity="${b.op}"`:'';
+      for(const sh of shapes){const d=ringPath(sh.p,N,s)+sh.holes.map(hh=>ringPath(hh,N,s)).join('');
+        out.push(`<path fill="${C[Ld.col]}"${sh.holes.length?' fill-rule="evenodd"':''}${op} d="${d}"/>\n`);np++;}
+      out.push('</g>\n');
+    }
+    out.push('</g>\n');stats.push({name:Ld.name,tones:bands.length,paths:np,bands});
+  }
+  out.push('</svg>\n');
+  return {svg:new Blob(out,{type:'image/svg+xml'}),stats,C};
+}
+function aiScript(svgName,p,C){
+  const rgb=h=>hex2rgb(h).map(v=>Math.round(v*255)).join(',');
+  const sw=[['Ground',C.ground],['Shadow',C.mid],['Highlight',C.light],['Shadow stroke',C.sec],['Stripe',C.stripe]];
+  const lay=[['01 Ground','Ground'],...AI_LAYERS.map(L=>[L.name,L.sw])];
+  const nm=String(p.name||'Untitled').replace(/["\\\r\n]/g,'');
+  return `// RD Pattern AI v${VERSION} - Illustrator setup script
+// In Illustrator: File > Scripts > Other Script... and pick this file.
+// Keep it in the same folder as ${svgName}.
+// It opens the SVG, puts each print element on its own named layer, sizes the artboard
+// to the ${p.inches} in repeat, and links every shape to a global swatch so one swatch edit recolours that element.
+#target illustrator
+(function () {
+  var SVG_NAME = "${svgName}";
+  var DESIGN = "${nm}";
+  var REPEAT_PT = ${p.inches * 72};
+  var LAYERS = [${lay.map(([a,b])=>`["${a}", "${b}"]`).join(', ')}];
+  var SWATCHES = [${sw.map(([a,h])=>`["${a}", ${rgb(h)}]`).join(', ')}];
+
+  var f = new File(File($.fileName).parent + "/" + SVG_NAME);
+  if (!f.exists) { f = File.openDialog("Find " + SVG_NAME); if (!f) { return; } }
+  var doc = app.open(f);
+
+  // find the six element groups (Illustrator names them from the SVG id or data-name)
+  var found = [], i, k, g, m;
+  for (i = 0; i < doc.groupItems.length; i++) {
+    g = doc.groupItems[i];
+    m = /^RDL[_ ]?(\\d)$/.exec(g.name);
+    if (m) { k = parseInt(m[1], 10) - 1; } else {
+      k = -1;
+      for (var j = 0; j < LAYERS.length; j++) { if (g.name === LAYERS[j][0] || g.name === LAYERS[j][0].replace(/ /g, "_")) { k = j; } }
+    }
+    if (k >= 0 && k < LAYERS.length && !found[k]) { found[k] = g; }
+  }
+  var missing = [];
+  for (i = 0; i < LAYERS.length; i++) { if (!found[i]) { missing.push(LAYERS[i][0]); } }
+  if (missing.length) { alert("RD Pattern AI: could not find these groups in the SVG:\\n" + missing.join("\\n") + "\\n\\nThe artwork is open as-is."); return; }
+
+  // size check: the ground rectangle must be exactly the repeat
+  var gb = found[0].geometricBounds, w = gb[2] - gb[0];
+  if (Math.abs(w - REPEAT_PT) > 0.5) {
+    var pct = REPEAT_PT / w * 100;
+    for (i = 0; i < found.length; i++) { found[i].resize(pct, pct, true, true, true, true, pct, Transformation.DOCUMENTORIGIN); }
+    gb = found[0].geometricBounds;
+  }
+  doc.artboards[0].artboardRect = gb;
+
+  // global swatches, grouped under the design name
+  var spots = {}, grp = null;
+  try { grp = doc.swatchGroups.add(); grp.name = "RD " + DESIGN; } catch (e0) { grp = null; }
+  for (i = 0; i < SWATCHES.length; i++) {
+    var sp = doc.spots.add();
+    sp.name = "RD " + SWATCHES[i][0];
+    sp.colorType = ColorModel.PROCESS;
+    var c = new RGBColor(); c.red = SWATCHES[i][1]; c.green = SWATCHES[i][2]; c.blue = SWATCHES[i][3];
+    sp.color = c;
+    if (grp) { try { grp.addSpot(sp); } catch (e1) {} }
+    var sc = new SpotColor(); sc.spot = sp; sc.tint = 100;
+    spots[SWATCHES[i][0]] = sc;
+  }
+
+  // one named layer per element, bottom to top, each filled with its global swatch
+  var old = [];
+  for (i = 0; i < doc.layers.length; i++) { old.push(doc.layers[i]); }
+  for (i = 0; i < LAYERS.length; i++) {
+    var L = doc.layers.add();
+    L.name = LAYERS[i][0];
+    found[i].move(L, ElementPlacement.PLACEATBEGINNING);
+    found[i].name = LAYERS[i][0];
+  }
+  var byLayer = {};
+  for (i = 0; i < LAYERS.length; i++) { byLayer[LAYERS[i][0]] = spots[LAYERS[i][1]]; }
+  var all = doc.pathItems;
+  for (k = 0; k < all.length; k++) {
+    try { var sc2 = byLayer[all[k].layer.name]; if (sc2) { all[k].fillColor = sc2; } } catch (e2) {}
+  }
+  for (i = 0; i < old.length; i++) { try { old[i].locked = false; old[i].visible = true; old[i].remove(); } catch (e3) {} }
+
+  doc.selectObjectsOnActiveArtboard();
+  alert("RD Pattern AI: " + DESIGN + " is ready.\\n\\n" +
+    "- Each element is on its own layer.\\n" +
+    "- Edit an 'RD' swatch (double-click it) to recolour that element everywhere.\\n" +
+    "- To make the pattern swatch: everything is selected, drag it into the Swatches panel.\\n\\n" +
+    "Save as .ai to keep the layers and swatches.");
+})();
+`;
+}
+function aiReadme(base,p,C,stats){
+  return `RD PATTERN AI - ILLUSTRATOR PACKAGE
+Design:   ${p.name||'Untitled'}
+Repeat:   ${p.inches} x ${p.inches} in, seamless on all four edges (vector, scales to any size)
+Seed:     ${p.seed}
+Made by:  RD Pattern AI v${VERSION}, ${new Date().toISOString().slice(0,16).replace('T',' ')}
+
+OPEN IN ILLUSTRATOR (recommended)
+1. Unzip the folder. Keep the files together.
+2. In Illustrator: File > Scripts > Other Script... and choose
+   ${base}_Illustrator_setup.jsx
+3. The script opens the artwork with:
+   - one named layer per print element (01 Ground ... 06 Main stripes)
+   - five global swatches (RD Ground, RD Shadow, RD Highlight, RD Shadow stroke,
+     RD Stripe): double-click one to recolour that element everywhere
+   - the artboard set to the repeat, all artwork selected
+4. Pattern swatch: with everything selected, drag it into the Swatches panel.
+   Fill any garment flat with that swatch; Object > Transform > Scale with only
+   "Transform Patterns" ticked resizes the print on the flat.
+5. File > Save As > Adobe Illustrator (.ai).
+
+If you would rather not run a script, File > Open the .svg. You get the same
+artwork, with each element as a named group inside one layer.
+
+WHAT IS IN EACH LAYER
+${stats.map(s=>`${s.name.padEnd(28)} ${s.paths} paths${s.tones>1?`, ${s.tones} tone steps`:''}`).join('\n')}
+01 Ground                    1 rectangle
+
+- Every stripe and shadow stroke is its own path: select, reshape, recolour or delete it.
+- The ground mottle and halo are stepped into flat tone bands (shapes with
+  transparency), so the soft clouding is slightly posterised compared with the PSD.
+- The main stripes are a single flat colour here; the PSD package keeps the slight
+  tonal texture inside the strokes.
+- Shapes that cross the repeat edge are cut exactly on the edge and continue on the
+  opposite side. On screen you may see a hairline where tiles meet; it does not print.
+
+COLOURS (sRGB)
+Ground         ${C.ground.toUpperCase()}
+Shadow         ${C.mid.toUpperCase()}
+Highlight      ${C.light.toUpperCase()}   (derived from ground)
+Shadow stroke  ${C.sec.toUpperCase()}   (65% shadow + 35% stripe)
+Stripe         ${C.stripe.toUpperCase()}
+Confirm against a lab dip or strike-off before bulk.
+
+FILES
+${base}_VECTOR.svg                 the layered vector artwork
+${base}_Illustrator_setup.jsx      Illustrator script (layers + global swatches)
+${base}_vector_preview_2x2.jpg     2 x 2 repeat preview of the vector version
+${base}_recipe.json                load into RD Pattern AI to regenerate or recolour
+`;}
+function svgToCanvas(blob,px){return new Promise((res,rej)=>{const u=URL.createObjectURL(blob),im=new Image();
+  im.onload=()=>{const c=document.createElement('canvas');c.width=c.height=px*2;const x=c.getContext('2d');
+    for(let i=0;i<2;i++)for(let j=0;j<2;j++)x.drawImage(im,i*px,j*px,px,px);URL.revokeObjectURL(u);res(c);};
+  im.onerror=()=>{URL.revokeObjectURL(u);rej(new Error('the vector preview could not be drawn'));};im.src=u;});}
+$('saveai').onclick=async()=>{
+  if(src==='gemini'){status('The Illustrator package is built from engine prints. For a Gemini render use Save repeat PNG, or go back to the stripe engine.');return;}
+  if(busy)return;
+  if(typeof CompressionStream==='undefined'){status('This browser cannot build the package. Use a current Chrome, Edge or Safari.');return;}
+  if(TRACE>Math.min(MAXR,MAXV)){status('This device cannot render at the trace size.');return;}
+  setBusy(true);
+  const base=`RDPAI_${slug(P.name)}_s${P.seed}_${P.inches}in`,p={...P};
+  try{
+    const {svg,stats,C}=await buildVectorSvg(p,(t,i)=>status(`${t}… (${i+1} of ${AI_LAYERS.length})`));
+    render();
+    status('Drawing the vector preview…');
+    const pc=await svgToCanvas(svg,800);
+    const prev=await new Promise(r=>pc.toBlob(r,'image/jpeg',.88));
+    const entries=[
+      {name:`${base}/${base}_VECTOR.svg`,blob:svg,deflate:true},
+      {name:`${base}/${base}_Illustrator_setup.jsx`,blob:new Blob([aiScript(`${base}_VECTOR.svg`,p,C).replace(/\n/g,'\r\n')]),deflate:true},
+      {name:`${base}/${base}_vector_preview_2x2.jpg`,blob:prev},
+      {name:`${base}/${base}_recipe.json`,blob:new Blob([JSON.stringify(recipe(p),null,2)]),deflate:true},
+      {name:`${base}/README_ILLUSTRATOR.txt`,blob:new Blob([aiReadme(base,p,C,stats).replace(/\n/g,'\r\n')]),deflate:true},
+    ];
+    const zip=await makeZip(entries,n=>status('Packing '+n.split('/').pop()+'…'));
+    const paths=stats.reduce((t,s)=>t+s.paths,0);
+    await saveFile(base+'_ILLUSTRATOR.zip',zip);
+    status(`Saved ${base}_ILLUSTRATOR.zip (${(zip.size/1048576).toFixed(1)} MB, ${paths.toLocaleString()} vector shapes).`);
+  }catch(e){console.error(e);render();status(e&&e.code?errMsg(e):'Could not build the Illustrator package ('+(e&&e.message||'error')+').');}
+  finally{setBusy(false);}
+};
 const recipe=p=>({tool:'RD Pattern AI',version:VERSION,print:'tiger-stripe',params:p});
 $('saverec').onclick=async()=>{
+  if(src==='gemini'&&gmeta){try{const fn=`RDPAI_${slug(P.name)}_GEMINI_recipe.json`;await saveFile(fn,JSON.stringify({tool:'RD Pattern AI',version:VERSION,kind:'gemini-render',model:gmeta.model,options:gmeta.opts,prompt:gmeta.prompt,note:'Gemini renders are not exactly repeatable; re-running the prompt gives a new variation.'},null,2));status('Saved '+fn);}catch(e){status(errMsg(e));}return;}
   try{await saveFile(fname('json'),JSON.stringify(recipe(P),null,2));status('Saved recipe '+fname('json'));}catch(e){status(errMsg(e));}
 };
-function applyParams(p){Object.keys(DEF).forEach(k=>{if(p[k]!==undefined)P[k]=p[k];});syncUI();render();renderVarsSoon();}
+function applyParams(p){toEngine();Object.keys(DEF).forEach(k=>{if(p[k]!==undefined)P[k]=p[k];});syncUI();render();renderVarsSoon();}
 $('loadrec').onclick=()=>$('recfile').click();
 $('recfile').onchange=async e=>{const f=e.target.files[0];if(!f)return;
   try{const r=JSON.parse(await f.text());const p=r.params||r;applyParams(p);status('Loaded '+f.name);}
@@ -667,7 +1020,7 @@ $('recfile').onchange=async e=>{const f=e.target.files[0];if(!f)return;
 
 // ---------- reference ----------
 function setReference(src,name){
-  refImg.onload=()=>{render();};refImg.src=src;$('refimg').src=src;$('refname').textContent=name;refStatus('');
+  refImg.onload=()=>{refreshGem();try{suggestFromReference();}catch(e){console.error(e);}render();};refImg.src=src;$('refimg').src=src;$('refname').textContent=name;refStatus('');
 }
 function loadRefFile(f){
   if(!f||!f.type.startsWith('image/')){refStatus('That file is not an image. Use a JPG, PNG or WebP photo.');return;}
@@ -710,8 +1063,7 @@ const lsSet=(k,v)=>{try{v?localStorage.setItem(k,v):localStorage.removeItem(k);r
 // connection state: 'ok' (green), 'bad' / 'off' (red), 'checking'
 let conn='off';
 function setConn(state,text){
-  conn=state;$('conndot').dataset.state=state;$('conntext').textContent=text;
-  $('connbtn').title=state==='ok'?'Claude connected':'Claude not connected — click to set up';
+  conn=state;$('conndot').dataset.state=state;$('conndot2').dataset.state=state;$('conntext').textContent=text;apiTitle();
   refreshMatch();
 }
 function refreshMatch(){
@@ -731,13 +1083,13 @@ async function testKey(){ // free check: list models with the key
 }
 const panel=$('connpanel'),cbtn=$('connbtn');
 const openPanel=o=>{panel.hidden=!o;cbtn.setAttribute('aria-expanded',String(o));if(o)setTimeout(()=>$('apikey').focus(),0);};
-cbtn.onclick=e=>{e.stopPropagation();if(inClaude&&sample)return;openPanel(panel.hidden);};
-document.addEventListener('click',e=>{if(!panel.hidden&&!panel.contains(e.target)&&e.target!==cbtn)openPanel(false);});
+cbtn.onclick=e=>{e.stopPropagation();openPanel(panel.hidden);};
+document.addEventListener('click',e=>{if(!panel.hidden&&!panel.contains(e.target)&&!cbtn.contains(e.target))openPanel(false);});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!panel.hidden){openPanel(false);cbtn.focus();}});
 const connStatus=t=>$('connstatus').textContent=t;
 (async()=>{
   if(inClaude){try{sample=await window.claude.use('sample');const lim=sample?await sample.limits().catch(()=>null):null;if(!(lim&&lim.images))sample=null;}catch(e){sample=null;}}
-  if(inClaude&&sample){setConn('ok','Connected via Claude account');cbtn.style.cursor='default';return;}
+  if(inClaude&&sample){setConn('ok','Connected via Claude account');connStatus('Connected through your Claude account; no key needed in this viewer.');return;}
   await testKey();
 })();
 $('apimodel').value=lsGet(KMODEL)||'claude-sonnet-5-5';
@@ -750,7 +1102,6 @@ $('keysave').onclick=async()=>{const v=$('apikey').value.trim();
   } else if(!lsGet(KKEY)){connStatus('Paste a key first.');return;}
   connStatus('Testing…');const ok=await testKey();
   connStatus(ok?'Connected. Match with Claude is ready.':'The key did not work. Check it in the Anthropic console.');
-  if(ok)setTimeout(()=>openPanel(false),900);
 };
 $('keytest').onclick=async()=>{connStatus('Testing…');const ok=await testKey();connStatus(ok?'Connected.':(lsGet(KKEY)?'The key did not work.':'No key saved.'));};
 $('keyclear').onclick=()=>{lsSet(KKEY,'');$('apikey').value='';setConn('off','Not connected');connStatus('Key removed from this browser.');};
@@ -785,7 +1136,7 @@ Parameters (stay inside the ranges):
 
 Current settings: ${JSON.stringify(cur)}
 
-Reply with only one JSON object with exactly these keys: density, angle, weight, len, brk, warp, hair, sec, halo, mottle, ground, mid, stripe, notes (notes = one short sentence describing the print you see).`;
+Reply with only one JSON object with exactly these keys: density, angle, weight, len, brk, warp, hair, sec, halo, mottle, ground, mid, stripe, fit, notes (fit = true if this brush-stroke stripe generator can reasonably represent the print, false for checks, ginghams, plaids, florals, geometrics, dots and other prints that are not brush-stroke stripes; notes = one short sentence describing the print you see).`;
 $('match').onclick=async()=>{
   if(!matchVia)return;
   if(!refImg.naturalWidth){refStatus('Add a reference photo first.');return;}
@@ -796,11 +1147,14 @@ $('match').onclick=async()=>{
     const p={};
     Object.entries(RANGES).forEach(([k,[lo,hi]])=>{const v=Number(out?.[k]);if(Number.isFinite(v))p[k]=Math.min(hi,Math.max(lo,k==='density'||k==='angle'?Math.round(v):Math.round(v*100)/100));});
     ['ground','mid','stripe'].forEach(k=>{if(/^#[0-9a-fA-F]{6}$/.test(out?.[k]||''))p[k]=out[k].toLowerCase();});
+    if(out?.fit===false||String(out?.fit).toLowerCase()==='false'){
+      ['ground','mid','stripe'].forEach(k=>{if(p[k])P[k]=p[k];});toEngine();syncUI();render();renderVarsSoon();
+      refStatus('Claude sees: '+String(out?.notes||'a print that is not a stripe').slice(0,200)+' That is not a brush-stroke stripe print, so the stripe engine cannot match it. Claude applied the colours only; use Render with Gemini below for this reference.');return;}
     applyParams(p);
     refStatus('Claude set the print'+(out?.notes?': '+String(out.notes).slice(0,200):'.')+' Fine-tune with the sliders.');
   }catch(e){
     const m={not_granted:'Claude was not allowed for this page.',rate_limited:'Too many requests just now. Try again in a minute.',invalid_json:'Claude did not return usable settings. Try again.',
-      image_rejected:'Claude could not read that image. Try a different photo.',bad_key:'The API key was refused. Check it in the Claude API box in the top bar.',
+      image_rejected:'Claude could not read that image. Try a different photo.',bad_key:'The API key was refused. Check it under API in the top bar.',
       no_credit:'The Anthropic account has no credit left. Top it up in the Anthropic console.',cancelled:''};
     if(['not_granted','sampling_disabled','images_unavailable','not_declared','capability_disabled','capability_removed'].includes(e?.code))btn.hidden=true;
     if(e?.code==='bad_key')setConn('bad','Key not valid');
@@ -808,6 +1162,258 @@ $('match').onclick=async()=>{
   }finally{btn.disabled=false;}
 };
 
+// ---------- print source: the stripe engine, or a Gemini render ----------
+let src='engine', gimg=null, gmeta=null; const grenders=[];
+function toEngine(){if(src!=='engine'){src='engine';markGem();}}
+['input','change'].forEach(ev=>document.addEventListener(ev,e=>{if(e.target.closest&&e.target.closest('.rail')&&e.target.matches('input[type=range],input[type=color],#seed'))toEngine();},true));
+document.addEventListener('click',e=>{if(e.target.closest&&e.target.closest('.sw,#shuffle,#vargrid .thumb'))toEngine();},true);
+function drawGem(size){
+  vctx.imageSmoothingEnabled=true;vctx.imageSmoothingQuality='high';
+  const G=gimg.width;
+  if(mode==='cmp'){
+    const half=Math.floor(size/2);vctx.fillStyle='#000';vctx.fillRect(0,0,size,size);
+    if(refImg.naturalWidth){const iw=refImg.naturalWidth,ih=refImg.naturalHeight,ar=half/size;let sw=iw,sh=iw/ar;if(sh>ih){sh=ih;sw=ih*ar;}
+      vctx.drawImage(refImg,(iw-sw)/2,(ih-sh)/2,sw,sh,0,0,half,size);}
+    vctx.drawImage(gimg,G/4,0,G/2,G,half,0,half,size);
+    vctx.fillStyle='rgba(0,0,0,.55)';vctx.fillRect(0,size-34,size,34);
+    vctx.fillStyle='#fff';vctx.font=`600 ${Math.round(size/48)}px Archivo, system-ui, sans-serif`;
+    vctx.fillText('REFERENCE',14,size-12);vctx.fillText('GEMINI RENDER',half+14,size-12);
+  } else {
+    const tiles=mode==='tile'?1:mode==='grid'?2:3,t=size/tiles;
+    for(let i=0;i<tiles;i++)for(let j=0;j<tiles;j++)vctx.drawImage(gimg,Math.round(i*t),Math.round(j*t),Math.ceil(t),Math.ceil(t));
+    if(mode==='pleat'){const n=tiles*16,w=size/n;
+      for(let k=0;k<n;k++){const g=vctx.createLinearGradient(k*w,0,(k+1)*w,0);
+        g.addColorStop(0,'rgba(0,0,0,.20)');g.addColorStop(.5,'rgba(255,255,255,.10)');g.addColorStop(.52,'rgba(255,255,255,.16)');g.addColorStop(1,'rgba(0,0,0,.28)');
+        vctx.fillStyle=g;vctx.fillRect(k*w,0,w+1,size);}}
+    if(guides&&tiles>1){vctx.strokeStyle='rgba(50,215,240,.85)';vctx.lineWidth=Math.max(1,size/600);
+      for(let i=1;i<tiles;i++){vctx.beginPath();vctx.moveTo(i*t,0);vctx.lineTo(i*t,size);vctx.moveTo(0,i*t);vctx.lineTo(size,i*t);vctx.stroke();}}
+    $('m-repeat').textContent=`showing ${tiles}×${tiles} repeats`;
+  }
+  $('m-stripes').textContent='Gemini render · '+(gmeta.seamless?'seamless repeat':'not made seamless');
+  $('m-angle').textContent=`${gimg.width} px source · ${gmeta.model}`;
+  if(mode==='cmp')$('m-repeat').textContent='reference vs. part of one repeat';
+}
+function markGem(){document.querySelectorAll('#gemgrid .thumb').forEach(b=>b.setAttribute('aria-pressed',String(src==='gemini'&&b._r===gmeta)));
+  $('srcnote').hidden=src!=='gemini';render();}
+
+// ---------- Gemini connection (this workstation's Google AI key, saved in this browser) ----------
+const GKEY='rdpai.gemini.key',GMODEL='rdpai.gemini.model',GAPI='https://generativelanguage.googleapis.com/v1beta';
+let gconn='off',gmodels=[];
+function setGConn(state,text){gconn=state;$('gdot').dataset.state=state;$('gdot2').dataset.state=state;$('gtext').textContent=text;apiTitle();refreshGem();}
+function apiTitle(){const c=$('conndot').dataset.state==='ok',g=$('gdot').dataset.state==='ok';$('connbtn').title=`API keys: Claude ${c?'connected':'not connected'}, Gemini ${g?'connected':'not connected'}. Click to set up.`;}
+function refreshGem(){const ok=gconn==='ok'&&!!lsGet(GKEY);$('gemgo').disabled=!ok||!refImg.naturalWidth||gbusy;
+  $('gemhint').textContent=!ok?'Add a Gemini key under API in the top bar to render with it.':!refImg.naturalWidth?'Add a reference photo first.':'';$('gemhint').hidden=!$('gemhint').textContent;}
+const pickModel=list=>{const pref=[/nano-banana-2\.1/,/3-pro-image/,/3\.1-flash-image$/,/flash-image$/,/image/];
+  for(const re of pref){const m=list.find(x=>re.test(x));if(m)return m;}return list[0]||'';};
+function fillModels(){const s=$('gmodel'),cur=lsGet(GMODEL);s.innerHTML='';
+  (gmodels.length?gmodels:[cur||'gemini-3-pro-image']).forEach(m=>{const o=document.createElement('option');o.value=o.textContent=m;s.append(o);});
+  s.value=gmodels.includes(cur)?cur:pickModel(gmodels)||cur;if(s.value)lsSet(GMODEL,s.value);}
+async function testGKey(){
+  const k=lsGet(GKEY);if(!k){setGConn('off','Not connected');return false;}
+  setGConn('checking','Checking key…');
+  try{const r=await fetch(GAPI+'/models?pageSize=200',{headers:{'x-goog-api-key':k}});
+    if(!r.ok){setGConn('bad',r.status===400||r.status===401||r.status===403?'Key not valid':'Key check failed ('+r.status+')');return false;}
+    const j=await r.json();
+    gmodels=(j.models||[]).filter(m=>/image|banana/i.test(m.name)&&!/imagen/i.test(m.name)&&(m.supportedGenerationMethods||[]).includes('generateContent')).map(m=>m.name.replace(/^models\//,''));
+    fillModels();
+    if(!gmodels.length){setGConn('bad','No image models on this key');return false;}
+    setGConn('ok','Connected · …'+k.slice(-4));return true;
+  }catch(e){setGConn('bad','Cannot reach Google');return false;}
+}
+const gStatus=t=>$('gconnstatus').textContent=t;
+$('gmodel').onchange=e=>lsSet(GMODEL,e.target.value);
+$('gkeysave').onclick=async()=>{const v=$('gkey').value.trim();
+  if(v){if(!/^[A-Za-z0-9_\-]{30,}$/.test(v)){gStatus('That does not look like a Google AI API key.');setGConn('bad','Key not valid');return;}
+    if(!lsSet(GKEY,v)){gStatus('This browser is blocking saved data, so the key could not be stored.');return;}$('gkey').value='';}
+  else if(!lsGet(GKEY)){gStatus('Paste a key first.');return;}
+  gStatus('Testing…');const ok=await testGKey();
+  gStatus(ok?`Connected. ${gmodels.length} image model${gmodels.length>1?'s':''} available.`:'The key did not work. Check it in Google AI Studio.');
+};
+$('gkeytest').onclick=async()=>{gStatus('Testing…');const ok=await testGKey();gStatus(ok?'Connected.':(lsGet(GKEY)?'The key did not work.':'No key saved.'));};
+$('gkeyclear').onclick=()=>{lsSet(GKEY,'');$('gkey').value='';gmodels=[];setGConn('off','Not connected');gStatus('Key removed from this browser.');};
+fillModels();testGKey();
+
+// ---------- Gemini calls ----------
+const b64of=blob=>new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]);fr.readAsDataURL(blob);});
+const canvasBlob=(c,type='image/png',q)=>new Promise(r=>c.toBlob(r,type,q));
+async function gemImage(prompt,imgs,size){
+  const model=$('gmodel').value||lsGet(GMODEL);
+  const parts=[{text:prompt}];for(const b of imgs)parts.push({inline_data:{mime_type:b.type||'image/png',data:await b64of(b)}});
+  const send=async withSize=>{const ic={aspectRatio:'1:1'};if(withSize)ic.imageSize=size;
+    return fetch(`${GAPI}/models/${encodeURIComponent(model)}:generateContent`,{method:'POST',headers:{'content-type':'application/json','x-goog-api-key':lsGet(GKEY)},
+      body:JSON.stringify({contents:[{role:'user',parts}],generationConfig:{responseModalities:['TEXT','IMAGE'],imageConfig:ic}})});};
+  let r=await send(true),j=await r.json().catch(()=>({}));
+  if(r.status===400&&/image_?size|imageConfig|image_config/i.test(j?.error?.message||'')){r=await send(false);j=await r.json().catch(()=>({}));}
+  if(!r.ok){const msg=j?.error?.message||'',st=j?.error?.status||'';
+    throw {code:/API_KEY|API key/i.test(msg)||r.status===401||r.status===403?'bad_key':r.status===429||st==='RESOURCE_EXHAUSTED'?'rate_limited':r.status>=500?'upstream_error':'request_error',message:msg};}
+  const c=j.candidates?.[0],ps=c?.content?.parts||[];
+  const im=ps.filter(p=>!p.thought).map(p=>p.inlineData||p.inline_data).filter(Boolean).pop();
+  if(!im){const txt=ps.map(p=>p.text||'').join(' ').trim();throw {code:'no_image',message:j.promptFeedback?.blockReason||c?.finishReason||txt||''};}
+  const bl=await (await fetch(`data:${im.mimeType||im.mime_type||'image/png'};base64,${im.data}`)).blob();
+  const bmp=await createImageBitmap(bl);return {bmp,model};
+}
+function squareCanvas(bmp,N){const c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d');x.imageSmoothingQuality='high';
+  const s=Math.min(bmp.width,bmp.height);x.drawImage(bmp,(bmp.width-s)/2,(bmp.height-s)/2,s,s,0,0,N,N);return c;}
+function offsetHalf(cv){const N=cv.width,h=N/2,c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d');
+  x.drawImage(cv,-h,-h);x.drawImage(cv,h,-h);x.drawImage(cv,-h,h);x.drawImage(cv,h,h);return c;}
+function seamScore(cv){ // how much the centre lines jump compared with ordinary neighbouring pixels (about 1 = invisible)
+  const N=cv.width,h=N/2,d=cv.getContext('2d',{willReadFrequently:true}).getImageData(0,0,N,N).data;
+  const px=(x,y,c)=>d[(y*N+x)*4+c];let seam=0,norm=0,n=0;
+  for(let y=0;y<N;y+=2)for(let c=0;c<3;c++){seam+=Math.abs(px(h,y,c)-px(h-1,y,c));norm+=Math.abs(px(h-2,y,c)-px(h-3,y,c))+Math.abs(px(h+2,y,c)-px(h+1,y,c));n++;}
+  for(let x=0;x<N;x+=2)for(let c=0;c<3;c++){seam+=Math.abs(px(x,h,c)-px(x,h-1,c));norm+=Math.abs(px(x,h-2,c)-px(x,h-3,c))+Math.abs(px(x,h+2,c)-px(x,h+1,c));n++;}
+  return (seam/n+2)/(norm/n/2+2); // +2 levels so flat prints (checks, solids) don't read tiny jumps as seams
+}
+function crossBlend(base,top,frac){ // replace a feathered band along both centre lines of base with top
+  const N=base.width,h=N/2,b0=N*frac,b1=N*(frac+.07),out=document.createElement('canvas');out.width=out.height=N;
+  const ox=out.getContext('2d'),B=base.getContext('2d',{willReadFrequently:true}).getImageData(0,0,N,N),T=top.getContext('2d',{willReadFrequently:true}).getImageData(0,0,N,N),o=ox.createImageData(N,N);
+  const w1=new Float32Array(N);for(let i=0;i<N;i++){const t=Math.min(1,Math.max(0,(b1-Math.abs(i+.5-h))/(b1-b0)));w1[i]=t*t*(3-2*t);}
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++){const w=Math.max(w1[x],w1[y]),i=(y*N+x)*4;for(let c=0;c<3;c++)o.data[i+c]=B.data[i+c]*(1-w)+T.data[i+c]*w;o.data[i+3]=255;}
+  ox.putImageData(o,0,0);return out;
+}
+const SEAM_PROMPT=`This square image is a textile print tile that has been shifted by half its width and height. Because of that there are two visible straight seams where the pattern does not line up: one vertical line down the exact centre and one horizontal line across the exact centre.
+Repaint only a narrow band along those two centre lines so the pattern continues naturally across them and the seams disappear. Keep everything else exactly as it is: same motifs, scale, colours, texture and framing. Do not add borders, text or new elements. Return the full square image.`;
+function periodicCrop(cv){ // for geometric prints: crop to a whole number of the print's own repeats so the tile closes cleanly
+  const N=cv.width,S=Math.min(512,N),k=N/S,c=document.createElement('canvas');c.width=c.height=S;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(cv,0,0,S,S);
+  const d=x.getImageData(0,0,S,S).data,L=new Float32Array(S*S);for(let i=0;i<S*S;i++)L[i]=.299*d[i*4]+.587*d[i*4+1]+.114*d[i*4+2];
+  const corr=(T,axis)=>{let sa=0,sb=0,saa=0,sbb=0,sab=0,n=0;const ov=S-T;
+    for(let a=0;a<S;a+=3)for(let b=0;b<ov;b+=2){const i=axis?b*S+a:a*S+b,j=axis?(b+T)*S+a:a*S+b+T,u=L[i],v=L[j];sa+=u;sb+=v;saa+=u*u;sbb+=v*v;sab+=u*v;n++;}
+    const cu=saa/n-(sa/n)**2,cv2=sbb/n-(sb/n)**2;return cu<1||cv2<1?0:(sab/n-sa*sb/n/n)/Math.sqrt(cu*cv2);};
+  const cands=axis=>{const r=[];for(let T=Math.round(S*.5);T<=S-24;T++)r.push([T,corr(T,axis)]);
+    const m=Math.max(...r.map(q=>q[1]));return m<.9?[]:r.filter((q,i)=>q[1]>=m-.03&&(i===0||q[1]>=r[i-1][1])&&(i===r.length-1||q[1]>=r[i+1][1]));};
+  const cx=cands(0),cy=cands(1);if(!cx.length||!cy.length)return null;
+  let best=null;for(const [tx,ax] of cx)for(const [ty,ay] of cy){const sc=Math.abs(tx-ty)/S*4-(ax+ay)-(tx+ty)/S*.2;if(!best||sc<best.sc)best={tx,ty,sc,c:Math.min(ax,ay)};}
+  const Tx=Math.round(best.tx*k),Ty=Math.round(best.ty*k),out=document.createElement('canvas');out.width=out.height=N;
+  const o=out.getContext('2d');o.imageSmoothingQuality='high';o.drawImage(cv,Math.floor((N-Tx)/2),Math.floor((N-Ty)/2),Tx,Ty,0,0,N,N);
+  return {cv:out,stretch:Math.abs(Tx/Ty-1),match:best.c};
+}
+async function makeSeamless(cv,size,onStep){
+  const off=offsetHalf(cv),before=seamScore(off);
+  if(before<1.25)return {cv:off,how:'already seamless',score:before};
+  const pc=periodicCrop(cv);
+  if(pc&&pc.stretch<.04&&pc.match>=.95){const o2=offsetHalf(pc.cv),sc=seamScore(o2);
+    return {cv:o2,how:'cropped to the print\'s own repeat'+(pc.stretch>.005?` (${(pc.stretch*100).toFixed(1)}% aspect adjust)`:''),score:sc};}
+  onStep('Fixing the repeat seams…');
+  try{
+    const {bmp}=await gemImage(SEAM_PROMPT,[await canvasBlob(off)],size);
+    const ed=squareCanvas(bmp,cv.width),res=crossBlend(off,ed,.09),after=seamScore(res);
+    if(after<before*.8)return {cv:res,how:'seams repainted by Gemini',score:after};
+  }catch(e){if(e&&(e.code==='bad_key'||e.code==='rate_limited'))throw e;}
+  // fallback: soft blend of the unshifted artwork across the seams
+  const res=crossBlend(off,cv,.06);return {cv:res,how:'seams blended (check for soft ghosting)',score:seamScore(res)};
+}
+const SCALES={small:'small scale: about 8 to 12 repeats of the main motif across the square',medium:'medium scale: about 4 to 6 repeats of the main motif across the square',large:'large scale: about 2 to 3 repeats of the main motif across the square',ref:'the same motif scale as the reference, judged against the garment'};
+const CLOSE={close:'Stay very close to the reference: the same print type, the same motif shapes, proportions and layout, as if the same fabric were redrawn as clean artwork.',
+  inspired:'Keep the same print family, technique and mood, but redraw the motifs with your own variations so the design is new.',
+  loose:'Use the reference only as a starting point: a fresh design in the same print family and colour story.'};
+function gemPrompt(o){
+  const cols=o.cols==='current'?`Use exactly this palette and no other hues: ground ${P.ground.toUpperCase()}, secondary ${P.mid.toUpperCase()}, main motif ${P.stripe.toUpperCase()} (tints and blends of these are fine).`
+    :'Match the colours of the print in the reference as they would look on flat fabric in neutral light (ignore shadows, folds and highlights on the garment).';
+  return `Create an ORIGINAL seamless textile print design based on the print in the attached reference photo.
+${CLOSE[o.close]}
+Output: a flat, straight-on, edge-to-edge square swatch of the print itself, as artwork for fabric printing. No garment, model, hanger, folds, pleats, shadows, lighting, perspective, borders, labels or text. Fill the whole square evenly so it can repeat as a tile, with motifs allowed to run off every edge.
+Keep the reference's print type (for example gingham, check, plaid, stripe, floral, paisley, animal, geometric, conversational) and its technique (woven yarn-dye, printed, painted, watercolour, screen print), including fine texture such as twill or weave lines where the reference has them.
+Scale: ${SCALES[o.scale]}.
+Colours: ${cols}
+Do not reproduce logos, brand marks, signatures or recognisable copyrighted artwork; create a fresh design in the same spirit.${o.notes?`\nDesigner notes: ${o.notes}`:''}`;
+}
+let gbusy=false;
+const gemStatus=t=>$('gemstatus').textContent=t;
+const GERR={bad_key:'Gemini refused the key. Check it under API in the top bar.',rate_limited:'Gemini is rate limiting this key. Wait a minute and try again.',
+  upstream_error:'Gemini had a server error. Try again.',no_image:'Gemini did not return an image'};
+$('gemgo').onclick=async()=>{
+  if(gbusy||!refImg.naturalWidth||gconn!=='ok')return;
+  gbusy=true;refreshGem();
+  const o={close:$('gclose').value,cols:$('gcols').value,scale:$('gscale').value,notes:$('gnotes').value.trim().slice(0,400),count:+$('gcount').value,size:$('gsize').value,seam:$('gseam').checked};
+  const prompt=gemPrompt(o);let made=0;
+  try{
+    const ref=await refBlob();
+    for(let i=0;i<o.count;i++){
+      const lab=o.count>1?` (option ${i+1} of ${o.count})`:'';
+      gemStatus('Gemini is drawing the print'+lab+'…');
+      const {bmp,model}=await gemImage(prompt,[ref],o.size);
+      const N=Math.min(2048,Math.max(512,Math.min(bmp.width,bmp.height)));
+      let cv=squareCanvas(bmp,N),how='not made seamless',score=null;
+      if(o.seam){const r=await makeSeamless(cv,o.size,t=>gemStatus(t+lab));cv=r.cv;how=r.how;score=r.score;}
+      const rec={cv,model,how,seamless:o.seam,prompt,opts:o,name:(P.name||'Gemini print'),at:Date.now()};
+      grenders.unshift(rec);made++;
+      gimg=cv;gmeta=rec;src='gemini';renderGemGrid();markGem();
+    }
+    gemStatus(`Done. ${made} render${made>1?'s':''} added below the preview${o.seam?'; repeat check: '+gmeta.how:''}. Click a render to view it; touch any stripe control to go back to the engine.`);
+  }catch(e){console.error(e);
+    gemStatus((GERR[e?.code]?GERR[e.code].replace(/\.$/,''):'Gemini could not finish')+(e?.message?` (${String(e.message).slice(0,160)})`:'')+'.'+(made?` ${made} render${made>1?'s were':' was'} kept.`:''));
+    if(e?.code==='bad_key')setGConn('bad','Key not valid');}
+  finally{gbusy=false;refreshGem();}
+};
+function renderGemGrid(){
+  const wrap=$('gemwrap'),g=$('gemgrid');wrap.hidden=!grenders.length;g.innerHTML='';
+  grenders.forEach(r=>{const b=document.createElement('button');b.className='thumb';b._r=r;b.title='Show this render';
+    const c=document.createElement('canvas');c.width=c.height=240;c.getContext('2d').drawImage(r.cv,0,0,240,240);
+    const s=document.createElement('span');s.textContent=(r.seamless?'seamless · ':'')+r.opts.close+' · '+r.opts.scale;
+    b.append(c,s);b.onclick=()=>{gimg=r.cv;gmeta=r;src='gemini';markGem();};g.append(b);});
+  markGem();
+}
+$('gemclear').onclick=()=>{grenders.length=0;toEngine();renderGemGrid();gemStatus('Renders cleared.');};
+$('srcback').onclick=()=>toEngine();
+async function saveGemPng(){
+  const px=Math.round(P.inches*P.dpi),lim=Math.min(16384,MAXR);
+  if(px>lim){status(`That repeat needs ${px} px; lower the size or resolution.`);return;}
+  status('Scaling the Gemini render to print size…');await new Promise(r=>setTimeout(r,20));
+  const c=document.createElement('canvas');c.width=c.height=px;const x=c.getContext('2d');x.imageSmoothingEnabled=true;x.imageSmoothingQuality='high';x.drawImage(gimg,0,0,px,px);
+  const raw=new Uint8Array(await (await canvasBlob(c)).arrayBuffer());
+  const png=new Blob([withDpi(raw,P.dpi)],{type:'image/png'});
+  const fn=`RDPAI_${slug(P.name)}_GEMINI_${P.inches}in_${P.dpi}dpi.png`;
+  await saveFile(fn,png);
+  status(`Saved ${fn}. Gemini drew it at ${gimg.width} px, so it was enlarged ${(px/gimg.width).toFixed(1)}× for ${P.dpi} dpi; check fine detail before sending to the mill.`);
+}
+// ---------- colour suggestions from the reference ----------
+function refPixels(img){const N=96,c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d',{willReadFrequently:true});
+  const iw=img.naturalWidth,ih=img.naturalHeight,s=Math.min(iw,ih)*.7;x.drawImage(img,(iw-s)/2,(ih-s)/2,s,s,0,0,N,N);
+  const d=x.getImageData(0,0,N,N).data,px=[];for(let i=0;i<d.length;i+=4)px.push([d[i],d[i+1],d[i+2]]);return px;}
+function kmeans(px,k){const srt=[...px].sort((a,b)=>lum(a)-lum(b));let C=Array.from({length:k},(_,i)=>[...srt[Math.floor((i+.5)/k*srt.length)]]);
+  let A=new Int32Array(px.length);
+  for(let it=0;it<12;it++){const S=C.map(()=>[0,0,0,0]);
+    px.forEach((p,i)=>{let b=0,bd=1e9;C.forEach((c,j)=>{const d=(p[0]-c[0])**2+(p[1]-c[1])**2+(p[2]-c[2])**2;if(d<bd){bd=d;b=j;}});A[i]=b;const s=S[b];s[0]+=p[0];s[1]+=p[1];s[2]+=p[2];s[3]++;});
+    C=C.map((c,j)=>S[j][3]?[S[j][0]/S[j][3],S[j][1]/S[j][3],S[j][2]/S[j][3]]:c);}
+  const n=C.map((_,j)=>0);A.forEach(a=>n[a]++);return C.map((c,j)=>({c,f:n[j]/px.length})).filter(q=>q.f>.02);}
+const cdist=(a,b)=>Math.hypot(...[0,1,2].map(i=>a[i]-b[i]));
+function suggestPalettes(img){
+  const px=refPixels(img),out=[];
+  const p1=extractPalette(img);out.push({label:'Reference tones',...p1});
+  const K=kmeans(px,5).sort((a,b)=>b.f-a.f);
+  if(K.length>=2){
+    const g=K[0],rest=K.slice(1),st=rest.reduce((a,b)=>Math.abs(lum(b.c)-lum(g.c))*Math.sqrt(b.f)>Math.abs(lum(a.c)-lum(g.c))*Math.sqrt(a.f)?b:a);
+    const md=rest.filter(q=>q!==st)[0]||{c:g.c.map((v,i)=>(v+st.c[i])/2)};
+    out.push({label:'Main colours',ground:toHex(g.c),mid:toHex(md.c),stripe:toHex(st.c)});
+    const big=K.filter(q=>q.f>.06).sort((a,b)=>lum(a.c)-lum(b.c));
+    if(big.length>=2){const dk=big[0],lt=big[big.length-1],mid=big.length>2?big[Math.floor(big.length/2)]:{c:dk.c.map((v,i)=>(v*.6+lt.c[i]*.4))};
+      out.push({label:'Reversed (dark ground)',ground:toHex(dk.c),mid:toHex(mid.c),stripe:toHex(lt.c)});}
+  }
+  const h2=h=>hex2rgb(h).map(v=>v*255);
+  return out.filter((q,i)=>!out.slice(0,i).some(r=>['ground','mid','stripe'].every(k=>cdist(h2(q[k]),h2(r[k]))<20)));
+}
+let refSug=[];
+function showSuggestions(){
+  const box=$('refsw');box.innerHTML='';$('refsug').hidden=!refSug.length;
+  refSug.forEach((p,i)=>{const b=document.createElement('button');b.className='sw sug';b.title=p.label;b.setAttribute('aria-label','Use '+p.label);
+    b.innerHTML=`<span style="background:${p.ground}"></span><span style="background:${p.mid}"></span><span style="background:${p.stripe}"></span>`;
+    b.onclick=()=>{Object.assign(P,{ground:p.ground,mid:p.mid,stripe:p.stripe});syncUI();render();renderVarsSoon();refStatus(`Using "${p.label}" from the reference.`);};
+    box.append(b);});
+}
+function suggestFromReference(){
+  if(!refImg.naturalWidth)return;
+  refSug=suggestPalettes(refImg);showSuggestions();
+  const p=refSug[0];Object.assign(P,{ground:p.ground,mid:p.mid,stripe:p.stripe});toEngine();syncUI();render();renderVarsSoon();
+  refStatus(`Started from the reference's colours (${p.ground.toUpperCase()} / ${p.mid.toUpperCase()} / ${p.stripe.toUpperCase()}).`+(refSug.length>1?` ${refSug.length-1} more option${refSug.length>2?'s':''} under Colourway › From reference.`:'')+' Lighting shifts colour, so check against the physical swatch.');
+}
+// ---------- reset (with undo) ----------
+let undoP=null,undoT=0;
+$('reset').onclick=()=>{
+  clearTimeout(undoT);
+  if(undoP){Object.assign(P,undoP);undoP=null;$('reset').textContent='Reset';syncUI();render();renderVarsSoon();status('Settings restored.');return;}
+  undoP={...P};Object.assign(P,{...DEF,name:P.name});toEngine();syncUI();render();renderVarsSoon();
+  $('reset').textContent='Undo reset';status('Stripe, brush, colour and output settings are back to the defaults. The reference and design name are kept.');
+  undoT=setTimeout(()=>{undoP=null;$('reset').textContent='Reset';},12000);
+};
 // ---------- design board (this browser) ----------
 const BKEY='rdpai.board.v1';
 const loadBoard=()=>{try{return JSON.parse(localStorage.getItem(BKEY)||'[]');}catch(e){return [];}};
@@ -819,21 +1425,25 @@ function renderBoard(){
     const w=document.createElement('div');w.className='bitem';
     const t=document.createElement('button');t.className='thumb';t.title='Load '+it.params.name;
     const im=document.createElement('img');im.src=it.thumb;im.alt='';im.style.cssText='width:100%;aspect-ratio:1/1;display:block;object-fit:cover';
-    const sp=document.createElement('span');const bb=document.createElement('b');bb.textContent=it.params.name||'Untitled';sp.append(bb,document.createTextNode('seed '+it.params.seed));
-    t.append(im,sp);t.onclick=()=>{applyParams(it.params);status('Loaded '+(it.params.name||'design')+' from the board.');};
+    const sp=document.createElement('span');const bb=document.createElement('b');bb.textContent=it.params.name||'Untitled';sp.append(bb,document.createTextNode(it.kind==='gemini'?'Gemini render':'seed '+it.params.seed));
+    t.append(im,sp);t.onclick=()=>{if(it.kind==='gemini'){const im=new Image();im.onload=()=>{const c=document.createElement('canvas');c.width=c.height=im.width;c.getContext('2d').drawImage(im,0,0);gimg=c;gmeta={model:it.model,seamless:it.seamless,prompt:it.prompt,opts:it.opts||{},how:''};src='gemini';markGem();};im.src=it.img;status('Loaded the Gemini render from the board.');return;}applyParams(it.params);status('Loaded '+(it.params.name||'design')+' from the board.');};
     const x=document.createElement('button');x.className='x';x.textContent='×';x.setAttribute('aria-label','Remove '+(it.params.name||'design'));
     x.onclick=()=>{const nb=loadBoard();nb.splice(i,1);storeBoard(nb);renderBoard();};
     w.append(t,x);g.append(w);
   });
 }
 $('addboard').onclick=()=>{
+  if(src==='gemini'&&gimg){const t=document.createElement('canvas');t.width=t.height=200;t.getContext('2d').drawImage(gimg,0,0,200,200);
+    const im=document.createElement('canvas');im.width=im.height=Math.min(1024,gimg.width);im.getContext('2d').drawImage(gimg,0,0,im.width,im.height);
+    const b=loadBoard();b.unshift({kind:'gemini',params:{...P},thumb:t.toDataURL('image/jpeg',.8),img:im.toDataURL('image/jpeg',.88),prompt:gmeta.prompt,model:gmeta.model,seamless:gmeta.seamless,opts:gmeta.opts,at:Date.now()});
+    status(storeBoard(b.slice(0,48))?'Added the Gemini render to the board (kept at '+im.width+' px).':'The board is full for this browser. Remove a few designs, or use Save repeat PNG.');renderBoard();return;}
   draw(P,200,200,1,0,false);const thumb=rc.toDataURL('image/jpeg',.8);render();
   const b=loadBoard();b.unshift({params:{...P},thumb,at:Date.now()});
   status(storeBoard(b.slice(0,48))?'Added '+(P.name||'design')+' to the board.':'This browser is not keeping saved data. Use "Save recipe" instead.');renderBoard();
 };
 $('exportboard').onclick=async()=>{
   const b=loadBoard();if(!b.length){status('The board is empty.');return;}
-  try{await saveFile(`RDPAI_board_${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({tool:'RD Pattern AI',version:VERSION,designs:b.map(x=>recipe(x.params))},null,2));status('Exported '+b.length+' designs.');}catch(e){status(errMsg(e));}
+  try{await saveFile(`RDPAI_board_${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({tool:'RD Pattern AI',version:VERSION,designs:b.map(x=>x.kind==='gemini'?{tool:'RD Pattern AI',kind:'gemini-render',name:x.params.name,model:x.model,prompt:x.prompt}:recipe(x.params))},null,2));status('Exported '+b.length+' designs.');}catch(e){status(errMsg(e));}
 };
 
 $('ver').textContent='v'+VERSION;
