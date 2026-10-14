@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<title>RD Pattern AI</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: print-room bench — big live repeat on the left, a spec rail of controls on the right, variations along the bottom */
+:root{
+  --bg:#ecebe7; --panel:#f7f6f3; --ink:#1d1b18; --muted:#6b665e; --line:#d6d2ca;
+  --accent:#8a5a1c; --accent-ink:#fff; --well:#dedad2;
+  --f-display:"Archivo",system-ui,sans-serif; --f-body:"Archivo",system-ui,sans-serif; --f-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161513;--panel:#1f1d1a;--ink:#ece8e1;--muted:#a19a8f;--line:#35322d;--accent:#d29a4e;--accent-ink:#1a1307;--well:#2a2723;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161513;--panel:#1f1d1a;--ink:#ece8e1;--muted:#a19a8f;--line:#35322d;--accent:#d29a4e;--accent-ink:#1a1307;--well:#2a2723;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 32px}
+.wrap{max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;justify-content:space-between}
+.brand{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+h1{font-family:var(--f-display);font-stretch:118%;font-weight:800;font-size:clamp(22px,3vw,30px);letter-spacing:-.01em;margin:0;text-wrap:balance}
+.pill{font-family:var(--f-mono);font-size:11px;padding:2px 8px;border-radius:99px;border:1px solid var(--accent);color:var(--accent)}
+.sub{color:var(--muted);margin:0;max-width:62ch}
+.refbox{display:grid;grid-template-columns:72px minmax(0,1fr);gap:12px;align-items:start}
+.refbox img{width:72px;height:96px;object-fit:cover;border-radius:4px;border:1px solid var(--line);background:var(--well)}
+.refbox .rtxt{font-size:12px;color:var(--muted);display:flex;flex-direction:column;gap:6px;min-width:0}
+.refbox .rtxt b{color:var(--ink);font-weight:600;font-size:13px;overflow-wrap:anywhere}
+.btn.sm{padding:6px 10px;font-size:12px}
+.keybox{border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:var(--bg)}
+.keybox summary{cursor:pointer;font-size:13px;font-weight:600}
+.keybox summary span{font-weight:400;color:var(--muted)}
+.keyin{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.name select{font:13px var(--f-body);padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);width:100%}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.drop{outline:2px dashed var(--accent);outline-offset:-6px}
+.name input{font:13px var(--f-body);padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%}
+.name{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.board-empty{font-size:13px;color:var(--muted);margin:0;padding:14px;border:1px dashed var(--line);border-radius:6px}
+.bitem{position:relative}
+.bitem .x{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer;font:600 13px/1 var(--f-body)}
+.thumb span b{display:block;color:var(--ink);font-family:var(--f-body);font-weight:600;font-size:12px;overflow-wrap:anywhere}
+.main{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start}
+@media (max-width:900px){.main{grid-template-columns:minmax(0,1fr)}}
+.stage{display:flex;flex-direction:column;gap:10px;min-width:0}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:var(--panel)}
+.seg button{border:0;background:transparent;color:var(--ink);font:500 13px var(--f-body);padding:7px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.chk{display:inline-flex;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+.canvasbox{position:relative;background:var(--well);border-radius:6px;overflow:hidden;aspect-ratio:1/1;max-width:100%}
+#view{width:100%;height:100%;display:block}
+.meta{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 16px}
+.rail{background:var(--panel);border:1px solid var(--line);border-radius:8px;display:flex;flex-direction:column}
+.rail section{padding:14px 16px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.rail section:first-child{border-top:0}
+.rail h2{margin:0;font:700 11px var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.row{display:grid;grid-template-columns:108px minmax(0,1fr) 40px;gap:8px;align-items:center}
+.row label{font-size:13px}
+.row output{font-family:var(--f-mono);font-size:11.5px;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.swatches{display:flex;flex-wrap:wrap;gap:6px}
+.sw{width:40px;height:28px;border-radius:4px;border:1px solid var(--line);cursor:pointer;padding:0;display:flex;overflow:hidden}
+.sw span{flex:1}
+.sw[aria-pressed="true"]{outline:2px solid var(--accent);outline-offset:2px}
+.colors{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.colors label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.colors input[type=color]{width:100%;height:32px;border:1px solid var(--line);border-radius:4px;background:none;padding:2px;cursor:pointer}
+.colors code{font-family:var(--f-mono);font-size:11px;color:var(--ink)}
+.btn{font:600 13px var(--f-body);border-radius:6px;padding:8px 12px;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:focus-visible,.seg button:focus-visible,.sw:focus-visible,.thumb:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.seedrow{display:flex;gap:8px;align-items:center}
+.seedrow input{width:90px;font:13px var(--f-mono);padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.out{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.out label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+.out select,.out input{font:13px var(--f-mono);padding:6px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);width:100%}
+.note{font-size:12px;color:var(--muted);margin:0}
+.status{font-size:12px;color:var(--accent);min-height:1.2em;margin:0}
+.vars{display:flex;flex-direction:column;gap:8px}
+.vars .head{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.vars h2{margin:0;font:700 11px var(--f-body);letter-spacing:.09em;text-transform:uppercase;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px}
+@media (max-width:700px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.thumb{border:1px solid var(--line);border-radius:6px;padding:0;background:var(--well);cursor:pointer;overflow:hidden;display:flex;flex-direction:column;color:var(--ink)}
+.thumb canvas{width:100%;aspect-ratio:1/1;display:block}
+.thumb span{font:11px var(--f-mono);padding:4px 6px;text-align:left;color:var(--muted)}
+.err{padding:16px;color:var(--ink)}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <div class="brand"><h1>RD Pattern AI</h1><span class="pill" id="ver">v0.5.0</span></div>
+      <p class="sub">Generate original prints in the spirit of a customer reference. Drop in a reference photo, pull its colours, let Claude set the stripe, then save a seamless repeat at print resolution.</p>
+    </div>
+  </header>
+
+  <div class="main">
+    <div class="stage">
+      <div class="toolbar">
+        <div class="seg" role="group" aria-label="Preview">
+          <button id="m-tile" aria-pressed="false">1 repeat</button>
+          <button id="m-grid" aria-pressed="true">2 × 2 repeat</button>
+          <button id="m-pleat" aria-pressed="false">Pleated</button>
+          <button id="m-cmp" aria-pressed="false">Compare</button>
+        </div>
+        <label class="chk"><input type="checkbox" id="guides"> Show repeat lines</label>
+      </div>
+      <div class="canvasbox"><canvas id="view" width="900" height="900"></canvas></div>
+      <div class="meta"><span id="m-stripes"></span><span id="m-angle"></span><span id="m-repeat"></span></div>
+    </div>
+
+    <aside class="rail">
+      <section>
+        <h2>Reference</h2>
+        <div class="refbox">
+          <img id="refimg" alt="Reference image">
+          <div class="rtxt"><b id="refname">No reference yet</b><span>Drop a photo anywhere on the preview, paste one, or upload it.</span>
+            <div class="btns"><button class="btn sm" id="refup">Upload</button><input type="file" id="reffile" accept="image/*" hidden></div>
+          </div>
+        </div>
+        <div class="btns">
+          <button class="btn" id="refcols">Use reference colours</button>
+          <button class="btn primary" id="match" hidden>Match with Claude</button>
+        </div>
+        <details class="keybox" id="keybox">
+          <summary>Claude API key <span id="keystate">· not set</span></summary>
+          <div class="keyin">
+            <p class="note">Match with Claude uses this workstation's Anthropic API key. It is saved only in this browser and sent only to api.anthropic.com.</p>
+            <label class="name">API key<input id="apikey" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…"></label>
+            <label class="name">Model<select id="apimodel"><option value="claude-sonnet-5-5">Claude Sonnet 5.5 (best match)</option><option value="claude-haiku-5-5">Claude Haiku 5.5 (lower cost)</option></select></label>
+            <div class="btns"><button class="btn sm" id="keysave">Save key</button><button class="btn sm" id="keyclear">Remove key</button></div>
+          </div>
+        </details>
+        <p class="status" id="refstatus" role="status"></p>
+      </section>
+      <section>
+        <h2>Colourway</h2>
+        <div class="swatches" id="presets"></div>
+        <div class="colors">
+          <label>Ground<input type="color" id="c-ground"><code id="x-ground"></code></label>
+          <label>Shadow<input type="color" id="c-mid"><code id="x-mid"></code></label>
+          <label>Stripe<input type="color" id="c-stripe"><code id="x-stripe"></code></label>
+        </div>
+      </section>
+      <section>
+        <h2>Stripe</h2>
+        <div class="row"><label for="density">Density</label><input type="range" id="density" min="4" max="22" step="1"><output for="density"></output></div>
+        <div class="row"><label for="angle">Angle</label><input type="range" id="angle" min="0" max="180" step="1"><output for="angle"></output></div>
+        <div class="row"><label for="weight">Weight</label><input type="range" id="weight" min="0.12" max="0.7" step="0.01"><output for="weight"></output></div>
+        <div class="row"><label for="len">Stroke length</label><input type="range" id="len" min="1" max="8" step="0.1"><output for="len"></output></div>
+        <div class="row"><label for="brk">Breakup</label><input type="range" id="brk" min="0" max="0.75" step="0.01"><output for="brk"></output></div>
+        <div class="row"><label for="warp">Flow</label><input type="range" id="warp" min="0" max="3" step="0.05"><output for="warp"></output></div>
+      </section>
+      <section>
+        <h2>Brush &amp; ground</h2>
+        <div class="row"><label for="hair">Dry brush</label><input type="range" id="hair" min="0" max="1.5" step="0.01"><output for="hair"></output></div>
+        <div class="row"><label for="sec">Shadow strokes</label><input type="range" id="sec" min="0" max="1" step="0.01"><output for="sec"></output></div>
+        <div class="row"><label for="halo">Shadow halo</label><input type="range" id="halo" min="0" max="1" step="0.01"><output for="halo"></output></div>
+        <div class="row"><label for="mottle">Ground mottle</label><input type="range" id="mottle" min="0" max="1.2" step="0.01"><output for="mottle"></output></div>
+        <div class="seedrow"><label for="seed">Seed</label><input id="seed" type="number" min="1" max="999999"><button class="btn" id="shuffle">Shuffle</button></div>
+      </section>
+      <section>
+        <h2>Output</h2>
+        <label class="name">Design name<input id="dname" maxlength="40"></label>
+        <div class="out">
+          <label>Repeat size (in)<input type="number" id="inches" min="2" max="36" step="0.5"></label>
+          <label>Resolution<select id="dpi"><option>150</option><option>200</option><option selected>300</option></select></label>
+        </div>
+        <p class="note" id="pxnote"></p>
+        <div class="btns">
+          <button class="btn primary" id="savepkg">Export layered package</button>
+          <button class="btn" id="savepng">Save repeat PNG</button>
+          <button class="btn" id="saverec">Save recipe</button>
+          <button class="btn" id="addboard">Add to board</button>
+          <button class="btn" id="loadrec">Load recipe</button>
+          <input type="file" id="recfile" accept=".json,application/json" hidden>
+        </div>
+        <p class="note">The package is a .zip with a layered PSD, each layer as a transparent PNG, the flat composite, a preview, the recipe and a spec sheet.</p>
+        <p class="status" id="status" role="status"></p>
+      </section>
+    </aside>
+  </div>
+
+  <div class="vars">
+    <div class="head"><h2>Variations on this colourway</h2><button class="btn" id="morevars">New variations</button></div>
+    <div class="grid" id="vargrid"></div>
+  </div>
+
+  <div class="vars">
+    <div class="head"><h2>Design board <span style="text-transform:none;letter-spacing:0;font-weight:400">· saved in this browser</span></h2><button class="btn" id="exportboard">Export board</button></div>
+    <div class="grid" id="boardgrid"></div>
+  </div>
+</div>
+
+<script id="fs" type="x-shader">#version 300 es
+precision highp float; precision highp int;
+uniform vec2 uRes; uniform vec2 uOrigin; uniform int uLayer; uniform float uTiles; uniform int uMode; uniform uint uSeed;
+uniform ivec2 uK; uniform ivec2 uAseg; uniform ivec2 uAhair; uniform int uHx;
+uniform float uWeight,uBreak,uWarp,uHair,uHalo,uMottle,uGuides,uSec;
+uniform vec3 cGround,cMid,cStripe;
+out vec4 o;
+uint pcg(uint v){uint s=v*747796405u+2891336453u;uint w=((s>>((s>>28u)+4u))^s)*277803737u;return (w>>22u)^w;}
+int imod(int a,int m){int r=a%m;return r<0?r+m:r;}
+// gradient at lattice corner c, canonicalised modulo the lattice M*Z^2 so the noise tiles exactly
+float gr(ivec2 c,ivec2 r0,ivec2 r1,uint sd,vec2 f){
+  int D=abs(r0.x*r1.y-r0.y*r1.x);
+  ivec2 w=ivec2(imod(r1.y*c.x-r0.y*c.y,D),imod(-r1.x*c.x+r0.x*c.y,D));
+  uint h=pcg(uint(w.x)^pcg(uint(w.y)^pcg(sd)));
+  float a=float(h)*(6.2831853/4294967296.0);
+  return dot(vec2(cos(a),sin(a)),f);
+}
+float gn(vec2 p,ivec2 r0,ivec2 r1,uint sd){
+  vec2 i=floor(p),f=fract(p);ivec2 c=ivec2(i);
+  vec2 u=f*f*f*(f*(f*6.-15.)+10.);
+  float a=gr(c,r0,r1,sd,f),b=gr(c+ivec2(1,0),r0,r1,sd,f-vec2(1,0));
+  float d=gr(c+ivec2(0,1),r0,r1,sd,f-vec2(0,1)),e=gr(c+ivec2(1,1),r0,r1,sd,f-vec2(1,1));
+  return mix(mix(a,b,u.x),mix(d,e,u.x),u.y)*1.45;
+}
+float fbm(vec2 uv,int F,int oct,uint sd){
+  float s=0.,amp=.5,n=0.;int f=F;
+  for(int i=0;i<6;i++){if(i>=oct)break;s+=amp*gn(uv*float(f),ivec2(f,0),ivec2(0,f),sd+uint(i)*977u);n+=amp;amp*=.5;f*=2;}
+  return s/n;
+}
+void main(){
+  vec2 sc=(gl_FragCoord.xy+uOrigin)/uRes;
+  vec2 g=sc*uTiles; vec2 uv=fract(g);
+  uint sd=pcg(uSeed);
+  // flow: gentle periodic domain warp of the stripe phase
+  float wv=fbm(uv,2,2,sd+11u)*1.3+fbm(uv,4,1,sd+29u)*0.18;
+  float ph=dot(uv,vec2(uK))+uWarp*wv;
+  vec2 pseg=vec2(ph,dot(uv,vec2(uAseg)));
+  float seg=gn(pseg,uK,uAseg,sd+41u)*.8+gn(pseg*2.,uK*2,uAseg*2,sd+43u)*.2;
+  float s01=seg*.8+.5;
+  float m=smoothstep(uBreak,uBreak+.3,s01);
+  float d=abs(fract(ph)-.5)*2.;
+  float hx=float(uHx);
+  // brush hair: noise that is very fine across the stroke and long along it
+  vec2 ph1=vec2(ph*hx,dot(uv,vec2(uAhair)));
+  float hn=gn(ph1,uK*uHx,uAhair,sd+31u)*.65+gn(ph1*vec2(2.3,1.),uK*uHx*2,uAhair,sd+37u)*.35;
+  float wvar=.7+.6*(gn(pseg*vec2(1.,1.),uK,uAseg,sd+47u)*.5+.5);
+  float width=uWeight*m*wvar-.015;
+  float dh=d+uHair*.3*hn*(.45+.55*m)*smoothstep(.0,.08,width);
+  float aa=fwidth(dot(g,vec2(uK)))*1.5+.018;
+  float cov=1.-smoothstep(width-aa,width+aa,dh);
+  cov*=step(0.,width);
+  // dry-brush streaks inside the stroke, stronger toward its edges
+  float st=gn(vec2(ph*hx*2.,dot(uv,vec2(uAhair))*2.),uK*uHx*2,uAhair*2,sd+53u);
+  float edge=smoothstep(.15,.95,d/max(width,.001));
+  cov*=1.-clamp(uHair*.6*max(0.,st)*edge,0.,.75);
+  // soft shadow halo around strokes
+  float mh=smoothstep(uBreak-.35,uBreak+.3,s01);
+  float hw=max(uWeight*mh,.02)+.1+.4*uHalo;
+  float halo=(1.-smoothstep(0.,hw,d))*mh*uHalo;
+  float mot=fbm(uv,3,4,sd+61u), big=fbm(uv,1,2,sd+71u);
+  float dark=clamp(uMottle*(.45*mot+.45*big),-1.,1.);
+  // the print is a stack of six flat-colour layers blended Normal, so the layered export recombines exactly
+  float aMD=clamp(dark,0.,1.);
+  vec3 cLight=min(cGround*1.18+.02,vec3(1.));
+  float aML=clamp(-dark*.8,0.,1.);
+  float aH=clamp(halo*.75,0.,1.);
+  float sv=fbm(uv,7,2,sd+83u);
+  vec3 stripe=mix(cStripe,cMid,clamp(.1+.2*sv,0.,.5)*(.3+.7*edge));
+  float ph2=ph+.5;
+  vec2 ps2=vec2(ph2,dot(uv,vec2(uAseg)));
+  float s2=gn(ps2,uK,uAseg,sd+91u)*.8+.5;
+  float m2=smoothstep(uBreak+.05,uBreak+.4,s2);
+  float d2=abs(fract(ph2)-.5)*2.;
+  float w2=uWeight*.55*m2-.01;
+  float cov2=(1.-smoothstep(w2-.06,w2+.06,d2+uHair*.2*hn))*step(0.,w2)*uSec;
+  vec3 cSec=mix(cMid,cStripe,.35);
+  float aS=clamp(cov2,0.,1.)*.85;
+  float aT=clamp(cov,0.,1.);
+  if(uLayer>=0){
+    if(uLayer==0)o=vec4(cGround,1.);
+    else if(uLayer==1)o=vec4(cMid,aMD);
+    else if(uLayer==2)o=vec4(cLight,aML);
+    else if(uLayer==3)o=vec4(cMid,aH);
+    else if(uLayer==4)o=vec4(cSec,aS);
+    else o=vec4(aT>.002?stripe:cStripe,aT);
+    return;
+  }
+  vec3 col=cGround;
+  col=mix(col,cMid,aMD);col=mix(col,cLight,aML);col=mix(col,cMid,aH);col=mix(col,cSec,aS);col=mix(col,stripe,aT);
+  if(uMode==2){
+    float P=uTiles*16.;
+    float t=fract(sc.x*P);
+    float lit=t<.5?mix(.80,1.10,smoothstep(0.,.5,t)):mix(1.10,.70,smoothstep(.5,1.,t));
+    float crest=exp(-pow((t-.5)*28.,2.))*.18;
+    float sheen=.08*sin(sc.y*3.1+sc.x*1.7);
+    col=col*(lit+sheen)+crest*mix(vec3(1.),cGround,.4);
+  }
+  if(uGuides>.5&&uTiles>1.){
+    vec2 dd=min(fract(g),1.-fract(g))*uRes/uTiles;
+    float l=1.-smoothstep(.5,1.5,min(dd.x,dd.y));
+    col=mix(col,vec3(0.2,.85,.95),l*.85);
+  }
+  o=vec4(clamp(col,0.,1.),1.);
+}
+</script>
+
+<script>
+(()=>{
+const VERSION='0.5.0';
+const PRESETS=[
+  {name:'Reference bronze',ground:'#94714a',mid:'#55392a',stripe:'#15100c'},
+  {name:'Camel / espresso',ground:'#b48a5a',mid:'#6e4c30',stripe:'#2a1a10'},
+  {name:'Olive',ground:'#6f6a3e',mid:'#3f3a20',stripe:'#141309'},
+  {name:'Burgundy',ground:'#6e2a2e',mid:'#431519',stripe:'#120708'},
+  {name:'Ink navy',ground:'#2f3a52',mid:'#1b2233',stripe:'#07090e'},
+  {name:'Pewter',ground:'#8d8a84',mid:'#55524d',stripe:'#151413'},
+  {name:'Ivory / black',ground:'#e3dccd',mid:'#b9ae99',stripe:'#141210'},
+];
+const DEF={name:'Tiger Bronze',ground:PRESETS[0].ground,mid:PRESETS[0].mid,stripe:PRESETS[0].stripe,density:9,angle:62,weight:0.5,len:2.6,brk:0.36,warp:0.6,hair:1.0,sec:0.6,halo:0.75,mottle:0.8,seed:7,inches:18,dpi:300};
+let P={...DEF};
+let mode='grid', guides=false;
+
+const $=id=>document.getElementById(id);
+const REF_EMPTY='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="72" height="96"><rect width="72" height="96" fill="#d6d2ca"/><path d="M20 62l12-14 9 10 6-6 9 10z" fill="#a39d93"/><circle cx="46" cy="38" r="5" fill="#a39d93"/></svg>');
+const refImg=new Image();$('refimg').src=REF_EMPTY;
+
+// ---------- renderer ----------
+const rc=document.createElement('canvas');
+const gl=rc.getContext('webgl2',{preserveDrawingBuffer:true,antialias:false,premultipliedAlpha:false});
+if(!gl){document.querySelector('.canvasbox').innerHTML='<p class="err">This preview needs WebGL 2. Open the page in a current version of Chrome, Edge, Safari or Firefox.</p>';return;}
+const vs=`#version 300 es
+in vec2 p;void main(){gl_Position=vec4(p,0.,1.);}`;
+function sh(t,s){const x=gl.createShader(t);gl.shaderSource(x,s);gl.compileShader(x);if(!gl.getShaderParameter(x,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(x));return x;}
+const prog=gl.createProgram();
+gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs));gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,$('fs').textContent.trim()));
+gl.linkProgram(prog);gl.useProgram(prog);
+const buf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+const loc=gl.getAttribLocation(prog,'p');gl.enableVertexAttribArray(loc);gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+const U={};['uRes','uOrigin','uLayer','uTiles','uMode','uSeed','uK','uAseg','uAhair','uHx','uWeight','uBreak','uWarp','uHair','uHalo','uMottle','uGuides','uSec','cGround','cMid','cStripe'].forEach(n=>U[n]=gl.getUniformLocation(prog,n));
+const MAXR=gl.getParameter(gl.MAX_RENDERBUFFER_SIZE);
+const MAXV=gl.getParameter(gl.MAX_VIEWPORT_DIMS)[0];
+
+const hex2rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255);
+function vecs(p){
+  const th=p.angle*Math.PI/180, u=[Math.cos(th),Math.sin(th)], n=[-Math.sin(th),Math.cos(th)];
+  let K=[Math.round(p.density*n[0]),Math.round(p.density*n[1])]; if(!K[0]&&!K[1])K=[1,0];
+  const det=(a,b)=>a[0]*b[1]-a[1]*b[0];
+  const along=s=>{let A=[Math.round(u[0]*s),Math.round(u[1]*s)];if(!A[0]&&!A[1])A=[Math.round(u[0]*1.5)||1,Math.round(u[1]*1.5)];
+    if(det(K,A)===0)A=[A[0]+(K[1]?1:0),A[1]+(K[0]?1:0)]; if(det(K,A)===0)A=[-K[1],K[0]]; return A;};
+  const Kl=Math.hypot(K[0],K[1]);
+  return {K,Aseg:along(Kl/p.len),Ahair:along(Kl*0.3),Kl,ang:(Math.atan2(-K[0],K[1])*180/Math.PI+360)%180};
+}
+function setU(p,v,w,h,tiles,md,gd,layer){
+  gl.uniform2f(U.uRes,w,h);gl.uniform2f(U.uOrigin,0,0);gl.uniform1i(U.uLayer,layer??-1);
+  gl.uniform1f(U.uTiles,tiles);gl.uniform1i(U.uMode,md);gl.uniform1ui(U.uSeed,p.seed>>>0);
+  gl.uniform2i(U.uK,v.K[0],v.K[1]);gl.uniform2i(U.uAseg,v.Aseg[0],v.Aseg[1]);gl.uniform2i(U.uAhair,v.Ahair[0],v.Ahair[1]);gl.uniform1i(U.uHx,22);
+  gl.uniform1f(U.uWeight,p.weight);gl.uniform1f(U.uBreak,p.brk);gl.uniform1f(U.uWarp,p.warp*v.Kl/9);
+  gl.uniform1f(U.uHair,p.hair);gl.uniform1f(U.uHalo,p.halo);gl.uniform1f(U.uMottle,p.mottle);gl.uniform1f(U.uGuides,gd?1:0);gl.uniform1f(U.uSec,p.sec??0);
+  gl.uniform3fv(U.cGround,hex2rgb(p.ground));gl.uniform3fv(U.cMid,hex2rgb(p.mid));gl.uniform3fv(U.cStripe,hex2rgb(p.stripe));
+}
+function draw(p,w,h,tiles,md,gd){
+  rc.width=w;rc.height=h;gl.viewport(0,0,w,h);
+  const v=vecs(p);setU(p,v,w,h,tiles,md,gd,-1);
+  gl.drawArrays(gl.TRIANGLES,0,3);
+  return v;
+}
+// full-resolution render of one repeat in horizontal strips; hands back top-down RGBA rows
+const STRIP=256;
+async function renderStrips(p,W,layer,onRows){
+  const v=vecs(p);rc.width=W;rc.height=STRIP;setU(p,v,W,W,1,0,false,layer);
+  const buf=new Uint8Array(W*STRIP*4),out=new Uint8Array(W*STRIP*4);
+  for(let r0=0;r0<W;r0+=STRIP){
+    const h=Math.min(STRIP,W-r0);
+    if(rc.height!==h)rc.height=h;
+    gl.viewport(0,0,W,h);gl.uniform2f(U.uOrigin,0,W-r0-h);
+    gl.drawArrays(gl.TRIANGLES,0,3);
+    gl.readPixels(0,0,W,h,gl.RGBA,gl.UNSIGNED_BYTE,buf);
+    const row=W*4;for(let y=0;y<h;y++)out.set(buf.subarray((h-1-y)*row,(h-y)*row),y*row);
+    await onRows(out.subarray(0,h*row),r0,h);
+    await new Promise(r=>setTimeout(r,0));
+  }
+}
+
+// ---------- UI ----------
+const view=$('view'), vctx=view.getContext('2d');
+const sliders=['density','angle','weight','len','brk','warp','hair','sec','halo','mottle'];
+const fmt={density:v=>v,angle:v=>v+'°',weight:v=>(+v).toFixed(2),len:v=>(+v).toFixed(1),brk:v=>(+v).toFixed(2),warp:v=>(+v).toFixed(2),hair:v=>(+v).toFixed(2),sec:v=>(+v).toFixed(2),halo:v=>(+v).toFixed(2),mottle:v=>(+v).toFixed(2)};
+function syncUI(){
+  sliders.forEach(k=>{$(k).value=P[k];document.querySelector(`output[for=${k}]`).textContent=fmt[k](P[k]);});
+  ['ground','mid','stripe'].forEach(k=>{$('c-'+k).value=P[k];$('x-'+k).textContent=P[k].toUpperCase();});
+  $('seed').value=P.seed;$('dname').value=P.name||'';$('inches').value=P.inches;$('dpi').value=String(P.dpi);
+  document.querySelectorAll('.sw').forEach((b,i)=>b.setAttribute('aria-pressed',String(PRESETS[i].ground===P.ground&&PRESETS[i].mid===P.mid&&PRESETS[i].stripe===P.stripe)));
+  const px=Math.round(P.inches*P.dpi);
+  $('pxnote').textContent=`${P.inches}″ × ${P.inches}″ at ${P.dpi} dpi = ${px.toLocaleString()} × ${px.toLocaleString()} px, seamless on all four edges.`+(px>Math.min(MAXR,MAXV)?` This device can render up to ${Math.min(MAXR,MAXV)} px; lower the size or resolution.`:'');
+}
+let raf=0;
+function render(){cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{
+  const size=Math.min(1100,Math.round(view.clientWidth*(window.devicePixelRatio||1))||900);
+  view.width=size;view.height=size;
+  const tiles=mode==='tile'||mode==='cmp'?1:mode==='grid'?2:3;
+  let v;
+  if(mode==='cmp'){
+    const half=Math.floor(size/2);
+    vctx.fillStyle='#000';vctx.fillRect(0,0,size,size);
+    if(refImg.naturalWidth){const iw=refImg.naturalWidth,ih=refImg.naturalHeight,ar=half/size;
+      let sw=iw,sh=iw/ar;if(sh>ih){sh=ih;sw=ih*ar;}
+      vctx.drawImage(refImg,(iw-sw)/2,(ih-sh)/2,sw,sh,0,0,half,size);}
+    else{vctx.fillStyle='#2a2723';vctx.fillRect(0,0,half,size);vctx.fillStyle='#d8d2c8';vctx.font=`500 ${Math.round(size/40)}px Archivo, system-ui, sans-serif`;
+      vctx.fillText('Drop or upload a reference',Math.round(size/30),size/2);}
+    v=draw(P,half,size,1,0,false);vctx.drawImage(rc,half,0);
+    vctx.fillStyle='rgba(0,0,0,.55)';vctx.fillRect(0,size-34,size,34);
+    vctx.fillStyle='#fff';vctx.font=`600 ${Math.round(size/48)}px Archivo, system-ui, sans-serif`;
+    vctx.fillText('REFERENCE',14,size-12);vctx.fillText('GENERATED',half+14,size-12);
+  } else {
+    v=draw(P,size,size,tiles,mode==='pleat'?2:0,guides);
+    vctx.drawImage(rc,0,0);
+  }
+  $('m-stripes').textContent=`${v.Kl.toFixed(1)} stripes / repeat`;
+  $('m-angle').textContent=`angle ${v.ang.toFixed(1)}° (snapped for seamless)`;
+  $('m-repeat').textContent=mode==='cmp'?'reference vs. part of one repeat':`showing ${tiles}×${tiles} repeats`;
+});}
+let vt=0;function renderVarsSoon(){clearTimeout(vt);vt=setTimeout(renderVars,350);}
+let varSeeds=[];
+function newVarSeeds(){varSeeds=Array.from({length:6},()=>1+Math.floor(Math.random()*999999));}
+function renderVars(){
+  const g=$('vargrid');g.innerHTML='';
+  varSeeds.forEach(s=>{
+    const b=document.createElement('button');b.className='thumb';b.title='Use seed '+s;
+    const c=document.createElement('canvas');c.width=c.height=240;
+    draw({...P,seed:s},240,240,1,0,false);c.getContext('2d').drawImage(rc,0,0);
+    const t=document.createElement('span');t.textContent='seed '+s;
+    b.append(c,t);b.onclick=()=>{P.seed=s;syncUI();render();};
+    g.append(b);
+  });
+}
+const pr=$('presets');
+PRESETS.forEach(p=>{const b=document.createElement('button');b.className='sw';b.title=p.name;b.setAttribute('aria-label',p.name);
+  b.innerHTML=`<span style="background:${p.ground}"></span><span style="background:${p.mid}"></span><span style="background:${p.stripe}"></span>`;
+  b.onclick=()=>{Object.assign(P,{ground:p.ground,mid:p.mid,stripe:p.stripe});syncUI();render();renderVarsSoon();};pr.append(b);});
+sliders.forEach(k=>$(k).addEventListener('input',e=>{P[k]=+e.target.value;syncUI();render();renderVarsSoon();}));
+['ground','mid','stripe'].forEach(k=>$('c-'+k).addEventListener('input',e=>{P[k]=e.target.value;syncUI();render();renderVarsSoon();}));
+$('dname').addEventListener('input',e=>{P.name=e.target.value;});
+$('seed').addEventListener('change',e=>{P.seed=Math.max(1,Math.floor(+e.target.value)||1);syncUI();render();});
+$('shuffle').onclick=()=>{P.seed=1+Math.floor(Math.random()*999999);syncUI();render();};
+$('inches').addEventListener('change',e=>{P.inches=Math.min(36,Math.max(2,+e.target.value||18));syncUI();});
+$('dpi').addEventListener('change',e=>{P.dpi=+e.target.value;syncUI();});
+const modes={tile:'m-tile',grid:'m-grid',pleat:'m-pleat',cmp:'m-cmp'};
+Object.entries(modes).forEach(([m,id])=>$(id).onclick=()=>{mode=m;Object.entries(modes).forEach(([mm,ii])=>$(ii).setAttribute('aria-pressed',String(mm===m)));render();});
+$('guides').onchange=e=>{guides=e.target.checked;render();};
+$('morevars').onclick=()=>{newVarSeeds();renderVars();};
+new ResizeObserver(()=>render()).observe(view);
+
+// ---------- saving (Claude viewer or plain browser) ----------
+const status=t=>$('status').textContent=t;
+const refStatus=t=>$('refstatus').textContent=t;
+let dl=null;
+(async()=>{try{dl=await window.claude?.use?.('downloads');}catch(e){dl=null;}})();
+async function saveFile(filename,data){
+  if(dl){await dl.save({filename,data});return;}
+  const blob=data instanceof Blob?data:new Blob([data],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.append(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+const crcT=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xedb88320^(c>>>1):c>>>1;t[n]=c>>>0;}return t;})();
+const crc=b=>{let c=~0;for(const x of b)c=crcT[(c^x)&255]^(c>>>8);return (~c)>>>0;};
+function withDpi(bytes,dpi){ // insert a pHYs chunk after IHDR so print software reads the resolution
+  const ppm=Math.round(dpi/0.0254), ch=new Uint8Array(21), dv=new DataView(ch.buffer);
+  dv.setUint32(0,9);ch.set([112,72,89,115],4);dv.setUint32(8,ppm);dv.setUint32(12,ppm);ch[16]=1;dv.setUint32(17,crc(ch.subarray(4,17)));
+  const out=new Uint8Array(bytes.length+21);out.set(bytes.subarray(0,33));out.set(ch,33);out.set(bytes.subarray(33),54);return out;
+}
+const slug=t=>(t||'Tiger').trim().replace(/[^A-Za-z0-9]+/g,'-').replace(/^-|-$/g,'')||'Tiger';
+const fname=ext=>`RDPAI_${slug(P.name)}_s${P.seed}_${P.inches}in_${P.dpi}dpi.${ext}`;
+const errMsg=e=>e&&e.code==='declined'?'Save cancelled.':'Could not save the file ('+(e&&e.code||'error')+').';
+// ---------- encoders: PNG (streamed deflate), PSD (PackBits), ZIP ----------
+const crcUpd=(c,b)=>{for(let i=0;i<b.length;i++)c=crcT[(c^b[i])&255]^(c>>>8);return c;};
+const crcEnd=c=>(~c)>>>0;
+const be32=n=>{const b=new Uint8Array(4);new DataView(b.buffer).setUint32(0,n>>>0);return b;};
+function pngChunk(type,data){const t=new Uint8Array([...type].map(ch=>ch.charCodeAt(0)));
+  return [be32(data.length),t,data,be32(crcEnd(crcUpd(crcUpd(~0,t),data)))];}
+class PngWriter{
+  constructor(W,H,C,dpi){this.W=W;this.H=H;this.C=C;this.dpi=dpi;this.cs=new CompressionStream('deflate');this.w=this.cs.writable.getWriter();this.out=new Response(this.cs.readable).arrayBuffer();}
+  async rows(rgba,h){const W=this.W,C=this.C,L=W*C+1,f=new Uint8Array(h*L);
+    for(let y=0;y<h;y++){let o=y*L;f[o++]=1;const s0=y*W*4;
+      for(let c=0;c<C;c++)f[o+c]=rgba[s0+c];
+      for(let x=1;x<W;x++){const s=s0+x*4,q=o+x*C;for(let c=0;c<C;c++)f[q+c]=(rgba[s+c]-rgba[s-4+c])&255;}}
+    await this.w.write(f);}
+  async finish(){await this.w.close();const idat=new Uint8Array(await this.out);
+    const ih=new Uint8Array(13),dv=new DataView(ih.buffer);dv.setUint32(0,this.W);dv.setUint32(4,this.H);ih[8]=8;ih[9]=this.C===4?6:2;
+    const ppm=Math.round(this.dpi/0.0254),ph=new Uint8Array(9),dp=new DataView(ph.buffer);dp.setUint32(0,ppm);dp.setUint32(4,ppm);ph[8]=1;
+    return new Blob([new Uint8Array([137,80,78,71,13,10,26,10]),...pngChunk('IHDR',ih),...pngChunk('pHYs',ph),...pngChunk('IDAT',idat),...pngChunk('IEND',new Uint8Array(0))],{type:'image/png'});}
+}
+// PackBits one channel of one row (src = RGBA rows, channel c)
+function packRow(src,off,n,tmp){
+  let i=0,o=0;const at=k=>src[off+k*4];
+  while(i<n){
+    let j=i+1;const v=at(i);while(j<n&&j-i<128&&at(j)===v)j++;
+    if(j-i>=3){tmp[o++]=(257-(j-i))&255;tmp[o++]=v;i=j;}
+    else{let k=i;while(k<n&&k-i<128){if(k+2<n&&at(k)===at(k+1)&&at(k)===at(k+2))break;k++;}
+      tmp[o++]=k-i-1;for(let t=i;t<k;t++)tmp[o++]=at(t);i=k;}
+  }
+  return tmp.slice(0,o);
+}
+class PsdChannels{ // RLE-compressed channels for one layer (or the merged image)
+  constructor(W,H,chans){this.W=W;this.H=H;this.chans=chans;this.counts=chans.map(()=>new Uint16Array(H));this.parts=chans.map(()=>[]);this.len=chans.map(()=>0);this.tmp=new Uint8Array(W*2+16);}
+  rows(rgba,y0,h){const W=this.W;
+    for(let y=0;y<h;y++)this.chans.forEach((c,ci)=>{const src=c<0?3:c;const r=packRow(rgba,y*W*4+src,W,this.tmp);
+      this.counts[ci][y0+y]=r.length;this.parts[ci].push(r);this.len[ci]+=r.length;});}
+  chanBlobParts(ci){const cnt=new Uint8Array(this.H*2),dv=new DataView(cnt.buffer);this.counts[ci].forEach((n,i)=>dv.setUint16(i*2,n));return [cnt,...this.parts[ci]];}
+}
+function buildPsd(W,H,dpi,layers,merged){
+  const parts=[];const u16=n=>{const b=new Uint8Array(2);new DataView(b.buffer).setInt16(0,n);return b;};
+  const hdr=new Uint8Array(26),hv=new DataView(hdr.buffer);hdr.set([56,66,80,83]);hv.setUint16(4,1);hv.setUint16(12,3);hv.setUint32(14,H);hv.setUint32(18,W);hv.setUint16(22,8);hv.setUint16(24,3);
+  parts.push(hdr,be32(0));
+  // image resources: ResolutionInfo (0x03ED) so Photoshop opens at the right ppi
+  const ri=new Uint8Array(16),rv=new DataView(ri.buffer);rv.setUint32(0,Math.round(dpi*65536));rv.setUint16(4,1);rv.setUint16(6,1);rv.setUint32(8,Math.round(dpi*65536));rv.setUint16(12,1);rv.setUint16(14,1);
+  const res=[new Uint8Array([56,66,73,77,0x03,0xED,0,0]),be32(16),ri];
+  parts.push(be32(28),...res);
+  // layer records
+  const recs=[],data=[];let infoLen=2;
+  layers.forEach(L=>{
+    const nm=[...L.name].map(ch=>ch.charCodeAt(0)&127);let nl=1+nm.length;while(nl%4)nl++;
+    const name=new Uint8Array(nl);name[0]=nm.length;name.set(nm,1);
+    const r=[be32(0),be32(0),be32(H),be32(W),u16(4)];
+    L.ch.chans.forEach((c,ci)=>{r.push(u16(c),be32(2+H*2+L.ch.len[ci]));});
+    r.push(new Uint8Array([56,66,73,77,110,111,114,109,255,0,0,0]),be32(8+nl),be32(0),be32(0),name);
+    recs.push(...r);infoLen+=r.reduce((t,b)=>t+b.length,0);
+    L.ch.chans.forEach((c,ci)=>{data.push(u16(1),...L.ch.chanBlobParts(ci));infoLen+=2+H*2+L.ch.len[ci];});
+  });
+  const pad=infoLen%2?[new Uint8Array(1)]:[];infoLen+=pad.length;
+  parts.push(be32(4+infoLen+4),be32(infoLen),u16(layers.length),...recs,...data,...pad,be32(0));
+  // merged composite
+  parts.push(u16(1));merged.chans.forEach((c,ci)=>{const cnt=merged.chanBlobParts(ci)[0];parts.push(cnt);});
+  merged.chans.forEach((c,ci)=>parts.push(...merged.parts[ci]));
+  return new Blob(parts,{type:'image/vnd.adobe.photoshop'});
+}
+async function blobCrc(blob){let c=~0;const rd=blob.stream().getReader();for(;;){const {done,value}=await rd.read();if(done)break;c=crcUpd(c,value);}return crcEnd(c);}
+async function makeZip(entries,onStep){
+  const parts=[],cen=[];let off=0;const now=new Date();
+  const dt=((now.getHours()<<11)|(now.getMinutes()<<5)|(now.getSeconds()>>1))&0xffff,dd=(((now.getFullYear()-1980)<<9)|((now.getMonth()+1)<<5)|now.getDate())&0xffff;
+  for(const e of entries){
+    onStep&&onStep(e.name);
+    const crcv=await blobCrc(e.blob);
+    const body=e.deflate?await new Response(e.blob.stream().pipeThrough(new CompressionStream('deflate-raw'))).blob():e.blob;
+    const nm=new TextEncoder().encode(e.name);
+    const lh=new Uint8Array(30+nm.length),lv=new DataView(lh.buffer);
+    lv.setUint32(0,0x04034b50,true);lv.setUint16(4,20,true);lv.setUint16(6,0x0800,true);lv.setUint16(8,e.deflate?8:0,true);lv.setUint16(10,dt,true);lv.setUint16(12,dd,true);
+    lv.setUint32(14,crcv,true);lv.setUint32(18,body.size,true);lv.setUint32(22,e.blob.size,true);lv.setUint16(26,nm.length,true);lh.set(nm,30);
+    const ch=new Uint8Array(46+nm.length),cv=new DataView(ch.buffer);
+    cv.setUint32(0,0x02014b50,true);cv.setUint16(4,20,true);cv.setUint16(6,20,true);cv.setUint16(8,0x0800,true);cv.setUint16(10,e.deflate?8:0,true);cv.setUint16(12,dt,true);cv.setUint16(14,dd,true);
+    cv.setUint32(16,crcv,true);cv.setUint32(20,body.size,true);cv.setUint32(24,e.blob.size,true);cv.setUint16(28,nm.length,true);cv.setUint32(42,off,true);ch.set(nm,46);
+    parts.push(lh,body);cen.push(ch);off+=lh.length+body.size;
+  }
+  const cs=cen.reduce((t,b)=>t+b.length,0),eo=new Uint8Array(22),ev=new DataView(eo.buffer);
+  ev.setUint32(0,0x06054b50,true);ev.setUint16(8,entries.length,true);ev.setUint16(10,entries.length,true);ev.setUint32(12,cs,true);ev.setUint32(16,off,true);
+  return new Blob([...parts,...cen,eo],{type:'application/zip'});
+}
+const LAYERS=['01 Ground','02 Ground shadow mottle','03 Ground highlight mottle','04 Stroke halo','05 Shadow strokes','06 Main stripes'];
+let busy=false;
+function sizeCheck(){const px=Math.round(P.inches*P.dpi),lim=Math.min(MAXR,MAXV);
+  if(px>lim){status(`That repeat needs ${px} px; this device tops out at ${lim}. Lower the size or resolution.`);return 0;}return px;}
+function setBusy(b){busy=b;['savepkg','savepng'].forEach(id=>$(id).disabled=b);}
+$('savepng').onclick=async()=>{
+  if(busy)return;const px=sizeCheck();if(!px)return;setBusy(true);
+  try{
+    const pw=new PngWriter(px,px,3,P.dpi);
+    await renderStrips(P,px,-1,async(rows,y0,h)=>{await pw.rows(rows,h);status(`Rendering ${Math.round((y0+h)/px*100)}%…`);});
+    const png=await pw.finish();render();
+    await saveFile(fname('png'),png);status('Saved '+fname('png'));
+  }catch(e){render();status(errMsg(e));}finally{setBusy(false);}
+};
+function specText(base,px){
+  const v=vecs(P),light=toHex(hex2rgb(P.ground).map(c=>Math.min(1,c*1.18+.02)*255)),sec=toHex(hex2rgb(P.mid).map((c,i)=>(c*.65+hex2rgb(P.stripe)[i]*.35)*255));
+  return `RD PATTERN AI — PRINT SPEC
+Design:        ${P.name||'Untitled'}
+Print family:  Tiger stripe (procedural, original)
+Generated:     ${new Date().toISOString().slice(0,16).replace('T',' ')} · RD Pattern AI v${VERSION}
+
+REPEAT
+Size:          ${P.inches} x ${P.inches} in  (${px} x ${px} px @ ${P.dpi} dpi)
+Repeat type:   Full drop (straight), seamless on all four edges
+Stripes:       ${v.Kl.toFixed(1)} bands per repeat at ${v.ang.toFixed(1)} deg
+Seed:          ${P.seed}
+
+COLOURWAY
+Ground         ${P.ground.toUpperCase()}
+Shadow         ${P.mid.toUpperCase()}
+Stripe         ${P.stripe.toUpperCase()}
+Highlight      ${light.toUpperCase()}   (derived from ground)
+Shadow stroke  ${sec.toUpperCase()}   (derived: 65% shadow + 35% stripe)
+
+LAYERS (bottom to top, all Normal 100%)
+01 Ground                    solid ground colour, opaque
+02 Ground shadow mottle      shadow colour, soft transparency
+03 Ground highlight mottle   highlight colour, soft transparency
+04 Stroke halo               shadow colour, soft glow around strokes
+05 Shadow strokes            shadow-stroke colour, mid-tone brush strokes
+06 Main stripes              stripe colour with slight tonal variation (dry brush)
+
+Layers 01-05 are each a single flat colour with transparency, so a colourway
+change is a fill or Color Overlay per layer. Layer 06 carries a little tonal
+texture inside the strokes; use Color Overlay or Hue/Saturation to recolour it.
+Stacked in order they rebuild the composite exactly.
+
+FILES
+${base}_LAYERED.psd        layered Photoshop file (RGB, 8-bit, ${P.dpi} ppi)
+${base}_COMPOSITE.png      flattened repeat for the mill
+layers/*.png               each layer as a transparent PNG, same size and position
+${base}_preview_2x2.jpg    2 x 2 repeat preview for review / email
+${base}_recipe.json        load into RD Pattern AI to regenerate or recolour exactly
+
+Colours are on-screen sRGB values. Confirm against a lab dip or strike-off before bulk.
+`;}
+$('savepkg').onclick=async()=>{
+  if(busy)return;const px=sizeCheck();if(!px)return;
+  if(typeof CompressionStream==='undefined'){status('This browser cannot build the package. Use a current Chrome, Edge or Safari.');return;}
+  setBusy(true);
+  const base=`RDPAI_${slug(P.name)}_s${P.seed}_${P.inches}in_${P.dpi}dpi`;
+  try{
+    const entries=[],psdLayers=[];let merged;
+    const passes=[{layer:-1,label:'composite'},...LAYERS.map((n,i)=>({layer:i,label:n}))];
+    for(let k=0;k<passes.length;k++){
+      const ps=passes[k],isC=ps.layer<0;
+      const pw=new PngWriter(px,px,isC?3:4,P.dpi),pc=new PsdChannels(px,px,isC?[0,1,2]:[-1,0,1,2]);
+      await renderStrips(P,px,ps.layer,async(rows,y0,h)=>{pc.rows(rows,y0,h);await pw.rows(rows,h);
+        status(`Layer ${k+1} of ${passes.length} (${ps.label}): ${Math.round((y0+h)/px*100)}%`);});
+      const png=await pw.finish();
+      if(isC){merged=pc;entries.push({name:`${base}/${base}_COMPOSITE.png`,blob:png});}
+      else{psdLayers.push({name:ps.label,ch:pc});entries.push({name:`${base}/layers/${ps.label.replace(/ /g,'_')}.png`,blob:png});}
+    }
+    status('Building layered PSD…');await new Promise(r=>setTimeout(r,20));
+    const psd=buildPsd(px,px,P.dpi,psdLayers,merged);
+    draw(P,1600,1600,2,0,false);
+    const prev=await new Promise(r=>rc.toBlob(r,'image/jpeg',.88));
+    render();
+    entries.unshift({name:`${base}/${base}_LAYERED.psd`,blob:psd,deflate:true});
+    entries.push({name:`${base}/${base}_preview_2x2.jpg`,blob:prev});
+    entries.push({name:`${base}/${base}_recipe.json`,blob:new Blob([JSON.stringify(recipe(P),null,2)]),deflate:true});
+    entries.push({name:`${base}/README_SPEC.txt`,blob:new Blob([specText(base,px).replace(/\n/g,'\r\n')]),deflate:true});
+    const zip=await makeZip(entries,n=>status('Packing '+n.split('/').pop()+'…'));
+    status(`Package ready (${(zip.size/1048576).toFixed(1)} MB). Saving…`);
+    await saveFile(base+'.zip',zip);status(`Saved ${base}.zip (${(zip.size/1048576).toFixed(1)} MB).`);
+  }catch(e){console.error(e);render();status(e&&e.code?errMsg(e):'Could not build the package ('+(e&&e.message||'error')+').');}
+  finally{setBusy(false);}
+};
+const recipe=p=>({tool:'RD Pattern AI',version:VERSION,print:'tiger-stripe',params:p});
+$('saverec').onclick=async()=>{
+  try{await saveFile(fname('json'),JSON.stringify(recipe(P),null,2));status('Saved recipe '+fname('json'));}catch(e){status(errMsg(e));}
+};
+function applyParams(p){Object.keys(DEF).forEach(k=>{if(p[k]!==undefined)P[k]=p[k];});syncUI();render();renderVarsSoon();}
+$('loadrec').onclick=()=>$('recfile').click();
+$('recfile').onchange=async e=>{const f=e.target.files[0];if(!f)return;
+  try{const r=JSON.parse(await f.text());const p=r.params||r;applyParams(p);status('Loaded '+f.name);}
+  catch(err){status('That file is not an RD Pattern AI recipe.');}
+  e.target.value='';};
+
+// ---------- reference ----------
+function setReference(src,name){
+  refImg.onload=()=>{render();};refImg.src=src;$('refimg').src=src;$('refname').textContent=name;refStatus('');
+}
+function loadRefFile(f){
+  if(!f||!f.type.startsWith('image/')){refStatus('That file is not an image. Use a JPG, PNG or WebP photo.');return;}
+  const r=new FileReader();r.onload=()=>setReference(r.result,f.name);r.readAsDataURL(f);
+}
+$('refup').onclick=()=>$('reffile').click();
+$('reffile').onchange=e=>{loadRefFile(e.target.files[0]);e.target.value='';};
+const box=document.querySelector('.canvasbox');
+['dragenter','dragover'].forEach(ev=>box.addEventListener(ev,e=>{e.preventDefault();box.classList.add('drop');}));
+['dragleave','drop'].forEach(ev=>box.addEventListener(ev,e=>{e.preventDefault();box.classList.remove('drop');}));
+box.addEventListener('drop',e=>loadRefFile(e.dataTransfer.files[0]));
+document.addEventListener('paste',e=>{const f=[...(e.clipboardData?.files||[])][0];if(f)loadRefFile(f);});
+
+const toHex=c=>'#'+c.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0')).join('');
+const lum=c=>.2126*c[0]+.7152*c[1]+.0722*c[2];
+function extractPalette(img){ // k-means on the centre of the photo, then ground / shadow / stripe by lightness
+  const N=96,c=document.createElement('canvas');c.width=c.height=N;const x=c.getContext('2d',{willReadFrequently:true});
+  const iw=img.naturalWidth,ih=img.naturalHeight,s=Math.min(iw,ih)*.7;
+  x.drawImage(img,(iw-s)/2,(ih-s)/2,s,s,0,0,N,N);
+  const d=x.getImageData(0,0,N,N).data,px=[];for(let i=0;i<d.length;i+=4)px.push([d[i],d[i+1],d[i+2]]);
+  px.sort((a,b)=>lum(a)-lum(b));
+  // percentile bands: darkest strokes, mid-tone shadow, lit ground (ignores specular highlights at the top end)
+  const band=(lo,hi)=>{const A=px.slice(Math.floor(lo*px.length),Math.max(Math.floor(lo*px.length)+1,Math.floor(hi*px.length)));
+    return [0,1,2].map(i=>A.reduce((t,p)=>t+p[i],0)/A.length);};
+  const stripe=band(0,.06),mid=band(.3,.42),ground=band(.66,.86);
+  return {ground:toHex(ground),mid:toHex(mid),stripe:toHex(stripe)};
+}
+$('refcols').onclick=()=>{
+  if(!refImg.naturalWidth){refStatus('Add a reference photo first.');return;}
+  const pal=extractPalette(refImg);Object.assign(P,pal);syncUI();render();renderVarsSoon();
+  refStatus(`Pulled ${pal.ground.toUpperCase()} / ${pal.mid.toUpperCase()} / ${pal.stripe.toUpperCase()} from the photo. Lighting shifts colour, so check against the physical swatch.`);
+};
+
+// ---------- Match with Claude: inside Claude (viewer's account) or direct to the Anthropic API with this workstation's key ----------
+let sample=null, matchVia=null;
+const inClaude=!!window.claude;
+const KKEY='rdpai.apikey', KMODEL='rdpai.model';
+const lsGet=k=>{try{return localStorage.getItem(k)||'';}catch(e){return '';}};
+const lsSet=(k,v)=>{try{v?localStorage.setItem(k,v):localStorage.removeItem(k);return true;}catch(e){return false;}};
+function refreshMatch(){
+  if(inClaude&&sample){matchVia='claude';}
+  else matchVia=lsGet(KKEY)?'key':null;
+  $('match').hidden=!matchVia;
+  $('keybox').hidden=inClaude&&!!sample;
+  const k=lsGet(KKEY);$('keystate').textContent=k?'· saved (…'+k.slice(-4)+')':'· not set';
+}
+(async()=>{
+  if(inClaude){try{sample=await window.claude.use('sample');const lim=sample?await sample.limits().catch(()=>null):null;if(!(lim&&lim.images))sample=null;}catch(e){sample=null;}}
+  refreshMatch();
+})();
+$('apimodel').value=lsGet(KMODEL)||'claude-sonnet-5-5';
+$('apimodel').onchange=e=>lsSet(KMODEL,e.target.value);
+$('keysave').onclick=()=>{const v=$('apikey').value.trim();
+  if(!/^sk-ant-[A-Za-z0-9_\-]{20,}$/.test(v)){refStatus('That does not look like an Anthropic API key (it starts with sk-ant-).');return;}
+  refStatus(lsSet(KKEY,v)?'Key saved in this browser. Match with Claude is ready.':'This browser is blocking saved data, so the key could not be stored.');
+  $('apikey').value='';$('keybox').open=false;refreshMatch();};
+$('keyclear').onclick=()=>{lsSet(KKEY,'');$('apikey').value='';refreshMatch();refStatus('Key removed from this browser.');};
+async function askAnthropic(img,prompt){
+  const b64=await new Promise(res=>{const fr=new FileReader();fr.onload=()=>res(String(fr.result).split(',')[1]);fr.readAsDataURL(img);});
+  const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':lsGet(KKEY),'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+    body:JSON.stringify({model:lsGet(KMODEL)||'claude-sonnet-5-5',max_tokens:1024,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},{type:'text',text:prompt}]}]})});
+  const j=await r.json().catch(()=>({}));
+  if(!r.ok){const t=j?.error?.type||'';throw {code:r.status===401||t==='authentication_error'?'bad_key':r.status===429||r.status===529?'rate_limited':r.status===400&&/credit|billing/i.test(j?.error?.message||'')?'no_credit':'upstream_error',message:j?.error?.message||''};}
+  const text=(j.content||[]).filter(x=>x.type==='text').map(x=>x.text).join('');
+  try{return JSON.parse(text.slice(text.indexOf('{'),text.lastIndexOf('}')+1));}catch(e){throw {code:'invalid_json'};}
+}
+function refBlob(){return new Promise(res=>{const c=document.createElement('canvas');const m=1024/Math.max(refImg.naturalWidth,refImg.naturalHeight,1);
+  c.width=Math.max(1,Math.round(refImg.naturalWidth*Math.min(1,m)));c.height=Math.max(1,Math.round(refImg.naturalHeight*Math.min(1,m)));
+  c.getContext('2d').drawImage(refImg,0,0,c.width,c.height);c.toBlob(res,'image/jpeg',.9);});}
+const RANGES={density:[4,22],angle:[0,180],weight:[.12,.7],len:[1,8],brk:[0,.75],warp:[0,3],hair:[0,1.5],sec:[0,1],halo:[0,1],mottle:[0,1.2]};
+const curParams=()=>Object.fromEntries(Object.keys(RANGES).map(k=>[k,P[k]]).concat([['ground',P.ground],['mid',P.mid],['stripe',P.stripe]]));
+const matchPrompt=cur=>`You are tuning a procedural textile print generator so its output resembles the print in the attached reference photo (a garment or fabric). The generator draws brush-stroke animal stripes (tiger-style) on a mottled ground. Look only at the print itself; ignore pleats, folds, lighting and surrounding garments.
+
+Parameters (stay inside the ranges):
+- density 4-22: number of stripe bands across one 18 inch repeat (integer). Judge from the stripe spacing relative to the garment.
+- angle 0-180: direction of the stroke's long axis in degrees, counter-clockwise from horizontal as seen in the photo (90 = vertical, 45 = rising to the right like "/", 135 = "\\").
+- weight 0.12-0.7: stroke thickness as a fraction of stripe spacing.
+- len 1-8: stroke length in stripe spacings before it breaks.
+- brk 0-0.75: how broken up / gappy strokes are (higher = shorter, more separate strokes).
+- warp 0-3: curvature / flow of the stripes (0 = straight).
+- hair 0-1.5: dry-brush hairiness of stroke edges.
+- sec 0-1: amount of secondary, softer mid-tone strokes between the main strokes.
+- halo 0-1: soft dark shadow glow around strokes.
+- mottle 0-1.2: cloudy tonal variation in the ground.
+- ground, mid, stripe: hex colours for the ground, the mid-tone shadow, and the darkest stroke colour as the print would be on flat fabric (correct for lighting).
+
+Current settings: ${JSON.stringify(cur)}
+
+Reply with only one JSON object with exactly these keys: density, angle, weight, len, brk, warp, hair, sec, halo, mottle, ground, mid, stripe, notes (notes = one short sentence describing the print you see).`;
+$('match').onclick=async()=>{
+  if(!matchVia)return;
+  if(!refImg.naturalWidth){refStatus('Add a reference photo first.');return;}
+  const btn=$('match');btn.disabled=true;refStatus('Claude is studying the reference…');
+  try{
+    const img=await refBlob();
+    const out=matchVia==='claude'?await sample.json(matchPrompt(curParams()),{images:img}):await askAnthropic(img,matchPrompt(curParams()));
+    const p={};
+    Object.entries(RANGES).forEach(([k,[lo,hi]])=>{const v=Number(out?.[k]);if(Number.isFinite(v))p[k]=Math.min(hi,Math.max(lo,k==='density'||k==='angle'?Math.round(v):Math.round(v*100)/100));});
+    ['ground','mid','stripe'].forEach(k=>{if(/^#[0-9a-fA-F]{6}$/.test(out?.[k]||''))p[k]=out[k].toLowerCase();});
+    applyParams(p);
+    refStatus('Claude set the print'+(out?.notes?': '+String(out.notes).slice(0,200):'.')+' Fine-tune with the sliders.');
+  }catch(e){
+    const m={not_granted:'Claude was not allowed for this page.',rate_limited:'Too many requests just now. Try again in a minute.',invalid_json:'Claude did not return usable settings. Try again.',
+      image_rejected:'Claude could not read that image. Try a different photo.',bad_key:'The API key was refused. Check it under Claude API key.',
+      no_credit:'The Anthropic account has no credit left. Top it up in the Anthropic console.',cancelled:''};
+    if(['not_granted','sampling_disabled','images_unavailable','not_declared','capability_disabled','capability_removed'].includes(e?.code))btn.hidden=true;
+    refStatus(m[e?.code]??'Claude could not finish ('+(e?.code||'error')+(e?.message?': '+String(e.message).slice(0,120):'')+'). Try again.');
+  }finally{btn.disabled=false;}
+};
+
+// ---------- design board (this browser) ----------
+const BKEY='rdpai.board.v1';
+const loadBoard=()=>{try{return JSON.parse(localStorage.getItem(BKEY)||'[]');}catch(e){return [];}};
+const storeBoard=b=>{try{localStorage.setItem(BKEY,JSON.stringify(b));return true;}catch(e){return false;}};
+function renderBoard(){
+  const g=$('boardgrid'),b=loadBoard();g.innerHTML='';
+  if(!b.length){const p=document.createElement('p');p.className='board-empty';p.style.gridColumn='1/-1';p.textContent='Nothing saved yet. Use "Add to board" to keep designs you like; click one to bring it back.';g.append(p);return;}
+  b.forEach((it,i)=>{
+    const w=document.createElement('div');w.className='bitem';
+    const t=document.createElement('button');t.className='thumb';t.title='Load '+it.params.name;
+    const im=document.createElement('img');im.src=it.thumb;im.alt='';im.style.cssText='width:100%;aspect-ratio:1/1;display:block;object-fit:cover';
+    const sp=document.createElement('span');const bb=document.createElement('b');bb.textContent=it.params.name||'Untitled';sp.append(bb,document.createTextNode('seed '+it.params.seed));
+    t.append(im,sp);t.onclick=()=>{applyParams(it.params);status('Loaded '+(it.params.name||'design')+' from the board.');};
+    const x=document.createElement('button');x.className='x';x.textContent='×';x.setAttribute('aria-label','Remove '+(it.params.name||'design'));
+    x.onclick=()=>{const nb=loadBoard();nb.splice(i,1);storeBoard(nb);renderBoard();};
+    w.append(t,x);g.append(w);
+  });
+}
+$('addboard').onclick=()=>{
+  draw(P,200,200,1,0,false);const thumb=rc.toDataURL('image/jpeg',.8);render();
+  const b=loadBoard();b.unshift({params:{...P},thumb,at:Date.now()});
+  status(storeBoard(b.slice(0,48))?'Added '+(P.name||'design')+' to the board.':'This browser is not keeping saved data. Use "Save recipe" instead.');renderBoard();
+};
+$('exportboard').onclick=async()=>{
+  const b=loadBoard();if(!b.length){status('The board is empty.');return;}
+  try{await saveFile(`RDPAI_board_${new Date().toISOString().slice(0,10)}.json`,JSON.stringify({tool:'RD Pattern AI',version:VERSION,designs:b.map(x=>recipe(x.params))},null,2));status('Exported '+b.length+' designs.');}catch(e){status(errMsg(e));}
+};
+
+$('ver').textContent='v'+VERSION;
+syncUI();newVarSeeds();varSeeds[0]=DEF.seed;render();renderVars();renderBoard();
+window.__ps={P,draw,rc,render,extractPalette,refImg};
+})();
+</script>
+
+</body></html>
