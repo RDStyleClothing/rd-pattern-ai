@@ -1,5 +1,4 @@
-<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>RD Pattern AI</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -101,7 +100,7 @@ input[type=range]{width:100%;accent-color:var(--accent)}
 <div class="wrap">
   <header>
     <div>
-      <div class="brand"><h1>RD Pattern AI</h1><span class="pill" id="ver">v1.0.0</span></div>
+      <div class="brand"><h1>RD Pattern AI</h1><span class="pill" id="ver">v1.0.1</span></div>
       <p class="sub">Generate original prints in the spirit of a customer reference. Drop in a reference photo, pull its colours, let Claude set the stripe, then save a seamless repeat at print resolution.</p>
     </div>
     <div class="conn">
@@ -318,7 +317,7 @@ void main(){
 
 <script>
 (()=>{
-const VERSION='1.0.0';
+const VERSION='1.0.1';
 const PRESETS=[
   {name:'Reference bronze',ground:'#94714a',mid:'#55392a',stripe:'#15100c'},
   {name:'Camel / espresso',ground:'#b48a5a',mid:'#6e4c30',stripe:'#2a1a10'},
@@ -518,7 +517,7 @@ class PsdChannels{ // RLE-compressed channels for one layer (or the merged image
   rows(rgba,y0,h){const W=this.W;
     for(let y=0;y<h;y++)this.chans.forEach((c,ci)=>{const src=c<0?3:c;const r=packRow(rgba,y*W*4+src,W,this.tmp);
       this.counts[ci][y0+y]=r.length;this.parts[ci].push(r);this.len[ci]+=r.length;});}
-  chanBlobParts(ci){const cnt=new Uint8Array(this.H*2),dv=new DataView(cnt.buffer);this.counts[ci].forEach((n,i)=>dv.setUint16(i*2,n));return [cnt,...this.parts[ci]];}
+  chanBlobParts(ci){const cnt=new Uint8Array(this.H*2),dv=new DataView(cnt.buffer);this.counts[ci].forEach((n,i)=>dv.setUint16(i*2,n));return [cnt,new Blob(this.parts[ci])];}
 }
 function buildPsd(W,H,dpi,layers,merged){
   const parts=[];const u16=n=>{const b=new Uint8Array(2);new DataView(b.buffer).setInt16(0,n);return b;};
@@ -537,13 +536,13 @@ function buildPsd(W,H,dpi,layers,merged){
     L.ch.chans.forEach((c,ci)=>{r.push(u16(c),be32(2+H*2+L.ch.len[ci]));});
     r.push(new Uint8Array([56,66,73,77,110,111,114,109,255,0,0,0]),be32(8+nl),be32(0),be32(0),name);
     recs.push(...r);infoLen+=r.reduce((t,b)=>t+b.length,0);
-    L.ch.chans.forEach((c,ci)=>{data.push(u16(1),...L.ch.chanBlobParts(ci));infoLen+=2+H*2+L.ch.len[ci];});
+    L.ch.chans.forEach((c,ci)=>{data.push(u16(1));for(const b of L.ch.chanBlobParts(ci))data.push(b);infoLen+=2+H*2+L.ch.len[ci];});
   });
   const pad=infoLen%2?[new Uint8Array(1)]:[];infoLen+=pad.length;
-  parts.push(be32(4+infoLen+4),be32(infoLen),u16(layers.length),...recs,...data,...pad,be32(0));
+  parts.push(be32(4+infoLen+4),be32(infoLen),u16(layers.length));for(const b of recs)parts.push(b);for(const b of data)parts.push(b);for(const b of pad)parts.push(b);parts.push(be32(0));
   // merged composite
   parts.push(u16(1));merged.chans.forEach((c,ci)=>{const cnt=merged.chanBlobParts(ci)[0];parts.push(cnt);});
-  merged.chans.forEach((c,ci)=>parts.push(...merged.parts[ci]));
+  merged.chans.forEach((c,ci)=>parts.push(merged.chanBlobParts(ci)[1]));
   return new Blob(parts,{type:'image/vnd.adobe.photoshop'});
 }
 async function blobCrc(blob){let c=~0;const rd=blob.stream().getReader();for(;;){const {done,value}=await rd.read();if(done)break;c=crcUpd(c,value);}return crcEnd(c);}
